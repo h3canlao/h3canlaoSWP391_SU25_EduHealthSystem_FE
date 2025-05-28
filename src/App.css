@@ -1,0 +1,172 @@
+#root {
+  /* max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center; */
+  margin: 0;
+  padding: 0;
+}
+
+.app-container .header-container .navbar-nav .nav-link.active {
+  color: #00bfff;
+}
+
+.green {
+  color: green;
+}
+.red {
+  color: red;
+}
+
+.App {
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.content-container {
+  padding: 15px;
+}
+
+header {
+  max-height: 80px;
+  background: lightcyan;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+footer {
+  min-height: 50px;
+  background: PapayaWhip;
+  margin-top: auto;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo {
+  height: 3em;
+  padding: .5em;
+  will-change: filter;
+}
+
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+video {
+  position: fixed;
+  bottom: 0;
+  width: 100vw;
+}
+
+.navbar {
+  z-index: 10;
+  background-color: rgba(0, 0, 0, 0)!important;
+}
+
+button.btn-login {
+  border-radius: 5px;
+  margin-right: 15px;
+  padding: 0 15px;
+  border: 1px solid #535353
+}
+
+button.btn-signup {
+  border-radius: 5px;
+  margin-right: 15px;
+  padding: 0 15px;
+  border: 1px solid white;
+  background-color: #303030;
+  color: white;
+}
+
+button.btn-signup {
+  border-radius: 5px;
+  margin-right: 15px;
+  padding: 0 15px;
+  border: 1px solid white;
+  background-color: #303030;
+  color: white;
+}
+
+button.btn-signup:hover {
+  background-color: black;
+}
+
+@media (min-width: 1200px) {
+  .container, .container-lg, .container-md, .container-sm, .container-xl {
+      max-width: 1815px;}
+.homepage-content {
+  position:  relative;
+  padding: 200px;
+  display: flex;
+  width: 50%;
+  flex-direction: column;
+  gap: 30px;
+}
+.title-1 {
+  font-size: 40px;
+  font-weight: 600;
+}
+.title-2 {
+  font-size: 25;
+}
+
+.title-3.button {
+  font-size: 25px;
+  border-radius: 5px;
+  margin-right: 15px;
+  padding: 0 15px;
+  border: 1px solid white;
+  color: white;
+  background-color: black;
+}
+
+button.submit-1  {
+  border-radius: 5px;
+  margin-right: 15px;
+  padding: 8px 15px;
+  border: 1px solid white;
+  background-color: #303030;
+  color: white;
+
+}
+
+.submit-1 {
+  background-color: black;
+  
+}
+
