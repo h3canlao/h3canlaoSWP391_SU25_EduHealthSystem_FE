@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import './Signin.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import { postSignin } from '../../services/apiServices';
 
 const Signin = () => {
     const navigate = useNavigate();
@@ -24,8 +25,19 @@ const Signin = () => {
             toast.error('Password must be at least 8 characters long, include a number and an uppercase letter!');
             return;
         }
-        navigate('/');
+
+        let res = await postSignin(email, password);
+        console.log(res);
+        if (res.data.isSuccess) {
+            toast.success('Sign in successful!');
+            navigate('/');
+        } else {
+            toast.error(res.data.message);
+        }
+
     };
+
+
 
     const handleForgotPasswordClick = () => {
         setFormState('login-form-change-atene'); 
@@ -37,15 +49,15 @@ const Signin = () => {
 
     return (
         <>
-            <img className="wave-atene" src="public/wave.png" alt="Wave"/>
+            <img className="wave-atene" src="/wave.png" alt="Wave"/>
             <div className="login-container-atene">
                 <div className="img-atene">
-                    <img src="public/logo.png" alt="Background" />
+                    <img src="/logo.png" alt="Background" />
                 </div>
                 <div className="login-content-atene">
                     <form className={`login-form-atene ${formState}`} onSubmit={handleLogin}>
                         <div className={`login-form-content-atene ${formState2}`}>
-                            <img src="public/avatar.svg" alt="Avatar" />
+                            <img src="/avatar.svg" alt="Avatar" />
                             <h2 className="title-atene">Welcome</h2>
                             <div className="input-div-atene one-atene">
                                 <div className="i-atene">
