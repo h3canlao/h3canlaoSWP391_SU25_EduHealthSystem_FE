@@ -8,6 +8,8 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Bounce } from 'react-toastify';
 import Register from './components/Auth/Register';
+import ForgetPassword from './components/Auth/2FA/forgetPassword';
+import ResetPassword from './components/Auth/2FA/resetPassword';
 const Layout = (props) => {
     return (
         <>
@@ -17,6 +19,8 @@ const Layout = (props) => {
                 </Route> */}
                 <Route path="/signin" element={<Signin />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/forget-password" element={<ForgetPassword/>} />
+                <Route path="/reset-password" element={<ResetPassword/>} />
             </Routes>
             <ToastContainer
             position="top-center"

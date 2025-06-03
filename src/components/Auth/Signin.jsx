@@ -25,21 +25,27 @@ const Signin = () => {
             toast.error('Password must be at least 8 characters long, include a number and an uppercase letter!');
             return;
         }
-
-        let res = await postSignin(email, password);
-        console.log(res);
-        if (res.data.isSuccess) {
-            toast.success('Sign in successful!');
-            navigate('/');
-        } else {
-            toast.error(res.data.message);
-        }
+try {
+    let response = await postSignin(email, password);
+    console.log(response);
+    toast.success('Sign in successful!');
+    navigate('/');
+} catch (error) {
+    toast.error(error.response.data.message);
+}
 
     };
 
 
 
     const handleForgotPasswordClick = () => {
+        setFormState('login-form-change-atene'); 
+        setFormState2('login-form-content-change-atene');
+        setTimeout(() => {
+            navigate('/forget-password'); 
+        }, 1000); 
+    };
+        const handleRegisterClick = () => {
         setFormState('login-form-change-atene'); 
         setFormState2('login-form-content-change-atene');
         setTimeout(() => {
@@ -88,7 +94,7 @@ const Signin = () => {
                                 </div>
                             </div>
                             <div className='action-link-atene'>
-                                <a onClick={handleForgotPasswordClick} href="#">Need Account?</a>
+                                <a onClick={handleRegisterClick} href="#">Need Account?</a>
                                 <a onClick={handleForgotPasswordClick} href="#">Forgot Password?</a>
                             </div>
 

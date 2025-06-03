@@ -34,17 +34,12 @@ const Register = () => {
             return;
         }
         try {
-            const res = await postRegister(firstName, lastName, email, password, confirmPassword, Number(gender));
-            console.log(res);
-            if (res.data.isSuccess) {
+            let response = await postRegister(firstName, lastName, email, password, confirmPassword, gender);
+            console.log(response)
             toast.success('Registration successful! Please check your email to confirm.');
             navigate('/signin');
-            } else {
-            toast.error(res.data.EM || 'Registration failed!');
-            }
         } catch (error) {
-            toast.error('An error occurred during registration.');
-            console.error(error);
+            toast.error(error.response.data.message);
         }
     }
 
@@ -101,9 +96,9 @@ const Register = () => {
                                         value={gender}
                                         onChange={(e) => setGender(e.target.value)}
                                     >
-                                        <option value="0">Other</option>
-                                        <option value="1">Male</option>
-                                        <option value="2">Female</option>
+                                        <option value="Other">Other</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
 
                                     </select>
                                 </div>
