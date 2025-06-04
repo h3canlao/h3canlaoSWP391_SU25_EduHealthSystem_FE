@@ -14,34 +14,34 @@ const Register = () => {
     const [lastName, setLastName] = useState('');
     const [gender, setGender] = useState('');
 
-    const handleRegister = async (e) => {
-        e.preventDefault();
+        const handleRegister = async (e) => {
+            e.preventDefault();
 
-        // Validate email
-        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            toast.error('Invalid email!');
-            return;
-        }
+            // Validate email
+            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                toast.error('Invalid email!');
+                return;
+            }
 
-        // Validate password
-        if (!password || password.length < 8 || !/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
-            toast.error('Password must be at least 8 characters long, include a number and an uppercase letter!');
-            return;
-        }
+            // Validate password
+            if (!password || password.length < 8 || !/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
+                toast.error('Password must be at least 8 characters long, include a number and an uppercase letter!');
+                return;
+            }
 
-        if (password !== confirmPassword) {
-            toast.error('Passwords do not match!');
-            return;
+            if (password !== confirmPassword) {
+                toast.error('Passwords do not match!');
+                return;
+            }
+            try {
+                let response = await postRegister(firstName, lastName, email, password, confirmPassword, gender);
+                console.log(response)
+                toast.success('Registration successful! Please check your email to confirm.');
+                navigate('/signin');
+            } catch (error) {
+                toast.error(error.response.data.message);
+            }
         }
-        try {
-            let response = await postRegister(firstName, lastName, email, password, confirmPassword, gender);
-            console.log(response)
-            toast.success('Registration successful! Please check your email to confirm.');
-            navigate('/signin');
-        } catch (error) {
-            toast.error(error.response.data.message);
-        }
-    }
 
     return (
         <>
