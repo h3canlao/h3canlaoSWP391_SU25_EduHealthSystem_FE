@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Form, Input, Button, Typography } from 'antd';
 import { toast } from 'react-toastify';
-import { resetPassword } from '../../../../services/apiServices';
+import { resetPassword } from '../../../../../services/apiServices';
 import './ResetPassword.css';
 
 const { Title, Text, Link } = Typography;
@@ -30,14 +30,14 @@ const ResetPassword = () => {
 
     setLoading(true);
     try {
-      const response = await resetPassword({ email, token, newPassword });
-      console.log(response);
+      const res = await resetPassword({ email, token, newPassword });
+      console.log(res);
       toast.success('Password reset successfully! Redirecting to sign-in...');
       setTimeout(() => {
         navigate('/signin');
       }, 1000);
     } catch (error) {
-      toast.error(error.response?.data?.message || 'An error occurred during password reset!');
+      toast.error(error.res?.data?.message || 'An error occurred during password reset!');
     } finally {
       setLoading(false);
     }
@@ -47,7 +47,7 @@ const ResetPassword = () => {
     <div className="rp-bg">
       <div className="rp-card">
         <Title level={2} className="rp-title">
-          Freddying
+          SchoolHealth
         </Title>
         <Text className="rp-welcome">
           Reset your password to continue.

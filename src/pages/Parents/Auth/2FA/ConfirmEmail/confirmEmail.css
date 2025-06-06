@@ -1,0 +1,71 @@
+.confirm-email-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.confirm-email-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f0f2f5;
+}
+
+.confirm-email-split {
+  display: flex;
+  width: 80%;
+  max-width: 1200px;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.confirm-email-card {
+  flex: 1;
+  padding: 40px;
+}
+
+.confirm-email-image {
+  flex: 1;
+  background-color: #000; /* Màu nền đen như trong ảnh */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.confirm-email-player-image {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.confirm-email-title {
+  color: #333;
+}
+
+.confirm-email-status {
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.confirm-email-text {
+  color: #666;
+  display: block;
+  margin-bottom: 20px;
+}
+
+.confirm-email-btn {
+  background-color: #1890ff;
+  border-color: #1890ff;
+}
+
+.confirm-email-btn:hover {
+  background-color: #40a9ff;
+  border-color: #40a9ff;
+}
+
+.mt-3 {
+  margin-top: 20px;
+}

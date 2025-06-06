@@ -7,7 +7,7 @@ const postSignin = async (email, password) => {
 };
 
 const postRegister = async (firstName, lastName, email, password, passwordConfirm, gender) => {
-  return axios.post(`https://localhost:7096/parent/registerUser`, {
+  return axios.post(`${BASE_URL}/Parent/register-User`, {
     firstName,
     lastName,
     email,
@@ -29,9 +29,19 @@ const resetPassword = async ({ email, token, newPassword }) => {
     });
 };
 
-export {
+const verifyEmail = async (userId, token) => {
+    return axios.get(`${BASE_URL}/Auth/confirm-email`, {
+        params: {
+            userId,
+            token
+        }
+    });
+};
+
+export {    
     postSignin,
     postRegister,
     forgetPassword,
-    resetPassword
+    resetPassword,
+    verifyEmail
 };

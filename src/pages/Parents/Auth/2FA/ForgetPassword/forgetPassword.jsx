@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Form, Input, Button, Typography } from 'antd';
 import { toast } from 'react-toastify';
-import { forgetPassword } from '../../../../services/apiServices';
+import { forgetPassword } from '../../../../../services/apiServices';
 import './ForgetPassword.css';
 
 const { Title, Text, Link } = Typography;
@@ -17,14 +17,14 @@ const ForgetPassword = () => {
 
     setLoading(true);
     try {
-      const response = await forgetPassword(email);
-      console.log(response);
+      const res = await forgetPassword(email);
+      console.log(res);
       toast.success('If the email is valid, you will receive reset instructions.');
       setTimeout(() => {
         navigate('/signin');
       }, 1000);
     } catch (error) {
-      toast.error(error.response?.data?.message || 'An error occurred while sending the reset link.');
+      toast.error(error.res?.data?.message || 'An error occurred while sending the reset link.');
     } finally {
       setLoading(false);
     }
@@ -34,7 +34,7 @@ const ForgetPassword = () => {
     <div className="fp-bg">
       <div className="fp-card">
         <Title level={2} className="fp-title">
-          Freddying
+          SchoolHealth
         </Title>
         <Text className="fp-welcome">
           Enter your email to receive a password reset link.

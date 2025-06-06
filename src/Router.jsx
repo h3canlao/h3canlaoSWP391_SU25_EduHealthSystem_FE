@@ -1,10 +1,11 @@
-import Register from "@/pages/Customer/Auth/Register";
-import Signin from "@/pages/Customer/Auth/Signin";
-import ForgetPassword from "@/pages/Customer/Auth/2FA/forgetPassword"
-import ResetPassword from "@/pages/Customer/Auth/2FA/resetPassword"
+import Register from "@/pages/Parents/Auth/Register/Register";
+import Signin from "@/pages/Parents/Auth/Signin/Signin";
+import ForgetPassword from "@/pages/Parents/Auth/2FA/ForgetPassword/forgetPassword"
+import ResetPassword from "@/pages/Parents/Auth/2FA/ResetPassword/resetPassword"
 import { Route, Routes } from "react-router-dom";
 import { Bounce, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import ConfirmEmail from "@/pages/Parents/Auth/2FA/ConfirmEmail/confirmEmail"
 
 
 const Router = () => {
@@ -15,7 +16,8 @@ const Router = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/forget-password" element={<ForgetPassword/>} />
         <Route path="/reset-password" element={<ResetPassword/>} />       
-      </Routes>
+        <Route path= "/confirm-email" element={<ConfirmEmail/>} />
+       </Routes>
       <ToastContainer
         position="top-center"
         autoClose={5000}
