@@ -13,38 +13,6 @@ const Register = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
-  // const handleRegister = async (values) => {
-  //   const { firstName, lastName, email, password, confirmPassword, gender } =
-  //     values;
-
-  //   if (password !== confirmPassword) {
-  //     toast.error("Passwords do not match!");
-  //     return;
-  //   }
-
-  //   setLoading(true);
-  //   try {
-  //     const res = await postRegister(
-  //       firstName,
-  //       lastName,
-  //       email,
-  //       password,
-  //       confirmPassword,
-  //       gender
-  //     );
-  //     if (res.data.isSuccess) {
-  //       toast.success(
-  //         "Registration successful! Please check your email to confirm."
-  //       );
-  //       navigate("/signin");
-  //     } else {
-  //       toast.error(res.data.EM || "Registration failed!");
-  //     }
-  //   } catch (error) {
-  //     toast.error("An error occurred during registration!");
-  //   }
-  //   setLoading(false);
-  // };
   const handleRegister = async (values) => {
   const { firstName, lastName, email, password, confirmPassword, gender } = values;
 
@@ -66,12 +34,12 @@ const Register = () => {
   }
 
   try {
-    let response = await postRegister(firstName, lastName, email, password, confirmPassword, gender);
-    console.log(response);
+    let res = await postRegister(firstName, lastName, email, password, confirmPassword, gender);
+    console.log(res);
     toast.success('Registration successful! Please check your email to confirm.');
     navigate('/signin');
   } catch (error) {
-    toast.error(error.response?.data?.message || 'An error occurred during registration!');
+    toast.error(error.res?.data?.message || 'An error occurred during registration!');
   }
 };
 
@@ -79,7 +47,7 @@ const Register = () => {
     <div className="register-bg">
       <div className="register-card">
         <Title level={2} className="register-title">
-          Freddying
+          SchoolHealth
         </Title>
         <Text className="register-welcome">
           Welcome! Please enter your details to register.
@@ -141,9 +109,9 @@ const Register = () => {
                 rules={[{ required: true, message: "Please select gender!" }]}
               >
                 <Select size="large">
-                  <Option value={'Other'}>Other</Option>
-                  <Option value={'Male'}>Male</Option>
-                  <Option value={'Female'}>Female</Option>
+                  <Option value={2}>Other</Option>
+                  <Option value={0}>Male</Option>
+                  <Option value={1}>Female</Option>
                 </Select>
               </Form.Item>
             </Col>
