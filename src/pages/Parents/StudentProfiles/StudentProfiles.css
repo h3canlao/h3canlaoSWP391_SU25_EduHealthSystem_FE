@@ -1,0 +1,86 @@
+.student-profiles-container {
+  padding: 20px;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+}
+
+.controls {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  align-items: center;
+}
+
+.search-bar {
+  width: 200px;
+  margin-right: 10px;
+}
+
+.add-student-btn {
+  background-color: #ff9800;
+  border-color: #ff9800;
+  color: white;
+}
+
+.add-student-btn:hover {
+  background-color: #f57c00;
+  border-color: #f57c00;
+}
+
+.students-grid {
+  
+  display: grid;
+  grid-template-columns: repeat(1 ,1fr);
+  gap: 20px;
+  padding: 20px;
+}
+
+.student-card {
+  background-color: #e6f3ff;
+  border-radius: 10px;
+  padding: 15px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.student-card:hover {
+  transform: translateY(-5px);
+}
+
+.student-image {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+  object-fit: cover;
+}
+
+.student-info h3 {
+  margin: 0 0 5px 0;
+  font-size: 1rem;
+  color: #333;
+}
+
+.student-info p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .controls {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .search-bar {
+    width: 100%;
+  }
+
+  .students-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+}
