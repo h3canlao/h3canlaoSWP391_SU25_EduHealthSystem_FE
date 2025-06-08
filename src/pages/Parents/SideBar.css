@@ -1,0 +1,115 @@
+/* Căn trái text trong link và tắt hiệu ứng chuyển màu */
+a {
+    text-align: left !important;
+    transition: none !important;
+}
+
+.admin-sidebar {
+    animation: slideInLeft 0.3s ease;
+}
+
+/* Nền trắng cho phần nội dung, header, footer của sidebar */
+.sidebar-content,
+.sidebar-footer,
+.sidebar-header {
+    background-color: #FFFFFF !important;
+    
+}
+
+/* Chữ trong menu đậm và cỡ 14px */
+span.pro-item-content {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+/* Icon to và không có nền */
+span.pro-icon {
+    font-size: 22px;
+}
+
+/* Bỏ nền cho icon-wrapper khi menu shaped */
+.pro-sidebar .pro-menu.shaped .pro-menu-item > .pro-inner-item > .pro-icon-wrapper {
+    background-color: transparent;
+}
+
+/* Màu chữ xám cho menu item và link, có margin */
+.pro-inner-item, .pro-inner-item a {
+    color: #868585 !important;
+    margin: 3px;
+}
+
+/* Hover menu item: nền tím, chữ trắng, bo góc, không chuyển màu */
+.pro-inner-item:hover {
+    margin: 3px;
+    border-radius: 4px;
+    background: #685CFE;
+    color: white !important;
+    transition: none !important;
+}
+
+/* Hover link trong menu: chữ trắng */
+.pro-inner-item a:hover {
+    color: white !important;
+}
+
+/* Nền xám nhạt cho submenu mở rộng dạng slide */
+.react-slidedown.pro-inner-list-item {
+    background-color: #f5f5f5 !important;
+}
+
+/* Hover submenu có dấu bo góc, nền tím */
+li.pro-menu-item.pro-sub-menu:hover::before {
+    margin: 4px;
+    border-radius: 8px;
+    background: #685CFE;
+    color: white !important;
+    transition: none !important;
+}
+
+/* Popup submenu khi sidebar collapsed: căn giữa, nền xám, bóng */
+.popper-inner {
+    margin-left: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f5f5f5;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    padding-left: 0 !important;
+    /* Xóa animation tĩnh để chỉ chạy khi hover */
+}
+
+.pro-menu-item.pro-sub-menu:hover .popper-inner {
+    animation: slideInLeft 0.3s ease;
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Menu item đang chọn: chữ trắng, in đậm */
+.pro-menu-item.active .pro-inner-item .pro-item-content a {
+    color: white !important;
+    font-weight: bold;
+}
+
+/* Menu item đang chọn: nền tím, chữ trắng, bo góc, không chuyển màu */
+.pro-menu-item.active {
+    margin: 4px;
+    border-radius: 4px;
+    background: #685CFE;
+    color: white !important;
+    transition: none !important;
+}
+
+/* Icon menu item đang chọn đổi màu trắng */
+.pro-menu-item.active .pro-icon-wrapper {
+    color: white !important;
+}
+

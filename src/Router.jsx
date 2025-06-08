@@ -6,6 +6,12 @@ import { Route, Routes } from "react-router-dom";
 import { Bounce, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ConfirmEmail from "@/pages/Parents/Auth/2FA/ConfirmEmail/confirmEmail"
+import Immunization from "./pages/Parents/Immunization/Immunization";
+import HealthCheckup from "./pages/Parents/MedicalCheckups/HealthCheckup";
+import SendMedication from "./pages/Parents/Medication/SendMedication";
+import Notifications from "./pages/Parents/Notifications/Notifications";
+import StudentProfiles from "./pages/Parents/StudentProfiles/StudentProfiles";
+import Parents from "./pages/Parents/Parents";
 
 
 const Router = () => {
@@ -14,10 +20,17 @@ const Router = () => {
       <Routes>
         <Route path="/signin" element={<Signin />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/forget-password" element={<ForgetPassword/>} />
-        <Route path="/reset-password" element={<ResetPassword/>} />       
-        <Route path= "/confirm-email" element={<ConfirmEmail/>} />
-       </Routes>
+        <Route path="/forget-password" element={<ForgetPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/confirm-email" element={<ConfirmEmail />} />
+        <Route path="/parents" element={<Parents />}>
+          <Route path="immunization" element={<Immunization />} />
+          <Route path="medical-checkups" element={<HealthCheckup />} />
+          <Route path="send-medication" element={<SendMedication />} />
+          <Route path="notifications" element={<Notifications />} />
+          <Route path="student-profiles" element={<StudentProfiles />} />
+        </Route>
+      </Routes>
       <ToastContainer
         position="top-center"
         autoClose={5000}
