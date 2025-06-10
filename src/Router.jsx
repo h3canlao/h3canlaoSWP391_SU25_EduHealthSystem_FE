@@ -14,6 +14,7 @@ import StudentProfiles from "./pages/Parents/StudentProfiles/StudentProfiles";
 import Parents from "./pages/Parents/Parents";
 import Admin from "./pages/Admin/Admin";
 import ManageUser from "./pages/Admin/Features/ManageUser";
+import MedicationAdmin from "./pages/Admin/Medication";
 
 
 const Router = () => {
@@ -34,6 +35,7 @@ const Router = () => {
         </Route>
          <Route path="/admin" element={<Admin />}>
           <Route path="manage-users" element={<ManageUser />} />
+          <Route path="manage-medication" element={<MedicationAdmin />} />
         </Route>
       </Routes>
       <ToastContainer

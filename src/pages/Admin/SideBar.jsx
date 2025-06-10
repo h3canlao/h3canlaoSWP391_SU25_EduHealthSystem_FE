@@ -17,7 +17,8 @@ import {
     FaList, 
     FaBars, 
     FaSyringe, 
-    FaFirstAid 
+    FaFirstAid, 
+    FaBookMedical
 } from 'react-icons/fa';
 import { useLocation, NavLink } from 'react-router-dom';
 
@@ -55,8 +56,8 @@ const SideBar = ({ collapsed, toggleSidebar }) => {
                         <MenuItem icon={<FaUserCircle />} active={pathname === '/admin/manage-users'}>
                             <NavLink to="/admin/manage-users">Manage User</NavLink>
                         </MenuItem>
-                        <MenuItem icon={<FaArchive />}>
-                            <NavLink to="/admin/products">Manage Product</NavLink>
+                        <MenuItem icon={<FaBookMedical />} active={pathname === '/admin/manage-medication'}>
+                            <NavLink to="/admin/manage-medication">Manage Medication</NavLink>
                         </MenuItem>
                     </SubMenu>
 

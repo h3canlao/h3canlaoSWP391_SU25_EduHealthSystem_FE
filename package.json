@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@vitejs/plugin-react-swc": "^3.10.0",
-    "antd": "^5.25.3",
+    "antd": "^5.26.0",
     "jwt-decode": "^4.0.0"
   },
   "devDependencies": {
