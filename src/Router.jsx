@@ -12,6 +12,8 @@ import SendMedication from "./pages/Parents/Medication/SendMedication";
 import Notifications from "./pages/Parents/Notifications/Notifications";
 import StudentProfiles from "./pages/Parents/StudentProfiles/StudentProfiles";
 import Parents from "./pages/Parents/Parents";
+import Admin from "./pages/Admin/Admin";
+import ManageUser from "./pages/Admin/Features/ManageUser";
 
 
 const Router = () => {
@@ -29,6 +31,9 @@ const Router = () => {
           <Route path="send-medication" element={<SendMedication />} />
           <Route path="notifications" element={<Notifications />} />
           <Route path="student-profiles" element={<StudentProfiles />} />
+        </Route>
+         <Route path="/admin" element={<Admin />}>
+          <Route path="manage-users" element={<ManageUser />} />
         </Route>
       </Routes>
       <ToastContainer

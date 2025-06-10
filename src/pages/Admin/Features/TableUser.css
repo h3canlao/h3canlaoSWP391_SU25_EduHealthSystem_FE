@@ -1,0 +1,85 @@
+.card {
+    padding: 2em;
+}
+
+.card-header {
+    background-color: #007bff;
+    color: white;
+}
+
+.badge.bg-success {
+    background-color: #28a745 !important;
+}
+
+.badge.bg-danger {
+    background-color: #dc3545 !important;
+}
+
+.badge.bg-warning {
+    background-color: #ffc107 !important;
+}
+
+.btn-outline-primary i,
+.btn-outline-danger i {
+    font-size: 16px;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.table td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+button.btn.btn-light.btn-sm.me-2.square-btn {
+    color: #000000 !important;
+    border: 1px solid #ced4da !important;
+    border-radius: 4px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    padding: 0px 14px;
+    font-size: 18px;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.square-btn i {
+    margin-right: 5px; /* Space between icon and text */
+}
+
+.btn {
+    background-image: none !important;
+    text-transform: none !important;
+}
+
+button.btn.btn-sm.btn-outline-primary {
+    background-color: #0d6efd !important;
+}
+
+button.btn.btn-sm.btn-outline-danger {
+    background-color: #dc3545 !important;
+}
+
+/* Updated to make buttons circular */
+button.btn.btn-sm.rounded-circle,
+button.btn.btn-sm.btn-outline-primary.rounded-circle,
+button.btn.btn-sm.btn-outline-danger.rounded-circle {
+    width: 40px; /* Equal width and height for circular shape */
+    height: 40px;
+    padding: 0; /* Remove padding to fit the icon */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Ensure the icon inside the button is centered and sized appropriately */
+button.btn.btn-sm.rounded-circle i,
+button.btn.btn-sm.btn-outline-primary.rounded-circle i,
+button.btn.btn-sm.btn-outline-danger.rounded-circle i {
+    font-size: 16px;
+}
