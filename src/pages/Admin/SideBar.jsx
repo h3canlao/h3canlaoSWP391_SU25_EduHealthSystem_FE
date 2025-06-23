@@ -19,7 +19,9 @@ import {
     FaSyringe, 
     FaFirstAid, 
     FaBookMedical,
-    FaCreativeCommonsSamplingPlus
+    FaCreativeCommonsSamplingPlus,
+    FaClinicMedical,
+    FaDelicious
 } from 'react-icons/fa';
 import { useLocation, NavLink } from 'react-router-dom';
 
@@ -57,14 +59,17 @@ const SideBar = ({ collapsed, toggleSidebar }) => {
                         <MenuItem icon={<FaUserCircle />} active={pathname === '/admin/manage-users'}>
                             <NavLink to="/admin/manage-users">Manage User</NavLink>
                         </MenuItem>
-                           <MenuItem icon={<FaUserCircle />} active={pathname === '/admin/manage-medicalSupply'}>
+                           <MenuItem icon={<FaClinicMedical />} active={pathname === '/admin/manage-medicalSupply'}>
                             <NavLink to="/admin/manage-medicalSupply">Manage Medical Supply</NavLink>
                         </MenuItem>
-                           <MenuItem icon={<FaUserCircle />} active={pathname === '/admin/manage-medicalSupply-lot'}>
+                           <MenuItem icon={<FaDelicious />} active={pathname === '/admin/manage-medicalSupply-lot'}>
                             <NavLink to="/admin/manage-medicalSupply-lot">Manage Medical Supply Lot</NavLink>
                         </MenuItem>
                         <MenuItem icon={<FaBookMedical />} active={pathname === '/admin/manage-medication'}>
                             <NavLink to="/admin/manage-medication">Manage Medication</NavLink>
+                        </MenuItem>
+                         <MenuItem icon={<FaBookMedical />} active={pathname === '/admin/manage-medication-lot'}>
+                            <NavLink to="/admin/manage-medication-lot">Manage Medication Lot</NavLink>
                         </MenuItem>
                          <MenuItem icon={<FaCreativeCommonsSamplingPlus />} active={pathname === '/admin/manage-vaccinationCampaign'}>
                             <NavLink to="/admin/manage-vaccinationCampaign">Manage Vaccination Campaign</NavLink>

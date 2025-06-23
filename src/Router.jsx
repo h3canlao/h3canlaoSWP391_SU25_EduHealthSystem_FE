@@ -19,6 +19,7 @@ import MedicationAdmin from "./pages/Admin/Medication";
 import VaccinationCampaignAdmin from "./pages/Admin/VaccinationCampaign/VaccinationCampaign";
 import MedicalSupplyAdmin from "./pages/Admin/MedicalSupply/MedicalSupplyAdmin";
 import MedicalSupplyLotAdmin from "./pages/Admin/MedicalSupply/MedicalSupplyLotAdmin";
+import MedicationLotAdmin from "./pages/Admin/Medication/MedicationLotAdmin";
 
 
 
@@ -42,6 +43,7 @@ const Router = () => {
          <Route path="/admin" element={<Admin />}>
           <Route path="manage-users" element={<ManageUser />} />
           <Route path="manage-medication" element={<MedicationAdmin />} />
+          <Route path="manage-medication-lot" element={<MedicationLotAdmin />} />
           <Route path="manage-medicalSupply" element={<MedicalSupplyAdmin />} />
           <Route path="manage-medicalSupply-lot" element={<MedicalSupplyLotAdmin />} />
           <Route path="manage-vaccinationCampaign" element={<VaccinationCampaignAdmin />} />
