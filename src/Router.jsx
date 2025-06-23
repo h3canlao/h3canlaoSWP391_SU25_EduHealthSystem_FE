@@ -15,6 +15,7 @@ import Parents from "./pages/Parents/Parents";
 import VaccineOverview from "./pages/Parents/Immunization/VaccineOverview";
 
 
+
 const Router = () => {
   return (
     <>
@@ -31,6 +32,10 @@ const Router = () => {
           <Route path="confirm-medications" element={<SendMedication />} />
           <Route path="notifications" element={<Notifications />} />
           <Route path="student-profiles" element={<StudentProfiles />} />
+        </Route>
+         <Route path="/admin" element={<Admin />}>
+          <Route path="manage-users" element={<ManageUser />} />
+          <Route path="manage-medication" element={<MedicationAdmin />} />
         </Route>
       </Routes>
       <ToastContainer

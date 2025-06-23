@@ -1,0 +1,58 @@
+.admin-container {
+    display: flex;
+}
+
+.admin-container .admin-sidebar .pro-sidebar {
+    height: 100vh !important;
+}
+
+.admin-content {
+    width: 100%;
+    padding: 0 24px;
+    background-color: #F1F1F1;
+}
+.admin-header {
+    height: 40px;
+}
+.admin-main {
+    height: 40px;
+}
+
+.toggle-icon {
+  position: fixed;
+  top: 24px;
+  left: 22px;
+  z-index: 9999;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  padding: 4px;
+  background-color: white; /* nền trắng */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* bóng đổ nổi */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  user-select: none;
+}
+
+/* Hover hiệu ứng nổi bật hơn */
+.toggle-icon:hover {
+  background-color: #f0f0f0;
+  transform: scale(1.1);
+}
+
+/* Nếu muốn icon bay lơ lửng ở góc trên bên trái (fixed position) */
+.admin-header {
+  position: relative; /* giữ nguyên position để icon nằm trong khung header */
+}
+
+/* Hoặc bạn có thể dùng position fixed để icon lơ lửng trên page (bỏ phần admin-header) */
+/*
+.toggle-icon {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 9999;
+}
+*/
