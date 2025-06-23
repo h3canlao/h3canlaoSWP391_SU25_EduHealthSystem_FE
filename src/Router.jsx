@@ -13,6 +13,12 @@ import Notifications from "./pages/Parents/Notifications/Notifications";
 import StudentProfiles from "./pages/Parents/StudentProfiles/StudentProfiles";
 import Parents from "./pages/Parents/Parents";
 import VaccineOverview from "./pages/Parents/Immunization/VaccineOverview";
+import Admin from "./pages/Admin/Admin";
+import ManageUser from "./pages/Admin/Features/ManageUser";
+import MedicationAdmin from "./pages/Admin/Medication";
+import VaccinationCampaignAdmin from "./pages/Admin/VaccinationCampaign/VaccinationCampaign";
+import MedicalSupplyAdmin from "./pages/Admin/MedicalSupply/MedicalSupplyAdmin";
+import MedicalSupplyLotAdmin from "./pages/Admin/MedicalSupply/MedicalSupplyLotAdmin";
 
 
 
@@ -36,6 +42,9 @@ const Router = () => {
          <Route path="/admin" element={<Admin />}>
           <Route path="manage-users" element={<ManageUser />} />
           <Route path="manage-medication" element={<MedicationAdmin />} />
+          <Route path="manage-medicalSupply" element={<MedicalSupplyAdmin />} />
+          <Route path="manage-medicalSupply-lot" element={<MedicalSupplyLotAdmin />} />
+          <Route path="manage-vaccinationCampaign" element={<VaccinationCampaignAdmin />} />
         </Route>
       </Routes>
       <ToastContainer
