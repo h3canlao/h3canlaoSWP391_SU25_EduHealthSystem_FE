@@ -1,115 +1,276 @@
-/* Căn trái text trong link và tắt hiệu ứng chuyển màu */
-a {
-    text-align: left !important;
-    transition: none !important;
+/* 
+  Updated styles for a floating, white-themed sidebar with rounded corners.
+*/
+
+/* Container for positioning */
+.sidebar-container {
+    height: 100vh;
+    padding: 32px 0 32px 16px;
+    box-sizing: border-box;
 }
 
-.admin-sidebar {
-    animation: slideInLeft 0.3s ease;
+/* When collapsed */
+.collapsed.sidebar-container {
+    padding-left: 16px;
 }
 
-/* Nền trắng cho phần nội dung, header, footer của sidebar */
-.sidebar-content,
-.sidebar-footer,
+/* Core sidebar styling */
+.pro-sidebar {
+    height: 100% !important;
+    border-radius: 16px !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05) !important;
+    border: none !important;
+    background-color: #ffffff;
+}
+
+.pro-sidebar-inner {
+    background: transparent;
+    border-radius: 16px;
+}
+
+/* Header */
 .sidebar-header {
-    background-color: #FFFFFF !important;
-    
-}
-
-/* Chữ trong menu đậm và cỡ 14px */
-span.pro-item-content {
-    font-weight: 600;
-    font-size: 14px;
-}
-
-/* Icon to và không có nền */
-span.pro-icon {
-    font-size: 22px;
-}
-
-/* Bỏ nền cho icon-wrapper khi menu shaped */
-.pro-sidebar .pro-menu.shaped .pro-menu-item > .pro-inner-item > .pro-icon-wrapper {
-    background-color: transparent;
-}
-
-/* Màu chữ xám cho menu item và link, có margin */
-.pro-inner-item, .pro-inner-item a {
-    color: #868585 !important;
-    margin: 3px;
-}
-
-/* Hover menu item: nền tím, chữ trắng, bo góc, không chuyển màu */
-.pro-inner-item:hover {
-    margin: 3px;
-    border-radius: 4px;
-    background: #685CFE;
-    color: white !important;
-    transition: none !important;
-}
-
-/* Hover link trong menu: chữ trắng */
-.pro-inner-item a:hover {
-    color: white !important;
-}
-
-/* Nền xám nhạt cho submenu mở rộng dạng slide */
-.react-slidedown.pro-inner-list-item {
-    background-color: #f5f5f5 !important;
-}
-
-/* Hover submenu có dấu bo góc, nền tím */
-li.pro-menu-item.pro-sub-menu:hover::before {
-    margin: 4px;
-    border-radius: 8px;
-    background: #685CFE;
-    color: white !important;
-    transition: none !important;
-}
-
-/* Popup submenu khi sidebar collapsed: căn giữa, nền xám, bóng */
-.popper-inner {
-    margin-left: 18px;
     display: flex;
-    justify-content: center;
     align-items: center;
-    background-color: #f5f5f5;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    justify-content: center;
+    padding: 24px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.sidebar-logo {
+    font-size: 24px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    color: #333;
+}
+
+.sidebar-logo:hover {
+    transform: rotate(90deg);
+}
+
+.sidebar-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-left: 16px;
+    white-space: nowrap;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+    color: #222;
+}
+
+.collapsed .sidebar-title {
+    opacity: 0;
+}
+
+/* Content & Menu */
+.pro-sidebar-content {
+    flex-grow: 1;
+    padding: 16px 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+.pro-menu-item {
+    margin: 0 16px 8px 16px !important;
+}
+
+.pro-inner-item {
+    padding: 12px 16px !important;
+    border-radius: 8px !important;
+    transition: background-color 0.3s ease, color 0.3s ease !important;
+    font-weight: 500 !important;
+    color: #333 !important;
+}
+
+.pro-inner-item:hover {
+    background-color: #f0f0f0 !important;
+    color: #111 !important;
+}
+
+.pro-menu-item.active > .pro-inner-item {
+    background-color: #ff4d4f !important;
+    color: #000000 !important;
+    box-shadow: 0 4px 15px rgba(255, 77, 79, 0.3);
+}
+
+.pro-icon-wrapper {
+    font-size: 20px !important;
+    color: inherit !important;
+    padding: 4px;
+}
+
+.pro-item-content a {
+    color: inherit !important;
+    text-decoration: none;
+}
+
+/* Badge */
+.notification-badge {
+    margin-left: auto;
+    background-color: #ff4d4f;
+    color: #fff;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Submenu */
+.pro-sub-menu .pro-inner-list-item {
+    background-color: #ffffff;
+    padding-left: 16px !important;
+    border-radius: 8px;
+    margin-top: 4px;
+}
+
+.pro-sub-menu .pro-inner-item {
+    margin: 0 !important;
+}
+
+/* Footer */
+.pro-sidebar-footer {
+    border-top: 1px solid #e0e0e0;
+    padding: 16px 24px;
+}
+
+.sidebar-footer-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ff4d4f;
+}
+
+.user-details {
+    white-space: nowrap;
+    animation: fadeIn 0.5s ease;
+}
+
+.user-name {
+    font-weight: 600;
+    color: #222;
+}
+
+.user-email {
+    font-size: 12px;
+    color: #999;
+}
+
+.logout-icon {
+    font-size: 24px;
+    cursor: pointer;
+    color: #888;
+    transition: color 0.3s ease;
+}
+
+.logout-icon:hover {
+    color: #ff4d4f;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.sidebar-title {
+    animation: fadeIn 0.5s ease;
+}
+
+.pro-sidebar > .pro-sidebar-inner {
+  background: white;
+  height: 100%;
+  position: relative;
+  z-index: 101;
+}
+
+span.pro-icon-wrapper {
+  background-color: #eeeeee !important;
+}
+
+.react-slidedown.pro-inner-list-item {
+  background-color: #eeeeee !important;
+}
+
+/* Collapsed State Styling */
+.collapsed .pro-inner-item {
+    justify-content: center !important;
     padding-left: 0 !important;
-    /* Xóa animation tĩnh để chỉ chạy khi hover */
+    padding-right: 0 !important;
 }
 
-.pro-menu-item.pro-sub-menu:hover .popper-inner {
-    animation: slideInLeft 0.3s ease;
+.collapsed .pro-icon-wrapper {
+    margin-right: 0 !important;
 }
 
-@keyframes slideInLeft {
-    from {
-        opacity: 0;
-        transform: translateX(-30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+.collapsed .pro-arrow-wrapper {
+    display: none !important;
 }
 
-/* Menu item đang chọn: chữ trắng, in đậm */
-.pro-menu-item.active .pro-inner-item .pro-item-content a {
-    color: white !important;
-    font-weight: bold;
+.collapsed .pro-item-content {
+    display: none !important;
 }
 
-/* Menu item đang chọn: nền tím, chữ trắng, bo góc, không chuyển màu */
-.pro-menu-item.active {
-    margin: 4px;
-    border-radius: 4px;
-    background: #685CFE;
-    color: white !important;
-    transition: none !important;
+/* Ensure text in the flyout submenu is visible when collapsed */
+.popper-inner .pro-item-content {
+    display: block !important;
 }
 
-/* Icon menu item đang chọn đổi màu trắng */
-.pro-menu-item.active .pro-icon-wrapper {
-    color: white !important;
+.popper-inner {
+  background-color: #ffffff !important;
+  border-radius: 12px !important;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1) !important;
+  padding: 8px !important;
+  margin-left: 12px !important; /* Creates the space */
+  border: none !important;
 }
 
+/* Style items inside the popper for a better look */
+.popper-inner .pro-inner-item {
+  padding: 10px 16px !important;
+  border-radius: 8px !important;
+  margin-bottom: 4px !important;
+}
+
+/* Make the active item in the popper more prominent */
+.popper-inner .pro-menu-item.active > .pro-inner-item {
+  background-color: #ff4d4f !important;
+  color: #fff !important;
+  box-shadow: 0 4px 12px rgba(255, 77, 79, 0.4) !important;
+}
+
+/* Ensure hover effect is consistent */
+.popper-inner .pro-inner-item:hover {
+  background-color: #f5f5f5 !important;
+  color: #111 !important;
+}
+
+/* Correct the icon style on active items in the popper */
+.popper-inner .pro-menu-item.active .pro-icon-wrapper {
+    background-color: transparent !important;
+    color: #fff !important;
+}
+.pro-sidebar-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pro-sidebar-footer .pro-inner-item {
+  justify-content: center !important;
+}

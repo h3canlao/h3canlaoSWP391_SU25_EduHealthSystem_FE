@@ -2,9 +2,10 @@ import React, { useState } from "react";
 import { Form, Input, Button, Typography, Divider } from "antd";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { postSignin } from "@/services/apiServices";
+import { postSignin, currentUsers } from "@/services/apiServices";
+import {  setUserInfo, setAccessToken } from '../../../../services/handleStorageApi';
 import "./Signin.css";
-import "antd/dist/reset.css"; // For Antd v5
+import "antd/dist/reset.css";
 
 const { Title, Text, Link } = Typography;
 
@@ -32,7 +33,16 @@ export default function Signin() {
     try {
       let res = await postSignin(email, password);
       console.log(res);
+      const token = res.data.data.accessToken;
+      console.log(token)
+      setAccessToken(token);
       if (res.data.isSuccess === true) {
+
+        const currentUser = await currentUsers(token);
+        console.log(currentUser)
+        if (currentUser.data.isSuccess) {
+            setUserInfo(currentUser.data.data);
+        }
         toast.success('Login successfully.');
         navigate('/');
       }

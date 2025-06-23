@@ -6,15 +6,14 @@ import { Route, Routes } from "react-router-dom";
 import { Bounce, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ConfirmEmail from "@/pages/Parents/Auth/2FA/ConfirmEmail/confirmEmail"
-import Immunization from "./pages/Parents/Immunization/Immunization";
+
 import HealthCheckup from "./pages/Parents/MedicalCheckups/HealthCheckup";
 import SendMedication from "./pages/Parents/Medication/SendMedication";
 import Notifications from "./pages/Parents/Notifications/Notifications";
 import StudentProfiles from "./pages/Parents/StudentProfiles/StudentProfiles";
 import Parents from "./pages/Parents/Parents";
-import Admin from "./pages/Admin/Admin";
-import ManageUser from "./pages/Admin/Features/ManageUser";
-import MedicationAdmin from "./pages/Admin/Medication";
+import VaccineOverview from "./pages/Parents/Immunization/VaccineOverview";
+
 
 
 const Router = () => {
@@ -27,9 +26,10 @@ const Router = () => {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/confirm-email" element={<ConfirmEmail />} />
         <Route path="/parents" element={<Parents />}>
-          <Route path="immunization" element={<Immunization />} />
+          <Route path="vaccine-overview" element={<VaccineOverview />}/>
           <Route path="medical-checkups" element={<HealthCheckup />} />
           <Route path="send-medication" element={<SendMedication />} />
+          <Route path="confirm-medications" element={<SendMedication />} />
           <Route path="notifications" element={<Notifications />} />
           <Route path="student-profiles" element={<StudentProfiles />} />
         </Route>

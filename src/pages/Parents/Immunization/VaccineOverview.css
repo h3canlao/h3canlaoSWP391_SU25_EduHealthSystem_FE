@@ -1,0 +1,77 @@
+/* General container for the vaccine confirmation page */
+.vaccine-container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 24px;
+  background-color: #f7f9fc;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Page title styling */
+.vaccine-title {
+  color: #1d3557; /* Dark blue */
+  margin-bottom: 24px !important;
+  text-align: center;
+  font-weight: 700;
+}
+
+/* Styling for the vaccine list */
+.vaccine-list .ant-list-items {
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Individual list item styling */
+.vaccine-list-item {
+  background-color: #ffffff;
+  padding: 20px 24px !important;
+  transition: background-color 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.vaccine-list-item:last-child {
+  border-bottom: none;
+}
+
+.vaccine-list-item:hover {
+  background-color: #e6f7ff; /* Light blue on hover */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* Vaccine name styling */
+.vaccine-name {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #00529b;
+}
+
+/* Container for the status tag */
+.vaccine-status-container {
+  display: flex;
+  align-items: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .vaccine-container {
+    margin: 20px 10px;
+    padding: 20px;
+  }
+
+  .vaccine-list-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .vaccine-status-container {
+    margin-top: 12px;
+  }
+  
+  .ant-list-item-action {
+    margin-left: 0;
+    margin-top: 10px;
+  }
+}

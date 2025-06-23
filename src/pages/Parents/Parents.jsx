@@ -17,11 +17,7 @@ const Parents = (props) => {
                 <SideBar collapsed={collapsed} toggleSidebar={toggleSidebar} />
             </div>
             <div className="parents-content">
-                <div className="parents-header">
-                    {!collapsed && (
-                        <FaBars className="toggle-icon" onClick={toggleSidebar} style={{ cursor: 'pointer' }} />
-                    )}
-                </div>
+
                 <div className="parents-main">
                     <Outlet />
                 </div>             
