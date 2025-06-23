@@ -34,7 +34,7 @@ const Register = () => {
   }
 
   try {
-    let res = await postRegister(firstName, lastName, email, password, confirmPassword, gender);
+    let res = await postRegister(firstName, lastName, email, password, confirmPassword, Number(gender));
     console.log(res);
     toast.success('Registration successful! Please check your email to confirm.');
     navigate('/signin');

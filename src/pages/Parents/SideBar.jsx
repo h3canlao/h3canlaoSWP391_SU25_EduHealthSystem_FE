@@ -9,78 +9,97 @@ import {
     SidebarFooter,
 } from 'react-pro-sidebar';
 
-import { 
-    FaUsers, // Icon cho Manage Users
-    FaShoppingCart, // Icon cho Manage Medications
-    FaCheckCircle, // Icon cho Confirm Immunization
-    FaPrescription, // Icon cho Confirm Medications
-    FaHeartbeat, // Icon cho Medical Events
-    FaBell, // Icon cho Notifications
+import {
+    FaUsers,
+    FaHeartbeat,
+    FaBell,
     FaBars,
+    FaSignOutAlt,
+    FaBriefcaseMedical,
+    FaShieldAlt,
+    FaUserMd
 } from 'react-icons/fa';
 import { useLocation, NavLink } from 'react-router-dom';
 
 import './SideBar.css';
 
+const user = {
+    name: 'Michael Smith',
+    email: 'michaelsmith12@gmail.com',
+    avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
+};
+
 const SideBar = ({ collapsed, toggleSidebar }) => {
     const location = useLocation();
     const { pathname } = location;
     return (
-        <ProSidebar collapsed={collapsed} className={collapsed ? 'collapsed' : ''}>
-
-            <SidebarHeader className='sidebar-header' style={{ padding: '24px', fontWeight: 'bold', fontSize: '1.2rem', textAlign: 'center' }}>
-                {collapsed ? (
-                    <FaBars 
-                        style={{ cursor: 'pointer' }} 
-                        onClick={toggleSidebar} 
-                    />
-                ) : (
-                    <div>
-                        <div style={{ fontWeight: 'bold', fontSize: '1.2rem' }}>Parent Portal</div>
-                        <div style={{ fontSize: '0.8rem', color: '#888' }}>Dashboard</div>
+        <div className={`sidebar-container ${collapsed ? 'collapsed' : ''}`}>
+            <ProSidebar collapsed={collapsed}>
+                <SidebarHeader>
+                    <div className="sidebar-header">
+                        <span className="sidebar-logo" onClick={toggleSidebar}>
+                            <FaBars />
+                        </span>
+                        {!collapsed && <span className="sidebar-title">Parent Portal</span>}
                     </div>
-                )}
-            </SidebarHeader>
+                </SidebarHeader>
 
-            <SidebarContent className='sidebar-content'>
-                <Menu iconShape="circle">
-
-                    {/* Manage Users and Medications */}
-                    <SubMenu icon={<FaUsers />} title="Manage">
-                        <MenuItem icon={<FaUsers />} active={pathname === '/parents/student-profiles'}>
+                <SidebarContent>
+                    <Menu iconShape="circle">
+                        <MenuItem
+                            icon={<FaUsers />}
+                            active={pathname === '/parents/student-profiles'}
+                        >
                             <NavLink to="/parents/student-profiles">Student Profiles</NavLink>
                         </MenuItem>
-                        <MenuItem icon={<FaShoppingCart />}>
-                            <NavLink to="/parents/send-medication">Send Medication</NavLink>
+                        <SubMenu title="Health" icon={<FaHeartbeat />}>
+                            <MenuItem
+                                icon={<FaBriefcaseMedical />}
+                                active={pathname === '/parents/send-medication'}
+                            >
+                                <NavLink to="/parents/send-medication">Send Medication</NavLink>
+                            </MenuItem>
+                            <MenuItem
+                                icon={<FaShieldAlt />}
+                                active={pathname === '/parents/vaccine-overview'}
+                            >
+                                <NavLink to="/parents/vaccine-overview">Immunization</NavLink>
+                            </MenuItem>
+                             <MenuItem 
+                                icon={<FaUserMd />} 
+                                active={pathname === '/parents/medical-checkups'}>
+                                <NavLink to="/parents/medical-checkups">Medical Events</NavLink>
+                            </MenuItem>
+                        </SubMenu>
+                        <MenuItem className='notification-menu-item'
+                            icon={<FaBell />}
+                            active={pathname === '/parents/notifications'}
+                        >
+                            <NavLink to="/parents/notifications">Notifications</NavLink>
                         </MenuItem>
-                    </SubMenu>
+                    </Menu>
+                </SidebarContent>
 
-                    {/* Confirmations */}
-                    <SubMenu icon={<FaCheckCircle />} title="Confirmations">
-                        <MenuItem icon={<FaCheckCircle />}>
-                            <NavLink to="/parents/immunization">Confirm Immunization</NavLink>
-                        </MenuItem>
-                        <MenuItem icon={<FaPrescription />}>
-                            <NavLink to="/parents/send-medication">Confirm Medications</NavLink>
-                        </MenuItem>
-                    </SubMenu>
-
-                    {/* Medical Events */}
-                    <MenuItem icon={<FaHeartbeat />}>
-                        <NavLink to="/parents/medical-checkups">Medical Events</NavLink>
-                    </MenuItem>
-
-                    {/* Notifications */}
-                    <MenuItem icon={<FaBell />}>
-                        <NavLink to="/parents/notifications">Notifications</NavLink>
-                    </MenuItem>
-
-                </Menu>
-            </SidebarContent>
-            <SidebarFooter className='sidebar-footer' style={{ textAlign: 'center', padding: '10px 0', fontWeight: 'bold', color: '#666' }}>
-                SWP391
-            </SidebarFooter>
-        </ProSidebar>
+                <SidebarFooter>
+                    <div className="sidebar-footer-content">
+                        <div className="user-info">
+                            <img src={user.avatar} alt="avatar" className="user-avatar" />
+                            {!collapsed && (
+                                <div className="user-details">
+                                    <div className="user-name">{user.name}</div>
+                                    <div className="user-email">{user.email}</div>
+                                </div>
+                            )}
+                        </div>
+                        {!collapsed && (
+                            <span className="logout-icon">
+                                <FaSignOutAlt />
+                            </span>
+                        )}
+                    </div>
+                </SidebarFooter>
+            </ProSidebar>
+        </div>
     )
 }
 

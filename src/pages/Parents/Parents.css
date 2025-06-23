@@ -1,9 +1,13 @@
+body {
+  background-color: #f1f1f1;
+}
+
 .parents-container {
     display: flex;
 }
 
 .parents-container .parents-sidebar .pro-sidebar {
-    height: 100vh !important;
+    height: 93vh !important;
 }
 
 .parents-content {
@@ -14,7 +18,15 @@
     
     background-color: #FFF5F5;
 }
+svg.toggle-icon {
+  display: none;
+}
 
+.parents-sidebar {
+  
+  z-index: 0;
+  background-color: #f1f1f1;
+}
 
 .parents-main {
     height: 40px;
@@ -58,3 +70,8 @@
   z-index: 9999;
 }
 */
+
+.vaccine-list {
+  max-height: 665px;
+  overflow-y: auto;
+}
