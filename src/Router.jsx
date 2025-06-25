@@ -20,6 +20,9 @@ import VaccinationCampaignAdmin from "./pages/Admin/VaccinationCampaign/Vaccinat
 import MedicalSupplyAdmin from "./pages/Admin/MedicalSupply/MedicalSupplyAdmin";
 import MedicalSupplyLotAdmin from "./pages/Admin/MedicalSupply/MedicalSupplyLotAdmin";
 import MedicationLotAdmin from "./pages/Admin/Medication/MedicationLotAdmin";
+import VaccinationScheduleAdmin from "./pages/Admin/VaccinationSchedule/VaccinationSchedule";
+import MedicationManager from "./pages/Admin/Medication/MedicationManager";
+import MedicalSupplyManager from "./pages/Admin/MedicalSupply/MedicalSupplyManager";
 
 
 
@@ -42,11 +45,10 @@ const Router = () => {
         </Route>
          <Route path="/admin" element={<Admin />}>
           <Route path="manage-users" element={<ManageUser />} />
-          <Route path="manage-medication" element={<MedicationAdmin />} />
-          <Route path="manage-medication-lot" element={<MedicationLotAdmin />} />
-          <Route path="manage-medicalSupply" element={<MedicalSupplyAdmin />} />
-          <Route path="manage-medicalSupply-lot" element={<MedicalSupplyLotAdmin />} />
+          <Route path="manage-medication" element={<MedicationManager />} />
+          <Route path="manage-medicalSupply" element={<MedicalSupplyManager />} />
           <Route path="manage-vaccinationCampaign" element={<VaccinationCampaignAdmin />} />
+          <Route path="manage-vaccinationSchedule" element={<VaccinationScheduleAdmin />} />
         </Route>
       </Routes>
       <ToastContainer
