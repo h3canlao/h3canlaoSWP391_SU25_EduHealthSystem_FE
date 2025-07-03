@@ -1,4 +1,3 @@
-// vaccinationHelperApi.js
 import axios from "axios";
 const BASE_URL = "https://localhost:7096/api";
 

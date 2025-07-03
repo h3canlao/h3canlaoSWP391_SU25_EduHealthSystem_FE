@@ -66,6 +66,9 @@ const SideBar = ({ collapsed, toggleSidebar }) => {
               <MenuItem icon={<FaSyringe />} active={pathname === "/admin/manage-vaccinationSchedule"}>
               <NavLink to="/admin/manage-vaccinationSchedule">Vaccination Schedule</NavLink>
             </MenuItem>
+            <MenuItem icon={<FaSyringe />} active={pathname === "/admin/manage-vaccine"}>
+              <NavLink to="/admin/manage-vaccine">Manage Vaccine</NavLink>
+            </MenuItem>
           </SubMenu>
           
 

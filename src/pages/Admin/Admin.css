@@ -10,6 +10,7 @@
     width: 100%;
     padding: 0 24px;
     background-color: #F1F1F1;
+    margin-left: 350px
 }
 .admin-header {
     height: 40px;
@@ -59,4 +60,5 @@
 
 .pro-sidebar {
   width: 350px;
+  position: fixed;
 }
