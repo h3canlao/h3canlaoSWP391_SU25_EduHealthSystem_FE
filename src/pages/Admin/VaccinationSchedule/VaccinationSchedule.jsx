@@ -21,8 +21,10 @@ import {
   getDeletedVaccinationSchedules,
   restoreVaccinationSchedules,
   updateStatusVaccinationSchedules,
+  getVaccinationScheduleById,
 } from "@/services/vaccinationSchedule";
-import { getGrades, getStudentsByGradeSection } from "@/services/vaccinationHelperApi";
+import { getGrades, getStudents } from "@/services/vaccinationHelperApi"; // Sử dụng service mới
+import VaccinationScheduleCreateModal from "./Modal";
 
 const statusOptions = [
   { value: 0, label: "Chưa bắt đầu", color: "default" },
@@ -32,9 +34,10 @@ const statusOptions = [
 ];
 
 const defaultForm = {
-  startDate: null,
-  endDate: null,
-  description: "",
+  vaccinationTypeId: null,
+  scheduledAt: null,
+  studentIds: [],
+  notes: "",
 };
 
 const VaccinationScheduleAdmin = () => {
@@ -48,12 +51,11 @@ const VaccinationScheduleAdmin = () => {
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 });
   const [filterType, setFilterType] = useState("all");
   const [grades, setGrades] = useState([]);
-  const [sections, setSections] = useState(["1A"]); // hardcoded unless dynamic
-  const [selectedGrade, setSelectedGrade] = useState();
-  const [selectedSection, setSelectedSection] = useState();
   const [students, setStudents] = useState([]);
   const [selectedStudentIds, setSelectedStudentIds] = useState([]);
+const [createModalOpen, setCreateModalOpen] = useState(false);
 
+  // Fetch schedule list
   const fetchData = async (params = {}) => {
     setLoading(true);
     try {
@@ -85,27 +87,93 @@ const VaccinationScheduleAdmin = () => {
     setLoading(false);
   };
 
+  // Fetch grades + students
+  const loadGrades = async () => {
+    try {
+      const res = await getGrades();
+      setGrades(res.data.data || res.data || []);
+    } catch {
+      message.error("Không tải được danh sách khối");
+    }
+  };
+  const loadStudents = async () => {
+    try {
+      const res = await getStudents();
+      setStudents(res.data.data || res.data || []);
+    } catch {
+      message.error("Không tải được danh sách học sinh");
+    }
+  };
+
   useEffect(() => {
     fetchData({ current: 1, searchTerm, status: statusFilter });
     setPagination(prev => ({ ...prev, current: 1 }));
+    loadGrades();
+    loadStudents();
   }, [filterType, statusFilter, searchTerm]);
 
-  useEffect(() => {
-    const fetchStudents = async () => {
-      if (selectedGrade && selectedSection) {
-        try {
-          const res = await getStudentsByGradeSection([selectedGrade], [selectedSection]);
-          setStudents(res.data.data || []);
-        } catch {
-          message.error("Không tải được danh sách học sinh");
-        }
+  // Edit modal: load chi tiết và set form
+  const openModal = async (record = null) => {
+    setEditing(record ? record.id : null);
+    form.resetFields();
+    if (record) {
+      try {
+        const res = await getVaccinationScheduleById(record.id);
+        const detail = res.data;
+        form.setFieldsValue({
+          vaccinationTypeId: detail.vaccinationTypeId,
+          scheduledAt: detail.scheduledAt ? dayjs(detail.scheduledAt) : null,
+          notes: detail.notes,
+        });
+        setSelectedStudentIds(detail.studentIds || []);
+      } catch {
+        message.error("Không lấy được thông tin chi tiết!");
+        return;
       }
-    };
-    fetchStudents();
-  }, [selectedGrade, selectedSection]);
+    } else {
+      form.setFieldsValue(defaultForm);
+      setSelectedStudentIds([]);
+    }
+    setModalVisible(true);
+  };
+
+  // Tạo hoặc cập nhật
+  const handleOk = async () => {
+    try {
+      const values = await form.validateFields();
+      const payload = {
+        vaccinationTypeId: values.vaccinationTypeId,
+        scheduledAt: values.scheduledAt?.toISOString(),
+        studentIds: selectedStudentIds,
+        notes: values.notes,
+      };
+      if (editing) {
+        await updateVaccinationSchedule(editing, payload);
+        message.success("Cập nhật thành công!");
+      } else {
+        await createVaccinationSchedule(payload);
+        message.success("Tạo mới thành công!");
+      }
+      setModalVisible(false);
+      fetchData();
+    } catch (err) {
+      message.error(err?.response?.data?.message ?? "Có lỗi xảy ra!");
+    }
+  };
+
+  // Xóa batch (nhiều id)
+  const handleDelete = async (ids) => {
+    try {
+      await deleteVaccinationSchedules(ids, true); // true: xóa vĩnh viễn
+      message.success("Xóa thành công!");
+      fetchData();
+    } catch (err) {
+      message.error(err?.response?.data?.message ?? "Xóa thất bại!");
+    }
+  };
 
   const columns = [
-    { title: "Loại tiêm", dataIndex: "vaccinationTypeName", key: "vaccinationTypeName" },
+    { title: "Loại vaccine", dataIndex: "vaccinationTypeName", key: "vaccinationTypeName" },
     {
       title: "Thời gian dự kiến",
       dataIndex: "scheduledAt",
@@ -145,48 +213,6 @@ const VaccinationScheduleAdmin = () => {
     fetchData({ current: pag.current, pageSize: pag.pageSize, searchTerm, status: statusFilter });
   };
 
-  const openModal = async (record = null) => {
-    setEditing(record ? record.id : null);
-    await loadGrades();
-    setModalVisible(true);
-  };
-
-  const loadGrades = async () => {
-    try {
-      const res = await getGrades();
-      setGrades(res.data.data || []);
-    } catch {
-      message.error("Không tải được danh sách khối");
-    }
-  };
-
-  const handleOk = async () => {
-    try {
-      const values = await form.validateFields();
-      const payload = {
-        scheduledAt: values.startDate?.toISOString(),
-        studentIds: selectedStudentIds,
-        notes: values.description,
-      };
-      await createVaccinationSchedule(payload);
-      message.success("Lịch tiêm đã được tạo!");
-      setModalVisible(false);
-      fetchData();
-    } catch (err) {
-      message.error(err?.response?.data?.message ?? "Có lỗi xảy ra!");
-    }
-  };
-
-  const handleDelete = async (ids) => {
-    try {
-      await deleteVaccinationSchedules(ids);
-      message.success("Xóa thành công!");
-      fetchData();
-    } catch (err) {
-      message.error(err?.response?.data?.message ?? "Xóa thất bại!");
-    }
-  };
-
   return (
     <div>
       <Space style={{ marginBottom: 16 }}>
@@ -221,7 +247,7 @@ const VaccinationScheduleAdmin = () => {
         >
           Xem lịch đã xóa
         </Button>
-        <Button type="primary" onClick={() => openModal()}>
+        <Button type="primary" onClick={() => setCreateModalOpen(true)}>
           Thêm mới lịch tiêm
         </Button>
       </Space>
@@ -242,21 +268,12 @@ const VaccinationScheduleAdmin = () => {
         destroyOnClose
       >
         <Form form={form} layout="vertical" initialValues={defaultForm}>
-          <Form.Item name="grade" label="Khối">
-            <Select
-              options={grades.map(g => ({ value: g, label: `Khối ${g}` }))}
-              onChange={val => {
-                setSelectedGrade(val);
-                setSelectedSection(undefined);
-              }}
-            />
-          </Form.Item>
-          <Form.Item name="section" label="Lớp">
-            <Select
-              value={selectedSection}
-              options={sections.map(s => ({ value: s, label: `Lớp ${s}` }))}
-              onChange={val => setSelectedSection(val)}
-            />
+          {/* Nếu có lấy danh sách loại vaccine, thêm vào Select này */}
+          {/* <Form.Item name="vaccinationTypeId" label="Loại vaccine" rules={[{ required: true }]}>
+            <Select options={listVaccineTypes} showSearch />
+          </Form.Item> */}
+          <Form.Item name="scheduledAt" label="Thời gian tiêm" rules={[{ required: true }]}>
+            <DatePicker showTime style={{ width: "100%" }} />
           </Form.Item>
           <Form.Item label="Chọn học sinh">
             <Select
@@ -272,14 +289,17 @@ const VaccinationScheduleAdmin = () => {
               placeholder="Chọn học sinh"
             />
           </Form.Item>
-          <Form.Item name="startDate" label="Thời gian tiêm" rules={[{ required: true }]}>  
-            <DatePicker showTime style={{ width: "100%" }} />
-          </Form.Item>
-          <Form.Item name="description" label="Ghi chú">
+          <Form.Item name="notes" label="Ghi chú">
             <Input.TextArea rows={3} />
           </Form.Item>
         </Form>
       </Modal>
+
+      <VaccinationScheduleCreateModal
+  visible={createModalOpen}
+  onClose={() => setCreateModalOpen(false)}
+  onCreated={fetchData}
+/>
     </div>
   );
 };

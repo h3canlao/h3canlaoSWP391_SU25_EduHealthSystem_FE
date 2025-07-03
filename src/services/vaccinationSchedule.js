@@ -1,33 +1,32 @@
 import axios from "axios";
 const BASE_URL = "https://localhost:7096/api";
 
-export const getVaccinationSchedules = async (params) => {
-  return axios.get(`${BASE_URL}/VaccinationSchedule`, { params });
-};
+// Danh sách
+export const getVaccinationSchedules = (params) => axios.get(`${BASE_URL}/VaccinationSchedule`, { params });
 
-export const createVaccinationSchedule = async (data) => {
-  return axios.post(`${BASE_URL}/VaccinationSchedule`, data);
-};
+// Lịch đã xóa
+export const getDeletedVaccinationSchedules = (params) =>
+  axios.get(`${BASE_URL}/VaccinationSchedule/deleted`, { params });
 
-export const updateVaccinationSchedule = async (id, data) => {
-  return axios.put(`${BASE_URL}/VaccinationSchedule/${id}`, data);
-};
+// Tạo mới
+export const createVaccinationSchedule = (data) => axios.post(`${BASE_URL}/VaccinationSchedule`, data);
 
-export const deleteVaccinationSchedules = async (ids, isPermanent = false) => {
-  return axios.delete(`${BASE_URL}/VaccinationSchedule/batch`, {
-    data: ids,
-    params: { isPermanent },
+// Cập nhật (edit)
+export const updateVaccinationSchedule = (id, data) => axios.put(`${BASE_URL}/VaccinationSchedule/${id}`, data);
+
+// Xem chi tiết 1 lịch
+export const getVaccinationScheduleById = (id) => axios.get(`${BASE_URL}/VaccinationSchedule/${id}`);
+
+// Xóa nhiều (batch, dùng body là mảng ids)
+export const deleteVaccinationSchedules = (ids, isPermanent = false) =>
+  axios.delete(`${BASE_URL}/VaccinationSchedule/batch`, {
+    data: { ids, isPermanent }, // đúng theo API
   });
-};
 
-export const getDeletedVaccinationSchedules = async (params) => {
-  return axios.get(`${BASE_URL}/VaccinationSchedule/deleted`, { params });
-};
+// Phục hồi nhiều
+export const restoreVaccinationSchedules = (ids) =>
+  axios.patch(`${BASE_URL}/VaccinationSchedule/batch/restore`, { ids });
 
-export const restoreVaccinationSchedules = async (ids) => {
-  return axios.patch(`${BASE_URL}/VaccinationSchedule/batch/restore`, ids);
-};
-
-export const updateStatusVaccinationSchedules = async (ids, status) => {
-  return axios.patch(`${BASE_URL}/VaccinationSchedule/batch/status`, { ids, status });
-};
+// Đổi trạng thái nhiều
+export const updateStatusVaccinationSchedules = (scheduleIds, newStatus, notes) =>
+  axios.patch(`${BASE_URL}/VaccinationSchedule/batch/status`, { scheduleIds, newStatus, notes });
