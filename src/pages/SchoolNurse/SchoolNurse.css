@@ -2,17 +2,17 @@ body {
   background-color: #f1f1f1;
 }
 
-.parents-container {
+.schoolnurse-container {
     display: flex;
     height: 100vh;
     min-height: 100vh;
 }
 
-.parents-container .parents-sidebar .pro-sidebar {
+.schoolnurse-container .schoolnurse-sidebar .pro-sidebar {
     height: 93vh !important;
 }
 
-.parents-content {
+.schoolnurse-content {
     width: 100%;
     background-color: #F1F1F1;
     height: 100vh;
@@ -20,7 +20,7 @@ body {
     display: flex;
     flex-direction: column;
 }
-.parents-header {
+.schoolnurse-header {
     
     background-color: #FFF5F5;
 }
@@ -28,14 +28,14 @@ svg.toggle-icon {
   display: none;
 }
 
-.parents-sidebar {
+.schoolnurse-sidebar {
   
   z-index: 0;
   background-color: #F5F7FA;
   height: 100vh;
 }
 
-.parents-main {
+.schoolnurse-main {
     height: 100%;
     overflow-y: auto;
 }
@@ -65,11 +65,11 @@ svg.toggle-icon {
 }
 
 /* Nếu muốn icon bay lơ lửng ở góc trên bên trái (fixed position) */
-.parents-header {
+.schoolnurse-header {
   position: relative; /* giữ nguyên position để icon nằm trong khung header */
 }
 
-/* Hoặc bạn có thể dùng position fixed để icon lơ lửng trên page (bỏ phần parents-header) */
+/* Hoặc bạn có thể dùng position fixed để icon lơ lửng trên page (bỏ phần schoolnurse-header) */
 /*
 .toggle-icon {
   position: fixed;

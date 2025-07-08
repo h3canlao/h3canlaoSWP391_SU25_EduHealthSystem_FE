@@ -59,16 +59,36 @@ const SideBar = ({ collapsed, toggleSidebar }) => {
                             >
                                 <NavLink to="/parents/send-medication">Send Medication</NavLink>
                             </MenuItem>
+                            <SubMenu title="Immunization" icon={<FaShieldAlt />}>
+                                <MenuItem
+                                    icon={<FaShieldAlt />}
+                                    active={pathname === '/parents/vaccine-overview'}
+                                >
+                                    <NavLink to="/parents/vaccine-overview">Overview</NavLink>
+                                </MenuItem>
+                                <MenuItem
+                                    icon={<FaShieldAlt />}
+                                    active={pathname === '/parents/vaccine-history'}
+                                >
+                                    <NavLink to="/parents/vaccine-history">History</NavLink>
+                                </MenuItem>
+                            </SubMenu>
+                        </SubMenu>
+                        <SubMenu title="Medical" icon={<FaUserMd />}>
                             <MenuItem
-                                icon={<FaShieldAlt />}
-                                active={pathname === '/parents/vaccine-overview'}
-                            >
-                                <NavLink to="/parents/vaccine-overview">Immunization</NavLink>
-                            </MenuItem>
-                             <MenuItem 
-                                icon={<FaUserMd />} 
+                                icon={<FaUserMd />}
                                 active={pathname === '/parents/medical-checkups'}>
-                                <NavLink to="/parents/medical-checkups">Medical Events</NavLink>
+                                <NavLink to="/parents/medical-checkups">Events</NavLink>
+                            </MenuItem>
+                            <MenuItem
+                                icon={<FaUserMd />}
+                                active={pathname === '/parents/checkup-history'}>
+                                <NavLink to="/parents/checkup-history">Checkups</NavLink>
+                            </MenuItem>
+                            <MenuItem
+                                icon={<FaUserMd />}
+                                active={pathname === '/parents/consultation-schedule'}>
+                                <NavLink to="/parents/consultation-schedule">Consult</NavLink>
                             </MenuItem>
                         </SubMenu>
                         <MenuItem className='notification-menu-item'

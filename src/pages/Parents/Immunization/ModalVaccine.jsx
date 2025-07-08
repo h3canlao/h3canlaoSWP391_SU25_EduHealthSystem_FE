@@ -59,17 +59,23 @@ const ModalVaccine = ({ show, setShow, vaccineData, resetData, onActionSuccess }
       toast.info("Bạn chưa chọn xác nhận hoặc từ chối cho học sinh nào.");
       return;
     }
+    
+    // Kiểm tra xem tất cả học sinh có cùng consentStatus không
+    const consentStatuses = [...new Set(toSave.map(s => s.consentStatus))];
+    if (consentStatuses.length > 1) {
+      toast.error("Tất cả học sinh phải có cùng trạng thái xác nhận (đồng ý hoặc từ chối).");
+      return;
+    }
+    
     setLoading(true);
     try {
-      await Promise.all(toSave.map(s =>
-        acceptVaccine({
-          studentId: s.studentId,
-          vaccinationScheduleId: vaccineData.id,
-          parentNote,
-          parentSignature,
-          consentStatus: s.consentStatus
-        })
-      ));
+      await acceptVaccine({
+        studentIds: toSave.map(s => s.studentId),
+        vaccinationScheduleId: vaccineData.id,
+        parentNote,
+        parentSignature,
+        consentStatus: consentStatuses[0]
+      });
       toast.success("Lưu thông tin xác nhận thành công!");
       if (onActionSuccess) onActionSuccess();
       handleClose();
