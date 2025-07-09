@@ -173,6 +173,20 @@ const createCheckupRecord = async (data) => {
   });
 };
 
+// Lấy danh sách lịch tư vấn theo staffId
+const getCounselingAppointmentsByStaffId = async (staffId) => {
+  return axios.get(`${BASE_URL}/counseling-appointments/staff/${staffId}`, {
+    headers: getAuthHeaders()
+  });
+};
+
+// Thêm ghi chú cho counseling appointment
+const addCounselingAppointmentNote = async (data) => {
+  return axios.post(`${BASE_URL}/counseling-appointments/add-note`, data, {
+    headers: getAuthHeaders()
+  });
+};
+
 export {
   postSignin,
   postRegister,
@@ -200,4 +214,6 @@ export {
   getCheckupSchedules,
   getNurseProfiles,
   createCheckupRecord,
+  getCounselingAppointmentsByStaffId,
+  addCounselingAppointmentNote,
 };
