@@ -20,7 +20,8 @@ import {
     FaUserMd,
     FaCalendarCheck,
     FaSyringe,
-    FaClock
+    FaClock,
+    FaStethoscope
 } from 'react-icons/fa';
 import { useLocation, NavLink } from 'react-router-dom';
 
@@ -66,6 +67,12 @@ const SideBar = ({ collapsed, toggleSidebar }) => {
                             active={pathname === '/nurse/pending-medications'}
                         >
                             <NavLink to="/nurse/pending-medications">Pending Medications</NavLink>
+                        </MenuItem>
+                        <MenuItem
+                            icon={<FaStethoscope />}
+                            active={pathname === '/nurse/health-checkups'}
+                        >
+                            <NavLink to="/nurse/health-checkups">Khám Sức Khỏe</NavLink>
                         </MenuItem>
                     </Menu>
                 </SidebarContent>

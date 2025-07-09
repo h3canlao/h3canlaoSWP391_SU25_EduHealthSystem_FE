@@ -152,6 +152,27 @@ const updateMedicationDeliveryStatus = async (parentMedicationDeliveryId, status
   );
 };
 
+// Lấy danh sách lịch khám sức khỏe
+const getCheckupSchedules = async () => {
+  return axios.get(`${BASE_URL}/CheckupSchedule`, {
+    headers: getAuthHeaders()
+  });
+};
+
+// Lấy danh sách nurse profiles
+const getNurseProfiles = async () => {
+  return axios.get(`${BASE_URL}/NurseProfile`, {
+    headers: getAuthHeaders()
+  });
+};
+
+// Tạo checkup record
+const createCheckupRecord = async (data) => {
+  return axios.post(`${BASE_URL}/checkup-records`, data, {
+    headers: getAuthHeaders()
+  });
+};
+
 export {
   postSignin,
   postRegister,
@@ -176,4 +197,7 @@ export {
   createCheckupSchedule,
   getPendingMedicationDeliveries,
   updateMedicationDeliveryStatus,
+  getCheckupSchedules,
+  getNurseProfiles,
+  createCheckupRecord,
 };

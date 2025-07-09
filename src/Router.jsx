@@ -25,6 +25,7 @@ import SchoolNurse from "./pages/SchoolNurse/SchoolNurse";
 import CreateVaccineSchedule from "./pages/SchoolNurse/CreateVaccineSchedule/CreateVaccineSchedule";
 import CreateCheckupSchedule from "./pages/SchoolNurse/CreateCheckupSchedule/CreateCheckupSchedule";
 import PendingMedications from "./pages/SchoolNurse/PendingMedications/PendingMedications";
+import HealthCheckups from "./pages/SchoolNurse/HealthCheckups/HealthCheckups";
 
 const Router = () => {
   return (
@@ -59,6 +60,7 @@ const Router = () => {
           <Route path="create-vaccine-schedule" element={<CreateVaccineSchedule />} />
           <Route path="create-checkup-schedule" element={<CreateCheckupSchedule />} />
           <Route path="pending-medications" element={<PendingMedications />} />
+          <Route path="health-checkups" element={<HealthCheckups />} />
         </Route>
       </Routes>
       <ToastContainer
