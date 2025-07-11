@@ -17,6 +17,8 @@ import {
   FaComments
 } from 'react-icons/fa';
 import './CheckupRecordModal.css';
+import DatePicker from "react-datepicker";
+import "/node_modules/react-datepicker/dist/react-datepicker.css";
 
 // Thêm hàm chuyển đổi đúng giờ local sang ISO
 function toISOStringLocal(dtStr) {
@@ -29,6 +31,22 @@ function toISOStringLocal(dtStr) {
     Number(hour), Number(minute)
   );
   return d.toISOString();
+}
+
+// Hàm lấy min/max cho input datetime-local (ngày hiện tại, 8h và 18h)
+function getMinDate(dateStr) {
+  const d = dateStr ? new Date(dateStr) : new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}T08:00`;
+}
+function getMaxDate(dateStr) {
+  const d = dateStr ? new Date(dateStr) : new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}T18:00`;
 }
 
 const CheckupRecordModal = ({ schedule, onClose, onRecordCreated }) => {
@@ -112,9 +130,19 @@ const CheckupRecordModal = ({ schedule, onClose, onRecordCreated }) => {
       return;
     }
 
+    const getHour = (dtStr) => Number(dtStr?.split('T')[1]?.split(':')[0]);
+    if (getHour(formData.examinedAt) < 8 || getHour(formData.examinedAt) > 18) {
+      toast.error('Chỉ được chọn giờ khám từ 08:00 đến 18:00');
+      return;
+    }
+    if (formData.status === 2 && (getHour(followUpData.appointmentDate) < 8 || getHour(followUpData.appointmentDate) > 18)) {
+      toast.error('Chỉ được chọn giờ hẹn tái khám từ 08:00 đến 18:00');
+      return;
+    }
+
     try {
       setLoading(true);
-      
+      // Set thời gian khám là hiện tại
       const submitData = {
         ...formData,
         heightCm: parseFloat(formData.heightCm) || 0,
@@ -123,7 +151,6 @@ const CheckupRecordModal = ({ schedule, onClose, onRecordCreated }) => {
         visionRight: parseFloat(formData.visionRight) || 0,
         hearing: parseFloat(formData.hearing) || 0,
         bloodPressureDiastolic: parseFloat(formData.bloodPressureDiastolic) || 0,
-        examinedAt: new Date(formData.examinedAt).toISOString(),
         counselingAppointment: formData.status === 2 ? [{
           ...followUpData,
           appointmentDate: toISOStringLocal(followUpData.appointmentDate),
@@ -344,12 +371,29 @@ const CheckupRecordModal = ({ schedule, onClose, onRecordCreated }) => {
                     <FaCalendar />
                     Thời gian khám
                   </label>
-                  <input
-                    type="datetime-local"
-                    name="examinedAt"
-                    value={formData.examinedAt}
-                    onChange={handleInputChange}
-                    required
+                  <DatePicker
+                    selected={formData.examinedAt ? new Date(formData.examinedAt) : null}
+                    onChange={date => {
+                      if (date) {
+                        // Format local ISO string yyyy-MM-ddTHH:mm:ss
+                        const localISO = date.getFullYear() + '-' +
+                          String(date.getMonth() + 1).padStart(2, '0') + '-' +
+                          String(date.getDate()).padStart(2, '0') + 'T' +
+                          String(date.getHours()).padStart(2, '0') + ':' +
+                          String(date.getMinutes()).padStart(2, '0') + ':00';
+                        console.log('examinedAt:', localISO);
+                        setFormData(prev => ({
+                          ...prev,
+                          examinedAt: localISO
+                        }));
+                      }
+                    }}
+                    showTimeSelect
+                    timeFormat="HH:mm"
+                    timeIntervals={15}
+                    dateFormat="yyyy-MM-dd HH:mm"
+                    placeholderText="Chọn ngày và giờ khám"
+                    className="react-datepicker__input"
                   />
                 </div>
                 <div className="form-group">
@@ -417,12 +461,29 @@ const CheckupRecordModal = ({ schedule, onClose, onRecordCreated }) => {
                       <FaCalendarAlt />
                       Ngày hẹn
                     </label>
-                    <input
-                      type="datetime-local"
-                      name="appointmentDate"
-                      value={followUpData.appointmentDate}
-                      onChange={handleFollowUpChange}
-                      required
+                    <DatePicker
+                      selected={followUpData.appointmentDate ? new Date(followUpData.appointmentDate) : null}
+                      onChange={date => {
+                        if (date) {
+                          // Format local ISO string yyyy-MM-ddTHH:mm:ss
+                          const localISO = date.getFullYear() + '-' +
+                            String(date.getMonth() + 1).padStart(2, '0') + '-' +
+                            String(date.getDate()).padStart(2, '0') + 'T' +
+                            String(date.getHours()).padStart(2, '0') + ':' +
+                            String(date.getMinutes()).padStart(2, '0') + ':00';
+                          console.log('appointmentDate:', localISO);
+                          setFollowUpData(prev => ({
+                            ...prev,
+                            appointmentDate: localISO
+                          }));
+                        }
+                      }}
+                      showTimeSelect
+                      timeFormat="HH:mm"
+                      timeIntervals={15}
+                      dateFormat="yyyy-MM-dd HH:mm"
+                      placeholderText="Chọn ngày và giờ hẹn"
+                      className="react-datepicker__input"
                     />
                   </div>
                   <div className="form-group">

@@ -76,7 +76,7 @@ const createHealthProfile = async (profileData) => {
 
 // Xác nhận tiêm chủng cho học sinh
 const acceptVaccine = async (data) => {
-  return axios.post(`${BASE_URL}session-students/parent/accept-vaccine`, data, { headers: getAuthHeaders() });
+  return axios.post(`${BASE_URL}/session-students/parent/accept-vaccine`, data, { headers: getAuthHeaders() });
 };
 
 // Lấy danh sách lịch tiêm sắp tới
@@ -159,6 +159,25 @@ const getCheckupSchedules = async () => {
   });
 };
 
+// Lấy lịch khám sức khỏe theo studentId
+const getCheckupSchedulesByStudentId = async (studentId) => {
+  return axios.get(`${BASE_URL}/CheckupSchedule/Student`, {
+    params: { studentId },
+    headers: getAuthHeaders()
+  });
+};
+
+// Xác nhận consent lịch khám sức khỏe
+const consentCheckupSchedule = async (scheduleId, consentStatus, notes) => {
+  return axios.post(`${BASE_URL}/CheckupSchedule/consent`, {
+    scheduleId,
+    consentStatus,
+    notes
+  }, {
+    headers: getAuthHeaders()
+  });
+};
+
 // Lấy danh sách nurse profiles
 const getNurseProfiles = async () => {
   return axios.get(`${BASE_URL}/NurseProfile`, {
@@ -185,6 +204,16 @@ const addCounselingAppointmentNote = async (data) => {
   return axios.post(`${BASE_URL}/counseling-appointments/add-note`, data, {
     headers: getAuthHeaders()
   });
+};
+
+// Lấy hồ sơ khám sức khỏe theo studentId
+export const getCheckupRecordsByStudentId = async (studentId) => {
+  return axios.get(`${BASE_URL}/checkup-records/by-id/${studentId}`, { headers: getAuthHeaders() });
+};
+
+// Lấy lịch tư vấn theo studentId
+export const getCounselingAppointmentsByStudentId = async (studentId) => {
+  return axios.get(`${BASE_URL}/counseling-appointments/id/${studentId}`, { headers: getAuthHeaders() });
 };
 
 export {
@@ -216,4 +245,6 @@ export {
   createCheckupRecord,
   getCounselingAppointmentsByStaffId,
   addCounselingAppointmentNote,
+  getCheckupSchedulesByStudentId,
+  consentCheckupSchedule,
 };

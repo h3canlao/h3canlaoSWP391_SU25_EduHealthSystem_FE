@@ -17,9 +17,11 @@ import {
     FaSignOutAlt,
     FaBriefcaseMedical,
     FaShieldAlt,
-    FaUserMd
+    FaUserMd,
+    FaFileMedical,
+    FaComments
 } from 'react-icons/fa';
-import { useLocation, NavLink } from 'react-router-dom';
+import { Link, useLocation, NavLink } from 'react-router-dom';
 
 import './SideBar.css';
 
@@ -59,38 +61,39 @@ const SideBar = ({ collapsed, toggleSidebar }) => {
                             >
                                 <NavLink to="/parents/send-medication">Send Medication</NavLink>
                             </MenuItem>
-                            <SubMenu title="Immunization" icon={<FaShieldAlt />}>
-                                <MenuItem
-                                    icon={<FaShieldAlt />}
-                                    active={pathname === '/parents/vaccine-overview'}
-                                >
-                                    <NavLink to="/parents/vaccine-overview">Overview</NavLink>
-                                </MenuItem>
-                                <MenuItem
-                                    icon={<FaShieldAlt />}
-                                    active={pathname === '/parents/vaccine-history'}
-                                >
-                                    <NavLink to="/parents/vaccine-history">History</NavLink>
-                                </MenuItem>
-                            </SubMenu>
+                        </SubMenu>
+                        <SubMenu title="Vắc xin" icon={<FaShieldAlt />}>
+                            <MenuItem
+                                icon={<FaShieldAlt />}
+                                active={pathname === '/parents/vaccine-overview'}
+                            >
+                                <NavLink to="/parents/vaccine-overview">Overview</NavLink>
+                            </MenuItem>
+                            <MenuItem
+                                icon={<FaShieldAlt />}
+                                active={pathname === '/parents/vaccine-history'}
+                            >
+                                <NavLink to="/parents/vaccine-history">History</NavLink>
+                            </MenuItem>
                         </SubMenu>
                         <SubMenu title="Medical" icon={<FaUserMd />}>
                             <MenuItem
-                                icon={<FaUserMd />}
-                                active={pathname === '/parents/medical-checkups'}>
-                                <NavLink to="/parents/medical-checkups">Events</NavLink>
+                                icon={<FaFileMedical />}
+                                active={pathname === '/parents/checkup-records'}>
+                                <NavLink to="/parents/checkup-records">Theo dõi hồ sơ khám sức khỏe</NavLink>
                             </MenuItem>
                             <MenuItem
-                                icon={<FaUserMd />}
-                                active={pathname === '/parents/checkup-history'}>
-                                <NavLink to="/parents/checkup-history">Checkups</NavLink>
-                            </MenuItem>
-                            <MenuItem
-                                icon={<FaUserMd />}
-                                active={pathname === '/parents/consultation-schedule'}>
-                                <NavLink to="/parents/consultation-schedule">Consult</NavLink>
+                                icon={<FaHeartbeat />}
+                                active={pathname === '/parents/checkup-schedules'}>
+                                <NavLink to="/parents/checkup-schedules">Lịch khám sức khỏe</NavLink>
                             </MenuItem>
                         </SubMenu>
+                        <MenuItem
+                            icon={<FaComments />}
+                            active={pathname === '/parents/counseling-records'}
+                        >
+                            <NavLink to="/parents/counseling-records">Theo dõi lịch tư vấn sức khỏe</NavLink>
+                        </MenuItem>
                         <MenuItem className='notification-menu-item'
                             icon={<FaBell />}
                             active={pathname === '/parents/notifications'}

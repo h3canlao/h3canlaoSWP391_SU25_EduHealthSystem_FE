@@ -16,9 +16,13 @@ import VaccineOverview from "./pages/Parents/Immunization/VaccineOverview";
 import VaccineHistory from "./pages/Parents/Immunization/VaccineHistory";
 import CheckupHistory from "./pages/Parents/MedicalCheckups/CheckupHistory";
 import ConsultationSchedule from "./pages/Parents/MedicalCheckups/ConsultationSchedule";
+import ParentCheckupSchedules from "./pages/Parents/MedicalCheckups/ParentCheckupSchedules";
+import ParentCheckupRecords from "./pages/Parents/MedicalCheckups/ParentCheckupRecords";
 import Admin from "./pages/Admin/Admin";
 import ManageUser from "./pages/Admin/Features/ManageUser";
 import MedicationAdmin from "./pages/Admin/Medication";
+import ParentCounselingRecords from "./pages/Parents/MedicalCheckups/ParentCounselingRecords";
+
 
 // SchoolNurse imports
 import SchoolNurse from "./pages/SchoolNurse/SchoolNurse";
@@ -42,13 +46,13 @@ const Router = () => {
         <Route path="/parents" element={<Parents />}>
           <Route path="vaccine-overview" element={<VaccineOverview />}/>
           <Route path="vaccine-history" element={<VaccineHistory />} />
-          <Route path="medical-checkups" element={<HealthCheckup />} />
-          <Route path="checkup-history" element={<CheckupHistory />} />
-          <Route path="consultation-schedule" element={<ConsultationSchedule />} />
+          <Route path="checkup-schedules" element={<ParentCheckupSchedules />} />
+          <Route path="checkup-records" element={<ParentCheckupRecords />} />
           <Route path="send-medication" element={<SendMedication />} />
           <Route path="confirm-medications" element={<SendMedication />} />
           <Route path="notifications" element={<Notifications />} />
           <Route path="student-profiles" element={<StudentProfiles />} />
+          <Route path="counseling-records" element={<ParentCounselingRecords />} />
         </Route>
         {/* Admin Routes */}
         <Route path="/admin" element={<Admin />}>
