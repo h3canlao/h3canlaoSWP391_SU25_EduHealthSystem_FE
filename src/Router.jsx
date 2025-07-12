@@ -18,19 +18,11 @@ import CheckupHistory from "./pages/Parents/MedicalCheckups/CheckupHistory";
 import ConsultationSchedule from "./pages/Parents/MedicalCheckups/ConsultationSchedule";
 import ParentCheckupSchedules from "./pages/Parents/MedicalCheckups/ParentCheckupSchedules";
 import ParentCheckupRecords from "./pages/Parents/MedicalCheckups/ParentCheckupRecords";
-import ParentCounselingRecords from "./pages/Parents/MedicalCheckups/ParentCounselingRecords";
-
-// Admin imports
 import Admin from "./pages/Admin/Admin";
 import ManageUser from "./pages/Admin/Features/ManageUser";
-import VaccinationCampaignAdmin from "./pages/Admin/VaccinationCampaign/VaccinationCampaign";
-import MedicalSupplyAdmin from "./pages/Admin/MedicalSupply/MedicalSupplyAdmin";
-import MedicalSupplyLotAdmin from "./pages/Admin/MedicalSupply/MedicalSupplyLotAdmin";
-import MedicationLotAdmin from "./pages/Admin/Medication/MedicationLotAdmin";
-import VaccinationScheduleAdmin from "./pages/Admin/VaccinationSchedule/VaccinationSchedule";
-import MedicationManager from "./pages/Admin/Medication/MedicationManager";
-import MedicalSupplyManager from "./pages/Admin/MedicalSupply/MedicalSupplyManager";
-import VaccineManager from "./pages/Admin/Vaccine/VaccineManager";
+import MedicationAdmin from "./pages/Admin/Medication";
+import ParentCounselingRecords from "./pages/Parents/MedicalCheckups/ParentCounselingRecords";
+
 
 // SchoolNurse imports
 import SchoolNurse from "./pages/SchoolNurse/SchoolNurse";
@@ -65,11 +57,7 @@ const Router = () => {
         {/* Admin Routes */}
         <Route path="/admin" element={<Admin />}>
           <Route path="manage-users" element={<ManageUser />} />
-          <Route path="manage-medication" element={<MedicationManager />} />
-          <Route path="manage-medicalSupply" element={<MedicalSupplyManager />} />
-          <Route path="manage-vaccinationCampaign" element={<VaccinationCampaignAdmin />} />
-          <Route path="manage-vaccinationSchedule" element={<VaccinationScheduleAdmin />} />
-          <Route path="manage-vaccine" element={<VaccineManager />} />
+          <Route path="manage-medication" element={<MedicationAdmin />} />
         </Route>
         {/* SchoolNurse Routes */}
         <Route path="/nurse" element={<SchoolNurse />}>
