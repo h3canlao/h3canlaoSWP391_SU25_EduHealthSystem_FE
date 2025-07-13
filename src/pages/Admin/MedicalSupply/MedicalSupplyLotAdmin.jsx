@@ -21,10 +21,8 @@ import {
   deleteMedicalSupplyLots,
   restoreMedicalSupplyLots,
   updateLotQuantity,
-  getExpiringLots,
-  getExpiredLots,
-  getLotsBySupplyId,
-  getDeletedLots
+  getLotsByExpiryStatus,
+  getMedicalSupplyLotById,
 } from "@/services/medicalSupplyLotApi";
 import { getMedicalSupplies } from "@/services/medicalSupplyApi";
 
@@ -49,6 +47,8 @@ const MedicalSupplyLotAdmin = () => {
   const [filterType, setFilterType] = useState("all"); // all, deleted, expiring, expired
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 });
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [qtyModal, setQtyModal] = useState({ open: false, record: null });
+  const [qtyValue, setQtyValue] = useState(0);
 
   // Load supplies for filter and create/update
   const fetchSupplies = async () => {
@@ -59,46 +59,42 @@ const MedicalSupplyLotAdmin = () => {
   };
 
   // Load lot list
-const fetchData = async (params = {}) => {
-  setLoading(true);
-  try {
-    let lots = [];
-    let total = 0;
+  const fetchData = async (params = {}) => {
+    setLoading(true);
+    try {
+      let lots = [];
+      let total = 0;
 
-    if (filterType === "expiring") {
-      // Gọi API riêng cho Sắp hết hạn
-      const res = await getExpiringLots();
-      lots = res.data?.data || [];
-      total = lots.length;
-    } else if (filterType === "expired") {
-      // Gọi API riêng cho Đã hết hạn
-      const res = await getExpiredLots();
-      lots = res.data?.data || [];
-      total = lots.length;
-    } else if (filterType === "deleted") {
-      const res = await getDeletedLots();
-      lots = res.data?.data || [];
-      total = res.data?.totalRecords || lots.length;
-    } else {
-      // API mặc định (tất cả)
-      const res = await getMedicalSupplyLots({
-        pageNumber: params.pageNumber || pagination.current,
-        pageSize: params.pageSize || pagination.pageSize,
-        searchTerm: params.searchTerm !== undefined ? params.searchTerm : searchTerm,
-        medicalSupplyId: supplyFilter,
-        isExpired: expiredFilter,
-      });
-      lots = res.data?.data || [];
-      total = res.data?.totalRecords || lots.length;
+      if (filterType === "expiring") {
+        // Sắp hết hạn: status=expiring, mặc định daysBeforeExpiry=30
+        const res = await getLotsByExpiryStatus("expiring", 30);
+        lots = res.data?.data || [];
+        total = lots.length;
+      } else if (filterType === "expired") {
+        // Đã hết hạn: status=expired
+        const res = await getLotsByExpiryStatus("expired");
+        lots = res.data?.data || [];
+        total = lots.length;
+      } else {
+        // all hoặc deleted
+        const res = await getMedicalSupplyLots({
+          pageNumber: params.pageNumber || pagination.current,
+          pageSize: params.pageSize || pagination.pageSize,
+          searchTerm: params.searchTerm !== undefined ? params.searchTerm : searchTerm,
+          medicalSupplyId: supplyFilter,
+          isExpired: expiredFilter,
+          includeDeleted: filterType === "deleted"
+        });
+        lots = res.data?.data || [];
+        total = res.data?.totalRecords || lots.length;
+      }
+      setData(lots);
+      setPagination((prev) => ({ ...prev, total, current: params.pageNumber || pagination.current }));
+    } catch (error) {
+      message.error(error?.response?.data?.message ?? "Không tải được dữ liệu!");
     }
-    setData(lots);
-    setPagination((prev) => ({ ...prev, total, current: params.pageNumber || pagination.current }));
-  } catch (error) {
-    message.error(error?.response?.data?.message ?? "Không tải được dữ liệu!");
-  }
-  setLoading(false);
-};
-
+    setLoading(false);
+  };
 
   useEffect(() => {
     fetchSupplies();
@@ -172,13 +168,19 @@ const fetchData = async (params = {}) => {
   };
 
   // Modal add/edit
-  const openModal = (record = null) => {
+  const openModal = async (record = null) => {
     setEditing(record ? record.id : null);
     if (record) {
+      // Lấy chi tiết để tránh thiếu trường, nếu cần
+      let detail = record;
+      try {
+        const res = await getMedicalSupplyLotById(record.id);
+        detail = res.data?.data || record;
+      } catch {}
       form.setFieldsValue({
-        ...record,
-        expirationDate: record.expirationDate ? dayjs(record.expirationDate) : null,
-        manufactureDate: record.manufactureDate ? dayjs(record.manufactureDate) : null,
+        ...detail,
+        expirationDate: detail.expirationDate ? dayjs(detail.expirationDate) : null,
+        manufactureDate: detail.manufactureDate ? dayjs(detail.manufactureDate) : null,
       });
     } else {
       form.setFieldsValue(defaultForm);
@@ -195,6 +197,7 @@ const fetchData = async (params = {}) => {
         manufactureDate: values.manufactureDate ? values.manufactureDate.toISOString() : null,
       };
       if (editing) {
+        delete payload.medicalSupplyId; // Không cho sửa vật tư khi update
         await updateMedicalSupplyLot(editing, payload);
         message.success("Cập nhật thành công!");
       } else {
@@ -204,7 +207,7 @@ const fetchData = async (params = {}) => {
       setModalVisible(false);
       fetchData();
     } catch (error) {
-      message.error(error?.response?.data?.message ??"Có lỗi xảy ra!");
+      message.error(error?.response?.data?.message ?? "Có lỗi xảy ra!");
     }
   };
 
@@ -216,26 +219,11 @@ const fetchData = async (params = {}) => {
       setSelectedRowKeys([]);
       fetchData();
     } catch (error) {
-      message.error(error?.response?.data?.message ??"Xóa thất bại!");
-    }
-  };
-
-  // Khôi phục batch
-  const handleRestore = async () => {
-    if (!selectedRowKeys.length) return message.warning("Chọn lô để khôi phục");
-    try {
-      await restoreMedicalSupplyLots(selectedRowKeys);
-      message.success("Khôi phục thành công!");
-      setSelectedRowKeys([]);
-      fetchData();
-    } catch (error) {
-      message.error(error?.response?.data?.message ??"Khôi phục thất bại!");
+      message.error(error?.response?.data?.message ?? "Xóa thất bại!");
     }
   };
 
   // Edit quantity
-  const [qtyModal, setQtyModal] = useState({ open: false, record: null });
-  const [qtyValue, setQtyValue] = useState(0);
   const openEditQuantityModal = (record) => {
     setQtyModal({ open: true, record });
     setQtyValue(record.quantity);
@@ -247,12 +235,25 @@ const fetchData = async (params = {}) => {
       setQtyModal({ open: false, record: null });
       fetchData();
     } catch (error) {
-      message.error(error?.response?.data?.message ??"Cập nhật số lượng thất bại!");
+      message.error(error?.response?.data?.message ?? "Cập nhật số lượng thất bại!");
+    }
+  };
+
+  // Khôi phục lô đã xóa
+  const handleRestore = async () => {
+    if (!selectedRowKeys.length) return message.warning("Chọn lô để khôi phục");
+    try {
+      await restoreMedicalSupplyLots(selectedRowKeys);
+      message.success("Khôi phục thành công!");
+      setSelectedRowKeys([]);
+      fetchData();
+    } catch (err) {
+      message.error(err?.response?.data?.message ?? "Khôi phục thất bại!");
     }
   };
 
   return (
-    <div>
+    <div style={{ margin: "0 24px" }}>
       <Space style={{ marginBottom: 16 }}>
         <Input
           placeholder="Tìm kiếm mã lô"
@@ -282,7 +283,6 @@ const fetchData = async (params = {}) => {
             { value: true, label: "Hết hạn" },
           ]}
         />
-        
         <Button
           type={filterType === "expiring" ? "primary" : "default"}
           onClick={() => setFilterType(filterType === "expiring" ? "all" : "expiring")}
@@ -306,7 +306,7 @@ const fetchData = async (params = {}) => {
             Khôi phục đã chọn
           </Button>
         )}
-        <Button type="primary" onClick={() => openModal()}>
+        <Button type="primary" onClick={() => openModal()} disabled={filterType === "deleted"}>
           Thêm mới
         </Button>
       </Space>
@@ -335,12 +335,17 @@ const fetchData = async (params = {}) => {
         destroyOnClose
       >
         <Form form={form} layout="vertical" initialValues={defaultForm}>
-          <Form.Item name="medicalSupplyId" label="Vật tư" rules={[{ required: true, message: "Chọn vật tư" }]}>
+          <Form.Item
+            name="medicalSupplyId"
+            label="Vật tư"
+            rules={[{ required: true, message: "Chọn vật tư" }]}
+          >
             <Select
               options={supplies.map((x) => ({ value: x.id, label: x.name }))}
               showSearch
               optionFilterProp="label"
               placeholder="Chọn vật tư"
+              disabled={!!editing}
             />
           </Form.Item>
           <Form.Item name="lotNumber" label="Mã lô" rules={[{ required: true, message: "Nhập mã lô" }]}>

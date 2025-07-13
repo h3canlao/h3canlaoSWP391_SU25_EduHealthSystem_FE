@@ -1,58 +1,53 @@
 import axios from "axios";
 const BASE_URL = "https://localhost:7096/api";
 
-// Danh sách lô, filter, paging, search, supply, expired
-export const getMedicalSupplyLots = async (params) => {
+// Lấy tất cả lô (có param filter, paging, search, expired, includeDeleted)
+export const getMedicalSupplyLots = (params) => {
   return axios.get(`${BASE_URL}/MedicalSupplyLot`, { params });
 };
 
 // Tạo mới
-export const createMedicalSupplyLot = async (data) => {
+export const createMedicalSupplyLot = (data) => {
   return axios.post(`${BASE_URL}/MedicalSupplyLot`, data);
 };
 
 // Cập nhật
-export const updateMedicalSupplyLot = async (id, data) => {
+export const updateMedicalSupplyLot = (id, data) => {
   return axios.put(`${BASE_URL}/MedicalSupplyLot/${id}`, data);
 };
 
-// Xóa nhiều/xóa mềm/vĩnh viễn
-export const deleteMedicalSupplyLots = async (ids, isPermanent = false) => {
+// Xóa nhiều
+export const deleteMedicalSupplyLots = (ids, isPermanent = false) => {
   return axios.delete(`${BASE_URL}/MedicalSupplyLot`, { data: { ids, isPermanent } });
 };
 
 // Khôi phục nhiều
-export const restoreMedicalSupplyLots = async (ids) => {
+export const restoreMedicalSupplyLots = (ids) => {
   return axios.post(`${BASE_URL}/MedicalSupplyLot/restore`, { ids });
 };
 
-// Lô đã xóa
-export const getDeletedMedicalSupplyLots = async (params) => {
-  return axios.get(`${BASE_URL}/MedicalSupplyLot`, { params: { ...params, includeDeleted: true } });
+// Lấy các lô sắp hết hạn hoặc hết hạn
+// status: "expiring" (sắp hết hạn) hoặc "expired" (đã hết hạn)
+// daysBeforeExpiry chỉ dùng khi status="expiring" (ví dụ 30 ngày trước hạn)
+export const getLotsByExpiryStatus = (status = "expiring", daysBeforeExpiry = 30) => {
+  return axios.get(`${BASE_URL}/MedicalSupplyLot/expiry-status`, {
+    params: { status, daysBeforeExpiry },
+  });
 };
 
-export const getExpiringLots = async () => {
-  return axios.get(`${BASE_URL}/MedicalSupplyLot/expiring`);
-};
-export const getExpiredLots = async () => {
-  return axios.get(`${BASE_URL}/MedicalSupplyLot/expired`);
-};
-
-export const getDeletedLots = async (params = {}) => {
-  return axios.get(`${BASE_URL}/MedicalSupplyLot/deleted`, { params });
-};
-
-// By supplyId
-export const getLotsBySupplyId = async (medicalSupplyId) => {
-  return axios.get(`${BASE_URL}/MedicalSupplyLot/by-supply/${medicalSupplyId}`);
+// Lấy lô theo vật tư
+export const getLotsBySupplyId = (medicalSupplyId, includeQuantitySummary = false) => {
+  return axios.get(`${BASE_URL}/MedicalSupplyLot/by-supply/${medicalSupplyId}`, {
+    params: { includeQuantitySummary },
+  });
 };
 
 // Get lot detail
-export const getMedicalSupplyLotById = async (id) => {
+export const getMedicalSupplyLotById = (id) => {
   return axios.get(`${BASE_URL}/MedicalSupplyLot/${id}`);
 };
 
 // Update quantity
-export const updateLotQuantity = async (id, quantity) => {
+export const updateLotQuantity = (id, quantity) => {
   return axios.patch(`${BASE_URL}/MedicalSupplyLot/${id}/quantity`, { quantity });
 };
