@@ -64,7 +64,7 @@ const VaccineDoseInfoTab = ({ vaccineTypes }) => {
   };
 
   return (
-    <>
+    <div style={{margin: '0 24px'}}>
       <Space style={{ marginBottom: 8 }}>
         <Button type="primary" onClick={() => handleDoseModal()}>Thêm liều tiêm</Button>
         <Popconfirm
@@ -127,7 +127,7 @@ const VaccineDoseInfoTab = ({ vaccineTypes }) => {
           </Form.Item>
         </Form>
       </Modal>
-    </>
+    </div>
   );
 };
 

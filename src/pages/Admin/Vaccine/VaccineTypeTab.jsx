@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Modal, Form, Input, InputNumber, Space, Switch, Popconfirm, message, Tag } from "antd";
+import {
+  Table, Button, Modal, Form, Input, InputNumber, Space, Switch, Popconfirm, message, Tag,
+} from "antd";
 import {
   getVaccineTypes, createVaccineType, updateVaccineType, deleteVaccineTypes,
   getDeletedVaccineTypes, restoreVaccineTypes, toggleVaccineTypeStatus
@@ -45,7 +47,8 @@ const VaccineTypeTab = () => {
     try {
       const values = await form.validateFields();
       if (editing) {
-        await updateVaccineType(editing.id, { ...values, id: editing.id });
+        // Không cho sửa code và name khi edit
+        await updateVaccineType(editing.id, { ...editing, ...values, code: editing.code, name: editing.name });
         message.success("Cập nhật thành công!");
       } else {
         await createVaccineType(values);
@@ -67,22 +70,22 @@ const VaccineTypeTab = () => {
       setSelectedRowKeys([]);
       fetchData();
     } catch {
-      message.error("Xoá thất bại!");
+      message.error("Xoá thất bại! Có thể loại vaccine đã được sử dụng.");
     }
   };
 
   // --- Phục hồi nhiều ---
   const handleRestore = async () => {
-    if (!selectedRowKeys.length) return;
-    try {
-      await restoreVaccineTypes(selectedRowKeys);
-      message.success("Đã phục hồi!");
-      setSelectedRowKeys([]);
-      fetchData();
-    } catch {
-      message.error("Phục hồi thất bại!");
-    }
-  };
+  if (!selectedRowKeys.length) return;
+  try {
+    await restoreVaccineTypes(selectedRowKeys);
+    message.success("Đã phục hồi!");
+    setSelectedRowKeys([]);
+    fetchData();
+  } catch {
+    message.error("Phục hồi thất bại!");
+  }
+};
 
   // --- Toggle status ---
   const handleToggleStatus = async (record) => {
@@ -106,14 +109,15 @@ const VaccineTypeTab = () => {
       title: "Kích hoạt",
       dataIndex: "isActive",
       render: (v, r) =>
-        <Switch checked={v} onChange={() => handleToggleStatus(r)} />
+        <Switch checked={v} onChange={() => handleToggleStatus(r)} disabled={showDeleted} />
     },
     {
       title: "Thao tác", render: (_, r) => (
         <Space>
-          <Button type="link" onClick={() => openModal(r)}>Sửa</Button>
+          <Button type="link" onClick={() => openModal(r)}>Chi tiết</Button>
           {!showDeleted && (
-            <Popconfirm title="Xoá loại vaccine này?" onConfirm={() => deleteVaccineTypes([r.id], true).then(fetchData)}>
+            <Popconfirm title="Xoá loại vaccine này? Nếu đang có lô vaccine sử dụng sẽ không xóa được."
+              onConfirm={() => deleteVaccineTypes([r.id], true).then(fetchData)}>
               <Button danger type="link">Xoá</Button>
             </Popconfirm>
           )}
@@ -123,7 +127,7 @@ const VaccineTypeTab = () => {
   ];
 
   return (
-    <div>
+    <div style={{margin: '0 24px'}}>
       <Space style={{ marginBottom: 8 }}>
         <Button type="primary" onClick={() => openModal()}>Thêm loại vaccine</Button>
         <Button
@@ -134,7 +138,7 @@ const VaccineTypeTab = () => {
         </Button>
         {!showDeleted ? (
           <Popconfirm
-            title="Xoá các loại vaccine đã chọn?"
+            title="Xoá các loại vaccine đã chọn? Nếu đang có lô vaccine sử dụng sẽ không xóa được."
             disabled={!selectedRowKeys.length}
             onConfirm={handleDelete}
           >
@@ -162,17 +166,18 @@ const VaccineTypeTab = () => {
       />
       <Modal
         open={modalVisible}
-        title={editing ? "Cập nhật loại vaccine" : "Thêm mới loại vaccine"}
+        title={editing ? "Chi tiết loại vaccine" : "Thêm mới loại vaccine"}
         onCancel={() => setModalVisible(false)}
         onOk={handleOk}
         destroyOnClose
+        okText={editing ? "Cập nhật" : "Thêm mới"}
       >
         <Form form={form} layout="vertical" initialValues={defaultVaccineType}>
-          <Form.Item name="code" label="Mã" rules={[{ required: true }]}>
-            <Input />
+          <Form.Item name="code" label="Mã" rules={[{ required: true }]} >
+            <Input disabled={!!editing} />
           </Form.Item>
-          <Form.Item name="name" label="Tên" rules={[{ required: true }]}>
-            <Input />
+          <Form.Item name="name" label="Tên" rules={[{ required: true }]} >
+            <Input disabled={!!editing} />
           </Form.Item>
           <Form.Item name="group" label="Nhóm">
             <Input />
@@ -183,9 +188,11 @@ const VaccineTypeTab = () => {
           <Form.Item name="minIntervalDays" label="Khoảng cách tiêm (ngày)">
             <InputNumber min={0} style={{ width: "100%" }} />
           </Form.Item>
-          <Form.Item name="isActive" label="Kích hoạt" valuePropName="checked">
-            <Switch checkedChildren="Bật" unCheckedChildren="Tắt" />
-          </Form.Item>
+          {!editing && (
+            <Form.Item name="isActive" label="Kích hoạt" valuePropName="checked">
+              <Switch checkedChildren="Bật" unCheckedChildren="Tắt" />
+            </Form.Item>
+          )}
         </Form>
       </Modal>
     </div>

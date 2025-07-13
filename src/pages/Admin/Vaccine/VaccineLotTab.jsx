@@ -85,7 +85,7 @@ const VaccineLotTab = ({ vaccineTypes }) => {
   };
 
   return (
-    <>
+    <div style={{margin: '0 24px'}}>
       <Space style={{ marginBottom: 8 }}>
         <Button type="primary" onClick={() => handleLotModal()}>Thêm lô vaccine</Button>
         <Button
@@ -162,7 +162,7 @@ const VaccineLotTab = ({ vaccineTypes }) => {
           </Form.Item>
         </Form>
       </Modal>
-    </>
+    </div>
   );
 };
 
