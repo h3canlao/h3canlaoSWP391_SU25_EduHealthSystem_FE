@@ -6,6 +6,7 @@ import {
   getVaccineTypes, createVaccineType, updateVaccineType, deleteVaccineTypes,
   getDeletedVaccineTypes, restoreVaccineTypes, toggleVaccineTypeStatus
 } from "@/services/vaccineManagerApi";
+import { useNavigate } from "react-router-dom";
 
 const defaultVaccineType = {
   code: "", name: "", group: "", recommendedAgeMonths: null, minIntervalDays: null, isActive: true,
@@ -99,6 +100,7 @@ const VaccineTypeTab = () => {
   };
 
   // --- Table columns ---
+  const navigate = useNavigate()
   const columns = [
     { title: "Mã", dataIndex: "code" },
     { title: "Tên", dataIndex: "name" },
@@ -112,9 +114,12 @@ const VaccineTypeTab = () => {
         <Switch checked={v} onChange={() => handleToggleStatus(r)} disabled={showDeleted} />
     },
     {
-      title: "Thao tác", render: (_, r) => (
+      title: "Thao tác", render: (record, r) => (
         <Space>
-          <Button type="link" onClick={() => openModal(r)}>Chi tiết</Button>
+          <Button  onClick={() => {
+            navigate(`/admin/manage-vaccineType/${record.id}`)
+            console.log("tét")
+          }}>Chi tiết</Button>
           {!showDeleted && (
             <Popconfirm title="Xoá loại vaccine này? Nếu đang có lô vaccine sử dụng sẽ không xóa được."
               onConfirm={() => deleteVaccineTypes([r.id], true).then(fetchData)}>

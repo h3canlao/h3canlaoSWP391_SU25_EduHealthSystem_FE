@@ -37,6 +37,7 @@ import MedicalSupplyDetail from "./pages/Admin/MedicalSupply/MedicalSupplyAdminD
 import MedicationDetail from "./pages/Admin/Medication/MedicationDetail";
 import VaccinationCampaignDetail from "./pages/Admin/VaccinationCampaign/VaccinationCampaignDetail";
 import VaccinationScheduleDetail from "./pages/Admin/VaccinationSchedule/VaccinationScheduleDetail";
+import VaccineTypeDetail from "./pages/Admin/Vaccine/VaccineTypeDetail";
 
 const Router = () => {
   return (
@@ -72,6 +73,7 @@ const Router = () => {
           <Route path="manage-vaccinationSchedule" element={<VaccinationScheduleAdmin />} />
           <Route path="manage-vaccinationSchedule/:id" element={<VaccinationScheduleDetail />} />
           <Route path="manage-vaccine" element={<VaccineManager />} />
+          <Route path="manage-vaccineType/:id" element={<VaccineTypeDetail />} />
         </Route>
         {/* SchoolNurse Routes */}
         <Route path="/nurse" element={<SchoolNurse />}>
