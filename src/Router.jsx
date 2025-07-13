@@ -1,12 +1,11 @@
 import Register from "@/pages/Parents/Auth/Register/Register";
 import Signin from "@/pages/Parents/Auth/Signin/Signin";
-import ForgetPassword from "@/pages/Parents/Auth/2FA/ForgetPassword/forgetPassword"
-import ResetPassword from "@/pages/Parents/Auth/2FA/ResetPassword/resetPassword"
+import ForgetPassword from "@/pages/Parents/Auth/2FA/ForgetPassword/forgetPassword";
+import ResetPassword from "@/pages/Parents/Auth/2FA/ResetPassword/resetPassword";
 import { Route, Routes, Navigate } from "react-router-dom";
 import { Bounce, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import ConfirmEmail from "@/pages/Parents/Auth/2FA/ConfirmEmail/confirmEmail"
-
+import ConfirmEmail from "@/pages/Parents/Auth/2FA/ConfirmEmail/confirmEmail";
 
 import SendMedication from "./pages/Parents/Medication/SendMedication";
 import Notifications from "./pages/Parents/Notifications/Notifications";
@@ -35,6 +34,7 @@ import HealthCheckups from "./pages/SchoolNurse/HealthCheckups/HealthCheckups";
 import CounselingAppointments from "./pages/SchoolNurse/HealthCheckups/CounselingAppointments";
 import Dashboard from "./pages/SchoolNurse/Dashboard";
 import MedicalSupplyDetail from "./pages/Admin/MedicalSupply/MedicalSupplyAdminDetail";
+import MedicationDetail from "./pages/Admin/Medication/MedicationDetail";
 
 const Router = () => {
   return (
@@ -48,7 +48,7 @@ const Router = () => {
 
         {/* Parents Routes */}
         <Route path="/parents" element={<Parents />}>
-          <Route path="vaccine-overview" element={<VaccineOverview />}/>
+          <Route path="vaccine-overview" element={<VaccineOverview />} />
           <Route path="vaccine-history" element={<VaccineHistory />} />
           <Route path="checkup-schedules" element={<ParentCheckupSchedules />} />
           <Route path="checkup-records" element={<ParentCheckupRecords />} />
@@ -60,10 +60,11 @@ const Router = () => {
         </Route>
         {/* Admin Routes */}
         <Route path="/admin" element={<Admin />}>
-        <Route path="manage-users" element={<ManageUser />} />
+          <Route path="manage-users" element={<ManageUser />} />
           <Route path="manage-medication" element={<MedicationManager />} />
+          <Route path="manage-medication/:id" element={<MedicationDetail />} />
           <Route path="manage-medicalSupply" element={<MedicalSupplyManager />} />
-         <Route path="/admin/manage-medicalSupply/:id" element={<MedicalSupplyDetail />} />
+          <Route path="manage-medicalSupply/:id" element={<MedicalSupplyDetail />} />
           <Route path="manage-vaccinationCampaign" element={<VaccinationCampaignAdmin />} />
           <Route path="manage-vaccinationSchedule" element={<VaccinationScheduleAdmin />} />
           <Route path="manage-vaccine" element={<VaccineManager />} />

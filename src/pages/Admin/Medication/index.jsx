@@ -6,9 +6,9 @@ import {
   updateMedication,
   deleteMedication,
   getMedicationCategories,
-  getActiveMedications,
-  getDeletedMedications
+  restoreMedications,
 } from "@/services/medicationApi";
+import { useNavigate } from "react-router-dom";
 
 const defaultForm = {
   name: "",
@@ -28,7 +28,7 @@ const MedicationAdmin = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState(undefined);
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 });
-  const [filterType, setFilterType] = useState("all"); // all, active, deleted
+  const [filterType, setFilterType] = useState("all"); // all, deleted
 
   // Lấy categories từ API
   const fetchCategories = async () => {
@@ -44,28 +44,19 @@ const MedicationAdmin = () => {
   const fetchData = async (params = {}) => {
     setLoading(true);
     try {
-      let res;
-      // Chọn API theo filterType
-      if (filterType === "active") {
-        res = await getActiveMedications({
-          pageNumber: params.current || pagination.current,
-          pageSize: params.pageSize || pagination.pageSize,
-        });
-      } else if (filterType === "deleted") {
-        res = await getDeletedMedications({
-          pageNumber: params.current || pagination.current,
-          pageSize: params.pageSize || pagination.pageSize,
-        });
-      } else {
-        res = await getMedications({
-          pageNumber: params.current || pagination.current,
-          pageSize: params.pageSize || pagination.pageSize,
-          searchTerm: params.searchTerm !== undefined ? params.searchTerm : searchTerm,
-          category: params.category !== undefined ? params.category : filterCategory,
-        });
-      }
+      let apiParams = {
+        pageNumber: params.current || pagination.current,
+        pageSize: params.pageSize || pagination.pageSize,
+        searchTerm: params.searchTerm !== undefined ? params.searchTerm : searchTerm,
+        category: params.category !== undefined ? params.category : filterCategory,
+      };
+      if (filterType === "deleted") apiParams.includeDeleted = true;
+      else delete apiParams.includeDeleted;
+
+      const res = await getMedications(apiParams);
+
       setData(res.data.data || []);
-      setPagination(prev => ({
+      setPagination((prev) => ({
         ...prev,
         current: params.current || pagination.current,
         pageSize: params.pageSize || pagination.pageSize,
@@ -84,9 +75,12 @@ const MedicationAdmin = () => {
   // Theo dõi filterType, filterCategory, searchTerm => fetch lại data
   useEffect(() => {
     fetchData({ current: 1, searchTerm, category: filterCategory });
-    setPagination(prev => ({ ...prev, current: 1 }));
+    setPagination((prev) => ({ ...prev, current: 1 }));
     // eslint-disable-next-line
   }, [filterType, filterCategory, searchTerm]);
+
+  const navigate = useNavigate();
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
   // Table columns
   const columns = [
@@ -100,40 +94,50 @@ const MedicationAdmin = () => {
       render: (value) => {
         const cat = categories.find((c) => c.value === value);
         return cat ? cat.name : value;
-      }
+      },
     },
     {
       title: "Trạng thái",
       dataIndex: "status",
       key: "status",
-      render: (status) =>
-        status === 0 ? (
-          <Tag color="green">Hoạt động</Tag>
-        ) : (
-          <Tag color="red">Khóa</Tag>
-        ),
+      render: (status) => (status === 0 ? <Tag color="green">Hoạt động</Tag> : <Tag color="red">Khóa</Tag>),
     },
     {
       title: "Thao tác",
       key: "actions",
       render: (_, record) => (
         <>
-          <Button type="link" onClick={() => openModal(record)}>
-            Sửa
+          <Button type="link" onClick={() => navigate(`/admin/manage-medication/${record.id}`)}>
+            Chi tiết
           </Button>
-          <Popconfirm
-            title="Xác nhận xóa thuốc này?"
-            onConfirm={() => handleDelete(record.id)}
-          >
-            <Button type="link" danger>
-              Xóa
-            </Button>
-          </Popconfirm>
+          {filterType !== "deleted" && (
+            <>
+              <Button type="link" onClick={() => openModal(record)}>
+                Sửa
+              </Button>
+              <Popconfirm title="Xác nhận xóa thuốc này?" onConfirm={() => handleDelete(record.id, false)}>
+                <Button type="link" danger>
+                  Xóa
+                </Button>
+              </Popconfirm>
+            </>
+          )}
         </>
       ),
     },
   ];
 
+  const handleRestore = async () => {
+    if (!selectedRowKeys.length) return message.warning("Chọn thuốc để khôi phục");
+    try {
+      await restoreMedications(selectedRowKeys);
+      message.success("Khôi phục thành công!");
+      setSelectedRowKeys([]);
+      fetchData();
+    } catch (err) {
+      message.error("Khôi phục thất bại!");
+    }
+  };
   // Pagination
   const handleTableChange = (pag) => {
     setPagination(pag);
@@ -173,13 +177,16 @@ const MedicationAdmin = () => {
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (ids, isPermanent = false) => {
+    // ids có thể là 1 id hoặc 1 mảng id
+    const _ids = Array.isArray(ids) ? ids : [ids];
     try {
-      await deleteMedication(id);
-      message.success("Xóa thành công!");
+      await deleteMedication(_ids, isPermanent);
+      message.success(isPermanent ? "Đã xóa vĩnh viễn!" : "Xóa thành công!");
+      setSelectedRowKeys([]);
       fetchData();
     } catch (err) {
-      message.error("Xóa thất bại!");
+      message.error(isPermanent ? "Xóa vĩnh viễn thất bại!" : "Xóa thất bại!");
     }
   };
 
@@ -188,10 +195,10 @@ const MedicationAdmin = () => {
     setSearchTerm("");
     setFilterCategory(undefined);
     setFilterType("all");
-    setPagination(prev => ({ ...prev, current: 1 }));
+    setPagination((prev) => ({ ...prev, current: 1 }));
   };
 
-  // Chọn chế độ xem active/deleted, nếu đã chọn rồi thì click lại trả về 'all'
+  // Chọn chế độ xem hoạt động/đã xóa
   const handleSetFilterType = (type) => {
     if (filterType === type) {
       setFilterType("all");
@@ -200,19 +207,18 @@ const MedicationAdmin = () => {
       setSearchTerm("");
       setFilterCategory(undefined);
     }
-    setPagination(prev => ({ ...prev, current: 1 }));
+    setPagination((prev) => ({ ...prev, current: 1 }));
   };
 
   return (
-    <div>
+    <div style={{ margin: "0 24px" }}>
       <Space style={{ marginBottom: 16 }}>
-        {filterType === "all" && (
           <>
             <Input
               placeholder="Tìm kiếm tên thuốc"
               value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-              onPressEnter={() => setPagination(prev => ({ ...prev, current: 1 }))}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onPressEnter={() => setPagination((prev) => ({ ...prev, current: 1 }))}
               style={{ width: 200 }}
             />
             <Select
@@ -220,29 +226,32 @@ const MedicationAdmin = () => {
               placeholder="Danh mục"
               style={{ width: 180 }}
               value={filterCategory}
-              onChange={val => setFilterCategory(val)}
-              options={categories.map(c => ({ value: c.value, label: c.name }))}
+              onChange={(val) => setFilterCategory(val)}
+              options={categories.map((c) => ({ value: c.value, label: c.name }))}
             />
             <Button type="primary" onClick={handleClearFilter}>
               Xóa lọc
             </Button>
           </>
-        )}
-        <Button
-          type={filterType === "active" ? "primary" : "default"}
-          onClick={() => handleSetFilterType("active")}
-        >
-          Xem thuốc đang hoạt động
+        <Button type={filterType === "all" ? "primary" : "default"} onClick={() => handleSetFilterType("all")}>
+          Xem thuốc hoạt động
         </Button>
-        <Button
-          type={filterType === "deleted" ? "primary" : "default"}
-          onClick={() => handleSetFilterType("deleted")}
-        >
+        <Button type={filterType === "deleted" ? "primary" : "default"} onClick={() => handleSetFilterType("deleted")}>
           Xem thuốc đã xóa
         </Button>
-        <Button type="primary" onClick={() => openModal()}>
+        <Button type="primary" onClick={() => openModal()} disabled={filterType === "deleted"}>
           Thêm mới thuốc
         </Button>
+        {filterType === "deleted" && (
+          <Button danger disabled={selectedRowKeys.length === 0} onClick={() => handleDelete(selectedRowKeys, true)}>
+            Xóa vĩnh viễn
+          </Button>
+        )}
+        {filterType === "deleted" && (
+          <Button onClick={handleRestore} disabled={selectedRowKeys.length === 0} type="primary">
+            Khôi phục đã chọn
+          </Button>
+        )}
       </Space>
       <Table
         rowKey="id"
@@ -250,6 +259,14 @@ const MedicationAdmin = () => {
         columns={columns}
         dataSource={data}
         pagination={pagination}
+        rowSelection={
+          filterType === "deleted"
+            ? {
+                selectedRowKeys,
+                onChange: setSelectedRowKeys,
+              }
+            : undefined
+        }
         onChange={handleTableChange}
       />
       <Modal
@@ -260,23 +277,19 @@ const MedicationAdmin = () => {
         okText={editing ? "Cập nhật" : "Thêm mới"}
         destroyOnClose
       >
-        <Form
-          form={form}
-          layout="vertical"
-          initialValues={defaultForm}
-        >
-          <Form.Item name="name" label="Tên thuốc" rules={[{ required: true, message: "Nhập tên thuốc" }]} >
+        <Form form={form} layout="vertical" initialValues={defaultForm}>
+          <Form.Item name="name" label="Tên thuốc" rules={[{ required: true, message: "Nhập tên thuốc" }]}>
+            <Input disabled={!!editing} />
+          </Form.Item>
+          <Form.Item name="unit" label="Đơn vị" rules={[{ required: true, message: "Nhập đơn vị" }]}>
             <Input />
           </Form.Item>
-          <Form.Item name="unit" label="Đơn vị" rules={[{ required: true, message: "Nhập đơn vị" }]} >
-            <Input />
-          </Form.Item>
-          <Form.Item name="dosageForm" label="Dạng dùng" rules={[{ required: true, message: "Nhập dạng dùng" }]} >
+          <Form.Item name="dosageForm" label="Dạng dùng" rules={[{ required: true, message: "Nhập dạng dùng" }]}>
             <Input />
           </Form.Item>
           <Form.Item name="category" label="Danh mục" rules={[{ required: true, message: "Chọn danh mục" }]}>
             <Select
-              options={categories.map(c => ({ value: c.value, label: c.name }))}
+              options={categories.map((c) => ({ value: c.value, label: c.name }))}
               showSearch
               optionFilterProp="label"
               placeholder="Chọn danh mục"

@@ -233,7 +233,7 @@ const MedicationLotAdmin = () => {
   };
 
   return (
-    <div>
+    <div style={{margin: '0 24px'}}>
       <Space style={{ marginBottom: 16 }}>
         <Input
           placeholder="Tìm kiếm mã lô"
