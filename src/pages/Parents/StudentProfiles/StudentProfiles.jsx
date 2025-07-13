@@ -38,7 +38,6 @@ const StudentProfiles = () => {
   const navigate = useNavigate();
   const userInfo = getUserInfo();
   const userId = JSON.parse(atob(userInfo.accessToken.split('.')[1]))?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
-
   useEffect(() => {
     const fetchStudents = async () => {
       if (!userId) {
@@ -115,42 +114,30 @@ const StudentProfiles = () => {
   };
 
   return (
-    <div className="parents-container">
-      <div className="parents-content">
-        <div className="parents-header">
-          <FaBars className="toggle-icon" style={{ cursor: "pointer" }} />
+    <div className="student-outer-container">
+      <div className="student-inner-container">
+        <div className="student-header-row">
+          <h1 className="student-title">Danh Sách Học Sinh</h1>
         </div>
-        <div className="parents-main">
-          <div className="student-profiles-container">
-            <div className="student-profiles-header">
-              <h1 style={{ color: "var(--primary-text-color)" }}>My Students</h1>
-              <Button type="primary" size="large" className="add-student-btn" onClick={handleAddStudent}>
-                ADD NEW STUDENT
-              </Button>
-            </div>
-
-            {loading ? (
-              <div className="loading-text">Loading students...</div>
-            ) : students.length === 0 ? (
-              <div className="no-students-text">No students found. Add a new student to get started.</div>
-            ) : (
-              <div className="students-grid">
-                {students.map((student) => (
-                  <StudentCard key={student.id} student={student} onClick={handleCardClick} />
-                ))}
-              </div>
-            )}
-
-            <ModalStudent
-              show={showModal}
-              setShow={setShowModal}
-              healthProfile={healthProfile}
-              loading={healthProfileLoading}
-              resetData={resetModalData}
-              onUpdated={handleProfileUpdate}
-            />
+        {loading ? (
+          <div className="loading-text">Đang tải danh sách học sinh...</div>
+        ) : students.length === 0 ? (
+          <div className="no-students-text">Không có học sinh nào.</div>
+        ) : (
+          <div className="students-grid">
+            {students.map((student) => (
+              <StudentCard key={student.id} student={student} onClick={handleCardClick} />
+            ))}
           </div>
-        </div>
+        )}
+        <ModalStudent
+          show={showModal}
+          setShow={setShowModal}
+          healthProfile={healthProfile}
+          loading={healthProfileLoading}
+          resetData={resetModalData}
+          onUpdated={handleProfileUpdate}
+        />
       </div>
     </div>
   );

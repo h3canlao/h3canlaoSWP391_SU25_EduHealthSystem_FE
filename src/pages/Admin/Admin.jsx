@@ -13,7 +13,7 @@ const Admin = (props) => {
 
     return (
         <div className="admin-container">
-            <div className="admin-sidebar">
+            <div className={`admin-sidebar${collapsed ? ' collapsed' : ''}`}>
                 <SideBar collapsed={collapsed} toggleSidebar={toggleSidebar} />
             </div>
             <div className="admin-content">

@@ -1,135 +1,180 @@
-:root {
-  --primary-font: 'Poppins', sans-serif;
-  --bg-color: #f4f7f9;
-  --card-bg-gradient: linear-gradient(135deg, #ffffff 0%, #eef4f8 100%);
-  --primary-text-color: #2c3e50;
-  --secondary-text-color: #7f8c8d;
-  --accent-color: #3498db;
-  --accent-color-hover: #2980b9;
-  --shadow-color: rgba(44, 62, 80, 0.15);
-  --card-border-color: #e0e7ec;
-}
+  :root {
+    --primary-font: 'Poppins', sans-serif;
+    --bg-color: #f4f7f9;
+    --card-bg-gradient: linear-gradient(135deg, #ffffff 0%, #eef4f8 100%);
+    --primary-text-color: #2c3e50;
+    --secondary-text-color: #7f8c8d;
+    --accent-color: #3498db;
+    --accent-color-hover: #2980b9;
+    --shadow-color: rgba(44, 62, 80, 0.15);
+    --card-border-color: #e0e7ec;
+  }
 
-.student-profiles-container {
-  padding: 2rem;
-  background-color: #f1f1f1;
-  min-height: 100vh;
-  font-family: var(--primary-font);
-}
+  .student-outer-container {
+    min-height: 100vh;
+    background: #f5f7fa;
+    padding: 32px 0;
+  }
 
-.student-profiles-header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 2rem;
-  align-items: center;
-}
+  .student-inner-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+    padding: 40px 40px 32px 40px;
+  }
 
-.controls {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
-  align-items: center;
-}
+  .student-header-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 24px;
+  }
 
-.search-bar {
-  width: 200px;
-  margin-right: 10px;
-}
+  .student-title {
+    color: #1d3557;
+    font-weight: 700;
+    font-size: 2.2rem;
+    margin-bottom: 0 !important;
+  }
 
-.add-student-btn {
-  background-color: var(--accent-color);
-  border: none;
-  color: white;
-  font-weight: 600;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  transition: background-color 0.3s ease;
-}
+  .student-profiles-container {
+    padding: 2rem;
+    background-color: #f1f1f1;
+    min-height: 100vh;
+    font-family: var(--primary-font);
+  }
 
-.add-student-btn:hover {
-  background-color: var(--accent-color-hover);
-}
-
-.students-grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 2rem;
-}
-
-.student-card {
-  background: var(--card-bg-gradient);
-  border-radius: 12px;
-  padding: 2rem;
-  text-align: center;
-  box-shadow: 0 4px 15px var(--shadow-color);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--card-border-color);
-  flex: 1 1 300px;
-  max-width: 380px;
-  min-width: 280px;
-}
-
-.student-card:hover {
-  transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 10px 25px var(--shadow-color);
-}
-
-.student-image {
-  width: 90px;
-  height: 90px;
-  border-radius: 50%;
-  margin-bottom: 1.5rem;
-  object-fit: cover;
-  border: 4px solid var(--accent-color);
-  padding: 3px;
-  background-color: white;
-}
-
-.student-info h3 {
-  margin: 0 0 0.5rem 0;
-  font-size: 1.25rem;
-  color: var(--primary-text-color);
-  font-weight: 700;
-}
-
-.student-info p {
-  margin: 0;
-  font-size: 0.95rem;
-  color: var(--secondary-text-color);
-  font-style: italic;
-}
-
-.loading-text, .no-students-text {
-  text-align: center;
-  font-size: 1.2rem;
-  color: var(--secondary-text-color);
-  margin-top: 4rem;
-  font-weight: 500;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
   .student-profiles-header {
-    flex-direction: column;
-    gap: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    align-items: center;
   }
 
   .controls {
-    flex-direction: column;
-    gap: 10px;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    align-items: center;
   }
 
   .search-bar {
-    width: 100%;
+    width: 200px;
+    margin-right: 10px;
+  }
+
+  .add-student-btn {
+    background-color: var(--accent-color);
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+  }
+
+  .add-student-btn:hover {
+    background-color: var(--accent-color-hover);
   }
 
   .students-grid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2.5rem;
   }
-}
+
+  .student-card {
+    background: var(--card-bg-gradient);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 4px 15px var(--shadow-color);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--card-border-color);
+    flex: 1 1 300px;
+    max-width: 380px;
+    min-width: 280px;
+  }
+
+  .student-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 10px 25px var(--shadow-color);
+  }
+
+  .student-image {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    margin-bottom: 1.5rem;
+    object-fit: cover;
+    border: 4px solid var(--accent-color);
+    padding: 3px;
+    background-color: white;
+  }
+
+  .student-info h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.25rem;
+    color: var(--primary-text-color);
+    font-weight: 700;
+  }
+
+  .student-info p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--secondary-text-color);
+    font-style: italic;
+  }
+
+  .loading-text, .no-students-text {
+    text-align: center;
+    font-size: 1.2rem;
+    color: var(--secondary-text-color);
+    margin-top: 4rem;
+    font-weight: 500;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 1600px) {
+    .student-inner-container {
+      max-width: 98vw;
+      padding: 20px 4vw;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .student-inner-container {
+      padding: 10px 2vw;
+    }
+    .students-grid {
+      gap: 1rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .student-profiles-header {
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .controls {
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .search-bar {
+      width: 100%;
+    }
+
+    .students-grid {
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+  }

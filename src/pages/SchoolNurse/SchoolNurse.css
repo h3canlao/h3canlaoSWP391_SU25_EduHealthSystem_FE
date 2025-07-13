@@ -1,32 +1,43 @@
-.admin-container {
+body {
+  background-color: #f1f1f1;
+}
+
+.schoolnurse-container {
     display: flex;
+    height: 100vh;
     min-height: 100vh;
 }
 
-.admin-sidebar {
-    width: 280px;
-    flex-shrink: 0;
-    z-index: 0;
-    background-color: #F5F7FA;
-    height: 100vh;
-    transition: width 0.3s;
-}
-.admin-sidebar.collapsed {
-    width: 80px;
+.schoolnurse-container .schoolnurse-sidebar .pro-sidebar {
+    height: 93vh !important;
 }
 
-.admin-content {
-    flex: 1;
+.schoolnurse-content {
+    width: 100%;
     background-color: #F1F1F1;
+    height: 100vh;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
 }
-.admin-header {
-    height: 40px;
+.schoolnurse-header {
+    
+    background-color: #FFF5F5;
 }
-.admin-main {
-    height: 40px;
+svg.toggle-icon {
+  display: none;
+}
+
+.schoolnurse-sidebar {
+  
+  z-index: 0;
+  background-color: #F5F7FA;
+  height: 100vh;
+}
+
+.schoolnurse-main {
+    height: 100%;
+    overflow-y: auto;
 }
 
 .toggle-icon {
@@ -54,11 +65,11 @@
 }
 
 /* Nếu muốn icon bay lơ lửng ở góc trên bên trái (fixed position) */
-.admin-header {
+.schoolnurse-header {
   position: relative; /* giữ nguyên position để icon nằm trong khung header */
 }
 
-/* Hoặc bạn có thể dùng position fixed để icon lơ lửng trên page (bỏ phần admin-header) */
+/* Hoặc bạn có thể dùng position fixed để icon lơ lửng trên page (bỏ phần schoolnurse-header) */
 /*
 .toggle-icon {
   position: fixed;
@@ -68,3 +79,7 @@
 }
 */
 
+.vaccine-list {
+  max-height: 665px;
+  overflow-y: auto;
+}

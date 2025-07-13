@@ -1,35 +1,43 @@
 /* General container for the vaccine confirmation page */
-.vaccine-container {
-  max-width: 900px;
-  margin: 40px auto;
-  padding: 24px;
-  background-color: #f7f9fc;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+.vaccine-outer-container {
+  min-height: 100vh;
+  background: #f5f7fa;
+  padding: 32px 0;
+}
+
+.vaccine-inner-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+  padding: 40px 40px 16px 40px;
 }
 
 /* Page title styling */
 .vaccine-title {
   color: #1d3557; /* Dark blue */
   margin-bottom: 24px !important;
-  text-align: center;
   font-weight: 700;
 }
 
 /* Styling for the vaccine list */
 .vaccine-list .ant-list-items {
-  border: 1px solid #e8e8e8;
-  border-radius: 8px;
-  overflow: hidden;
+  border: none;
+  border-radius: 0;
+  overflow: visible;
 }
 
 /* Individual list item styling */
 .vaccine-list-item {
-  background-color: #ffffff;
+  background-color: #fafdff;
   padding: 20px 24px !important;
   transition: background-color 0.3s, box-shadow 0.3s;
   cursor: pointer;
-  border-bottom: 1px solid #e8e8e8;
+  border-radius: 18px !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  border: none !important;
+  margin-bottom: 32px;
 }
 
 .vaccine-list-item:last-child {
@@ -55,10 +63,22 @@
 }
 
 /* Responsive adjustments */
+@media (max-width: 1600px) {
+  .vaccine-inner-container {
+    max-width: 98vw;
+    padding: 20px 4vw;
+  }
+}
+
+@media (max-width: 900px) {
+  .vaccine-inner-container {
+    padding: 10px 2vw;
+  }
+}
+
 @media (max-width: 768px) {
-  .vaccine-container {
-    margin: 20px 10px;
-    padding: 20px;
+  .vaccine-inner-container {
+    padding: 16px 4px;
   }
 
   .vaccine-list-item {

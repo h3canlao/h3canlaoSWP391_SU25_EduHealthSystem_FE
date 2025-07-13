@@ -38,7 +38,7 @@ export default function Signin() {
       setAccessToken(token);
       if (res.data.isSuccess === true) {
 
-        const currentUser = await currentUsers(token);
+        const currentUser = await currentUsers();
         console.log(currentUser)
         if (currentUser.data.isSuccess) {
             setUserInfo(currentUser.data.data);
