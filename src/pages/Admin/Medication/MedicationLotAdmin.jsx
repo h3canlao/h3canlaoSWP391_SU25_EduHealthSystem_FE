@@ -10,18 +10,16 @@ import {
   deleteMedicationLotsBatch,
   restoreMedicationLotsBatch,
   updateMedicationLotQuantity,
-  getExpiringMedicationLots,
-  getExpiredMedicationLots,
-  getDeletedMedicationLots,
 } from "@/services/medicationLotApi";
 import { getMedications } from "@/services/medicationApi";
 
 const defaultForm = {
   medicationId: undefined,
   lotNumber: "",
-  expirationDate: null,
+  expiryDate: null,
   manufactureDate: null,
   quantity: 0,
+  storageLocation: "",
 };
 
 const MedicationLotAdmin = () => {
@@ -38,7 +36,7 @@ const MedicationLotAdmin = () => {
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 });
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
-  // Load medication list
+  // Load danh sách thuốc cho dropdown
   const fetchMedications = async () => {
     try {
       const res = await getMedications({ pageNumber: 1, pageSize: 100 });
@@ -46,43 +44,32 @@ const MedicationLotAdmin = () => {
     } catch {}
   };
 
-  // Load lot list
+  // Lấy danh sách lô thuốc với filter chuẩn theo API bạn gửi
   const fetchData = async (params = {}) => {
     setLoading(true);
     try {
-      let lots = [];
-      let total = 0;
-      if (filterType === "expiring") {
-        const res = await getExpiringMedicationLots();
-        lots = res.data?.data || [];
-        total = lots.length;
+      let apiParams = {
+        pageNumber: params.pageNumber || pagination.current,
+        pageSize: params.pageSize || pagination.pageSize,
+        searchTerm: params.searchTerm !== undefined ? params.searchTerm : searchTerm,
+        medicationId: medicationFilter,
+        isExpired: expiredFilter,
+      };
+      if (filterType === "deleted") {
+        apiParams.includeDeleted = true;
+      } else if (filterType === "expiring") {
+        apiParams.status = "expiring";
+        apiParams.daysBeforeExpiry = 30;
       } else if (filterType === "expired") {
-        const res = await getExpiredMedicationLots();
-        lots = res.data?.data || [];
-        total = lots.length;
-      } else if (filterType === "deleted") {
-        const res = await getDeletedMedicationLots({
-          pageNumber: params.pageNumber || pagination.current,
-          pageSize: params.pageSize || pagination.pageSize,
-          searchTerm: params.searchTerm !== undefined ? params.searchTerm : searchTerm,
-          medicationId: medicationFilter,
-          isExpired: expiredFilter,
-        });
-        lots = res.data?.data || [];
-        total = res.data?.totalRecords || lots.length;
-      } else {
-        const res = await getMedicationLots({
-          pageNumber: params.pageNumber || pagination.current,
-          pageSize: params.pageSize || pagination.pageSize,
-          searchTerm: params.searchTerm !== undefined ? params.searchTerm : searchTerm,
-          medicationId: medicationFilter,
-          isExpired: expiredFilter,
-        });
-        lots = res.data?.data || [];
-        total = res.data?.totalRecords || lots.length;
+        apiParams.isExpired = true;
       }
-      setData(lots);
-      setPagination((prev) => ({ ...prev, total, current: params.pageNumber || pagination.current }));
+      const res = await getMedicationLots(apiParams);
+      setData(res.data?.data || []);
+      setPagination((prev) => ({
+        ...prev,
+        total: res.data?.totalRecords || (res.data?.data ? res.data.data.length : 0),
+        current: params.pageNumber || pagination.current,
+      }));
     } catch (error) {
       message.error(error?.response?.data?.message ?? "Không tải được dữ liệu!");
     }
@@ -107,8 +94,8 @@ const MedicationLotAdmin = () => {
     { title: "Mã lô", dataIndex: "lotNumber", key: "lotNumber" },
     {
       title: "HSD",
-      dataIndex: "expirationDate",
-      key: "expirationDate",
+      dataIndex: "expiryDate",
+      key: "expiryDate",
       render: v => v ? dayjs(v).format("DD/MM/YYYY HH:mm") : ""
     },
     {
@@ -118,12 +105,13 @@ const MedicationLotAdmin = () => {
       render: v => v ? dayjs(v).format("DD/MM/YYYY HH:mm") : ""
     },
     { title: "Số lượng", dataIndex: "quantity", key: "quantity" },
+    { title: "Vị trí lưu trữ", dataIndex: "storageLocation", key: "storageLocation" },
     {
       title: "Trạng thái",
       dataIndex: "isExpired",
       key: "isExpired",
       render: (_, r) => {
-        const expired = r.expirationDate && dayjs(r.expirationDate).isBefore(dayjs());
+        const expired = r.expiryDate && dayjs(r.expiryDate).isBefore(dayjs());
         return expired ? <Tag color="red">Hết hạn</Tag> : <Tag color="green">Còn hạn</Tag>;
       }
     },
@@ -158,7 +146,7 @@ const MedicationLotAdmin = () => {
     if (record) {
       form.setFieldsValue({
         ...record,
-        expirationDate: record.expirationDate ? dayjs(record.expirationDate) : null,
+        expiryDate: record.expiryDate ? dayjs(record.expiryDate) : null,
         manufactureDate: record.manufactureDate ? dayjs(record.manufactureDate) : null,
       });
     } else {
@@ -172,7 +160,7 @@ const MedicationLotAdmin = () => {
       const values = await form.validateFields();
       const payload = {
         ...values,
-        expirationDate: values.expirationDate ? values.expirationDate.toISOString() : null,
+        expiryDate: values.expiryDate ? values.expiryDate.toISOString() : null,
         manufactureDate: values.manufactureDate ? values.manufactureDate.toISOString() : null,
       };
       if (editing) {
@@ -189,7 +177,7 @@ const MedicationLotAdmin = () => {
     }
   };
 
-  // Xóa batch
+  // Xóa batch (mềm/vĩnh viễn)
   const handleDelete = async (ids) => {
     try {
       await deleteMedicationLotsBatch(ids, false);
@@ -286,7 +274,7 @@ const MedicationLotAdmin = () => {
             Khôi phục đã chọn
           </Button>
         )}
-        <Button type="primary" onClick={() => openModal()}>
+        <Button type="primary" onClick={() => openModal()} disabled={filterType === "deleted"}>
           Thêm mới
         </Button>
       </Space>
@@ -321,13 +309,14 @@ const MedicationLotAdmin = () => {
               showSearch
               optionFilterProp="label"
               placeholder="Chọn thuốc"
+              disabled={!!editing}
             />
           </Form.Item>
           <Form.Item name="lotNumber" label="Mã lô" rules={[{ required: true, message: "Nhập mã lô" }]}>
             <Input />
           </Form.Item>
           <Form.Item
-            name="expirationDate"
+            name="expiryDate"
             label="Hạn sử dụng"
             rules={[{ required: true, message: "Chọn hạn sử dụng" }]}
           >
@@ -338,6 +327,9 @@ const MedicationLotAdmin = () => {
           </Form.Item>
           <Form.Item name="quantity" label="Số lượng" rules={[{ required: true, message: "Nhập số lượng" }]}>
             <InputNumber min={0} style={{ width: "100%" }} />
+          </Form.Item>
+          <Form.Item name="storageLocation" label="Vị trí lưu trữ" rules={[{ required: true, message: "Nhập vị trí lưu trữ" }]}>
+            <Input />
           </Form.Item>
         </Form>
       </Modal>
