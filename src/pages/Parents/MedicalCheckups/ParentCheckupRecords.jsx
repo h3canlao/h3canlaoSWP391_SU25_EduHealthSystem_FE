@@ -65,6 +65,10 @@ const ParentCheckupRecords = () => {
     });
   };
 
+  // Thêm hàm chuyển đổi enum
+  const visionLevelMap = ['Bình thường', 'Nhẹ', 'Trung bình', 'Nặng'];
+  const hearingLevelMap = ['Bình thường', 'Nhẹ', 'Trung bình', 'Nặng'];
+
   return (
     <div className="parent-checkup-records-container">
       <div className="header-section">
@@ -98,17 +102,17 @@ const ParentCheckupRecords = () => {
                       <div className="detail-row">
                         <FaEye className="detail-icon" />
                         <span className="label">Thị lực trái:</span>
-                        <span className="value">{record.visionLeft}</span>
+                        <span className="value">{visionLevelMap[record.visionLeft] ?? record.visionLeft}</span>
                       </div>
                       <div className="detail-row">
                         <FaEye className="detail-icon" />
                         <span className="label">Thị lực phải:</span>
-                        <span className="value">{record.visionRight}</span>
+                        <span className="value">{visionLevelMap[record.visionRight] ?? record.visionRight}</span>
                       </div>
                       <div className="detail-row">
                         <FaVolumeUp className="detail-icon" />
                         <span className="label">Thính lực:</span>
-                        <span className="value">{record.hearing}</span>
+                        <span className="value">{hearingLevelMap[record.hearing] ?? record.hearing}</span>
                       </div>
                       <div className="detail-row">
                         <FaHeartbeat className="detail-icon" />

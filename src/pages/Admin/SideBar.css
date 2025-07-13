@@ -113,3 +113,18 @@ li.pro-menu-item.pro-sub-menu:hover::before {
     color: white !important;
 }
 
+/* Xử lý trạng thái collapsed cho sidebar */
+.admin-sidebar.collapsed .pro-item-content {
+    display: none !important;
+}
+.admin-sidebar.collapsed .pro-inner-item {
+    justify-content: center !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+.admin-sidebar.collapsed .pro-icon-wrapper {
+    margin-right: 0 !important;
+    display: flex !important;
+    justify-content: center !important;
+}
+

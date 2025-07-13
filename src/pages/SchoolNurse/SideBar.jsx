@@ -3,7 +3,6 @@ import {
     ProSidebar,
     Menu,
     MenuItem,
-    SubMenu,
     SidebarHeader,
     SidebarContent,
     SidebarFooter,
@@ -52,16 +51,10 @@ const SideBar = ({ collapsed, toggleSidebar }) => {
                 <SidebarContent>
                     <Menu iconShape="circle">
                         <MenuItem
-                            icon={<FaSyringe />}
-                            active={pathname === '/nurse/create-vaccine-schedule'}
+                            icon={<FaHeartbeat />}
+                            active={pathname === '/nurse' || pathname === '/nurse/dashboard'}
                         >
-                            <NavLink to="/nurse/create-vaccine-schedule">Create Vaccine Schedule</NavLink>
-                        </MenuItem>
-                        <MenuItem
-                            icon={<FaCalendarCheck />}
-                            active={pathname === '/nurse/create-checkup-schedule'}
-                        >
-                            <NavLink to="/nurse/create-checkup-schedule">Create Checkup Schedule</NavLink>
+                            <NavLink to="/nurse/dashboard">Dashboard</NavLink>
                         </MenuItem>
                         <MenuItem
                             icon={<FaClock />}

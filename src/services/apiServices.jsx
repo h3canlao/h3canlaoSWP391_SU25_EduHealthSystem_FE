@@ -216,6 +216,13 @@ export const getCounselingAppointmentsByStudentId = async (studentId) => {
   return axios.get(`${BASE_URL}/counseling-appointments/id/${studentId}`, { headers: getAuthHeaders() });
 };
 
+// Lấy danh sách checkup records theo staffId (nurseId)
+export const getCheckupRecordsByStaffId = async (staffId) => {
+  return axios.get(`${BASE_URL}/checkup-records/staff/${staffId}`, {
+    headers: getAuthHeaders()
+  });
+};
+
 export {
   postSignin,
   postRegister,

@@ -286,42 +286,54 @@ const CheckupRecordModal = ({ schedule, onClose, onRecordCreated }) => {
                     <FaEye />
                     Thị lực trái
                   </label>
-                  <input
-                    type="number"
+                  <select
                     name="visionLeft"
                     value={formData.visionLeft}
                     onChange={handleInputChange}
-                    placeholder="Nhập thị lực"
-                    step="0.1"
-                  />
+                    required
+                  >
+                    <option value="">Chọn mức</option>
+                    <option value={0}>Bình thường</option>
+                    <option value={1}>Nhẹ</option>
+                    <option value={2}>Trung bình</option>
+                    <option value={3}>Nặng</option>
+                  </select>
                 </div>
                 <div className="form-group">
                   <label>
                     <FaEye />
                     Thị lực phải
                   </label>
-                  <input
-                    type="number"
+                  <select
                     name="visionRight"
                     value={formData.visionRight}
                     onChange={handleInputChange}
-                    placeholder="Nhập thị lực"
-                    step="0.1"
-                  />
+                    required
+                  >
+                    <option value="">Chọn mức</option>
+                    <option value={0}>Bình thường</option>
+                    <option value={1}>Nhẹ</option>
+                    <option value={2}>Trung bình</option>
+                    <option value={3}>Nặng</option>
+                  </select>
                 </div>
                 <div className="form-group">
                   <label>
                     <FaVolumeUp />
                     Thính lực
                   </label>
-                  <input
-                    type="number"
+                  <select
                     name="hearing"
                     value={formData.hearing}
                     onChange={handleInputChange}
-                    placeholder="Nhập thính lực"
-                    step="0.1"
-                  />
+                    required
+                  >
+                    <option value="">Chọn mức</option>
+                    <option value={0}>Bình thường</option>
+                    <option value={1}>Nhẹ</option>
+                    <option value={2}>Trung bình</option>
+                    <option value={3}>Nặng</option>
+                  </select>
                 </div>
                 <div className="form-group">
                   <label>

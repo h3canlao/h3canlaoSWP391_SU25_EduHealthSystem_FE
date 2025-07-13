@@ -7,22 +7,24 @@ import { Bounce, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ConfirmEmail from "@/pages/Parents/Auth/2FA/ConfirmEmail/confirmEmail"
 
-import HealthCheckup from "./pages/Parents/MedicalCheckups/HealthCheckup";
+
 import SendMedication from "./pages/Parents/Medication/SendMedication";
 import Notifications from "./pages/Parents/Notifications/Notifications";
 import StudentProfiles from "./pages/Parents/StudentProfiles/StudentProfiles";
 import Parents from "./pages/Parents/Parents";
 import VaccineOverview from "./pages/Parents/Immunization/VaccineOverview";
 import VaccineHistory from "./pages/Parents/Immunization/VaccineHistory";
-import CheckupHistory from "./pages/Parents/MedicalCheckups/CheckupHistory";
-import ConsultationSchedule from "./pages/Parents/MedicalCheckups/ConsultationSchedule";
 import ParentCheckupSchedules from "./pages/Parents/MedicalCheckups/ParentCheckupSchedules";
 import ParentCheckupRecords from "./pages/Parents/MedicalCheckups/ParentCheckupRecords";
 import Admin from "./pages/Admin/Admin";
 import ManageUser from "./pages/Admin/Features/ManageUser";
-import MedicationAdmin from "./pages/Admin/Medication";
-import ParentCounselingRecords from "./pages/Parents/MedicalCheckups/ParentCounselingRecords";
 
+import ParentCounselingRecords from "./pages/Parents/MedicalCheckups/ParentCounselingRecords";
+import MedicationManager from "./pages/Admin/Medication/MedicationManager";
+import VaccinationCampaignAdmin from "./pages/Admin/VaccinationCampaign/VaccinationCampaign";
+import VaccinationScheduleAdmin from "./pages/Admin/VaccinationSchedule/VaccinationSchedule";
+import MedicalSupplyManager from "./pages/Admin/MedicalSupply/MedicalSupplyManager";
+import VaccineManager from "./pages/Admin/Vaccine/VaccineManager";
 
 // SchoolNurse imports
 import SchoolNurse from "./pages/SchoolNurse/SchoolNurse";
@@ -31,6 +33,7 @@ import CreateCheckupSchedule from "./pages/SchoolNurse/CreateCheckupSchedule/Cre
 import PendingMedications from "./pages/SchoolNurse/PendingMedications/PendingMedications";
 import HealthCheckups from "./pages/SchoolNurse/HealthCheckups/HealthCheckups";
 import CounselingAppointments from "./pages/SchoolNurse/HealthCheckups/CounselingAppointments";
+import Dashboard from "./pages/SchoolNurse/Dashboard";
 
 const Router = () => {
   return (
@@ -56,12 +59,17 @@ const Router = () => {
         </Route>
         {/* Admin Routes */}
         <Route path="/admin" element={<Admin />}>
-          <Route path="manage-users" element={<ManageUser />} />
-          <Route path="manage-medication" element={<MedicationAdmin />} />
+        <Route path="manage-users" element={<ManageUser />} />
+          <Route path="manage-medication" element={<MedicationManager />} />
+          <Route path="manage-medicalSupply" element={<MedicalSupplyManager />} />
+          <Route path="manage-vaccinationCampaign" element={<VaccinationCampaignAdmin />} />
+          <Route path="manage-vaccinationSchedule" element={<VaccinationScheduleAdmin />} />
+          <Route path="manage-vaccine" element={<VaccineManager />} />
         </Route>
         {/* SchoolNurse Routes */}
         <Route path="/nurse" element={<SchoolNurse />}>
-          <Route index element={<Navigate to="create-vaccine-schedule" replace />} />
+          <Route index element={<Dashboard />} />
+          <Route path="dashboard" element={<Dashboard />} />
           <Route path="create-vaccine-schedule" element={<CreateVaccineSchedule />} />
           <Route path="create-checkup-schedule" element={<CreateCheckupSchedule />} />
           <Route path="pending-medications" element={<PendingMedications />} />
