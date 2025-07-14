@@ -1,5 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Modal, Form, Input, InputNumber, Select, Popconfirm, message, Space, Tag, Switch } from "antd";
+import {
+  Table,
+  Button,
+  Modal,
+  Form,
+  Input,
+  InputNumber,
+  Select,
+  Popconfirm,
+  message,
+  Space,
+  Tag,
+  Switch
+} from "antd";
 import {
   getMedicalSupplies,
   createMedicalSupply,
@@ -8,6 +21,7 @@ import {
   restoreMedicalSupplies,
   getLowStockMedicalSupplies
 } from "@/services/medicalSupplyApi";
+import { useNavigate } from "react-router-dom";
 
 const defaultForm = {
   name: "",
@@ -27,6 +41,7 @@ const MedicalSupplyAdmin = () => {
   const [onlyActive, setOnlyActive] = useState(undefined);
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 });
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const navigate = useNavigate();
 
   // Fetch list
   const fetchData = async (params = {}) => {
@@ -42,7 +57,7 @@ const MedicalSupplyAdmin = () => {
           pageNumber: params.pageNumber || pagination.current,
           pageSize: params.pageSize || pagination.pageSize,
           searchTerm: params.searchTerm !== undefined ? params.searchTerm : searchTerm,
-          isActive: onlyActive,
+          isActive: filterType === "deleted" ? undefined : onlyActive,
           includeDeleted: filterType === "deleted"
         });
         setData(res.data.data || []);
@@ -53,7 +68,7 @@ const MedicalSupplyAdmin = () => {
         });
       }
     } catch (err) {
-      message.error(err?.response?.data?.message ??"Không tải được dữ liệu!");
+      message.error(err?.response?.data?.message ?? "Không tải được dữ liệu!");
     }
     setLoading(false);
   };
@@ -77,11 +92,25 @@ const MedicalSupplyAdmin = () => {
       key: "isActive",
       render: (val) => val ? <Tag color="green">Đang dùng</Tag> : <Tag color="red">Ngưng</Tag>
     },
+    ...(filterType === "deleted"
+      ? [{
+          title: "Đã xóa",
+          dataIndex: "isDeleted",
+          key: "isDeleted",
+          render: (val) => val ? <Tag color="volcano">Đã xóa</Tag> : <Tag color="green">Chưa xóa</Tag>,
+        }]
+      : []),
     {
       title: "Thao tác",
       key: "actions",
       render: (_, record) => (
         <Space>
+          <Button
+            type="link"
+            onClick={() => navigate(`/admin/manage-medicalSupply/${record.id}`)}
+          >
+            Chi tiết
+          </Button>
           {filterType !== "deleted" && (
             <>
               <Button type="link" onClick={() => openModal(record)}>Sửa</Button>
@@ -126,7 +155,7 @@ const MedicalSupplyAdmin = () => {
       setModalVisible(false);
       fetchData();
     } catch (err) {
-      message.error(err?.response?.data?.message ??"Có lỗi xảy ra!");
+      message.error(err?.response?.data?.message ?? "Có lỗi xảy ra!");
     }
   };
 
@@ -137,8 +166,8 @@ const MedicalSupplyAdmin = () => {
       message.success("Xóa thành công!");
       setSelectedRowKeys([]);
       fetchData();
-    } catch (error) {
-      message.error(err?.response?.data?.message ??"Xóa thất bại!");
+    } catch (err) {
+      message.error(err?.response?.data?.message ?? "Xóa thất bại!");
     }
   };
 
@@ -150,13 +179,13 @@ const MedicalSupplyAdmin = () => {
       message.success("Khôi phục thành công!");
       setSelectedRowKeys([]);
       fetchData();
-    } catch {
-      message.error(err?.response?.data?.message ??"Khôi phục thất bại!");
+    } catch (err) {
+      message.error(err?.response?.data?.message ?? "Khôi phục thất bại!");
     }
   };
 
   return (
-    <div>
+    <div style={{ margin: '0 24px' }}>
       <Space style={{ marginBottom: 16 }}>
         <Input
           placeholder="Tìm kiếm tên vật tư"
@@ -182,18 +211,22 @@ const MedicalSupplyAdmin = () => {
         >
           Tồn kho thấp
         </Button>
-        {/* <Button
+        <Button
           type={filterType === "deleted" ? "primary" : "default"}
           onClick={() => setFilterType(filterType === "deleted" ? "all" : "deleted")}
         >
           Xem đã xóa
-        </Button> */}
+        </Button>
         {filterType === "deleted" && (
           <Button onClick={handleRestore} disabled={!selectedRowKeys.length}>
             Khôi phục đã chọn
           </Button>
         )}
-        <Button type="primary" onClick={() => openModal()}>
+        <Button
+          type="primary"
+          onClick={() => openModal()}
+          disabled={filterType === "deleted"}
+        >
           Thêm mới
         </Button>
       </Space>

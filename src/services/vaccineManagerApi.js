@@ -49,3 +49,6 @@ export const getVaccineDoseInfoDetail = (id) => axios.get(`${BASE_URL}/VaccineDo
 
 export const getNextDoseInfo = (vaccineTypeId, currentDoseNumber) =>
   axios.get(`${BASE_URL}/VaccineDoseInfo/next-dose/${vaccineTypeId}/${currentDoseNumber}`);
+
+// vaccineManagerApi.js
+export const getVaccineTypeDetail = (id) => axios.get(`${BASE_URL}/VaccineType/${id}/detail`);

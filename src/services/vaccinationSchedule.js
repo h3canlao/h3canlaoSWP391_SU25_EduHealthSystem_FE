@@ -20,13 +20,20 @@ export const getVaccinationScheduleById = (id) => axios.get(`${BASE_URL}/Vaccina
 // Xóa nhiều (batch, dùng body là mảng ids)
 export const deleteVaccinationSchedules = (ids, isPermanent = false) =>
   axios.delete(`${BASE_URL}/VaccinationSchedule/batch`, {
-    data: { ids, isPermanent }, // đúng theo API
+    data: ids, // đúng theo API
   });
 
 // Phục hồi nhiều
-export const restoreVaccinationSchedules = (ids) =>
-  axios.patch(`${BASE_URL}/VaccinationSchedule/batch/restore`, { ids });
+export const restoreVaccinationSchedules = (ids) => axios.patch(`${BASE_URL}/VaccinationSchedule/batch/restore`, ids);
 
 // Đổi trạng thái nhiều
 export const updateStatusVaccinationSchedules = (scheduleIds, newStatus, notes) =>
   axios.patch(`${BASE_URL}/VaccinationSchedule/batch/status`, { scheduleIds, newStatus, notes });
+
+// PATCH /api/VaccinationSchedule/{scheduleId}/start
+export const startVaccinationSchedule = (scheduleId) =>
+  axios.patch(`${BASE_URL}/VaccinationSchedule/${scheduleId}/start`);
+
+// PATCH /api/VaccinationSchedule/{scheduleId}/complete
+export const completeVaccinationSchedule = (scheduleId) =>
+  axios.patch(`${BASE_URL}/VaccinationSchedule/${scheduleId}/complete`);

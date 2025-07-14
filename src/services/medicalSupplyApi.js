@@ -5,6 +5,10 @@ export const getMedicalSupplies = async (params) => {
   return axios.get(`${BASE_URL}/MedicalSupply`, { params });
 };
 
+export const getMedicalSupplyById = async (id) => {
+  return axios.get(`${BASE_URL}/MedicalSupply/${id}?includeLots=true`);
+};
+
 export const createMedicalSupply = async (data) => {
   return axios.post(`${BASE_URL}/MedicalSupply`, data);
 };
