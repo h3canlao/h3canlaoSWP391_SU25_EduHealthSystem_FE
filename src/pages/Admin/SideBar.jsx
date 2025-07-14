@@ -94,22 +94,6 @@ const SideBar = ({ collapsed, toggleSidebar }) => {
               <NavLink to="/admin/manage-vaccine">Quản lý vắc xin</NavLink>
             </MenuItem>
           </SubMenu>
-
-          {/* Xác nhận */}
-          <SubMenu icon={<FaRegClipboard />} title="Xác nhận">
-            <MenuItem icon={<FaRegCheckCircle />}>
-              <NavLink to="/admin/vaccinations/confirm">Xác nhận tiêm chủng</NavLink>
-            </MenuItem>
-            <MenuItem icon={<FaPills />}>
-              <NavLink to="/admin/medications/confirm">Xác nhận thuốc từ PH</NavLink>
-            </MenuItem>
-          </SubMenu>
-
-          {/* Sự kiện y tế */}
-          <MenuItem icon={<FaFirstAid />}>
-            <NavLink to="/admin/events">Sự kiện y tế</NavLink>
-          </MenuItem>
-        </Menu>
       </SidebarContent>
       <SidebarFooter
         className="sidebar-footer"

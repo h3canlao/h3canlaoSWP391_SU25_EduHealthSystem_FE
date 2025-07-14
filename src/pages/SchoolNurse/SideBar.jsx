@@ -74,6 +74,18 @@ const SideBar = ({ collapsed, toggleSidebar }) => {
                         >
                             <NavLink to="/nurse/counseling-appointments">Lịch tư vấn</NavLink>
                         </MenuItem>
+                        <MenuItem
+                            icon={<FaSyringe />}
+                            active={pathname === '/nurse/vaccine-forms'}
+                        >
+                            <NavLink to="/nurse/vaccine-forms">Tạo phiếu tiêm chủng</NavLink>
+                        </MenuItem>
+                        <MenuItem
+                            icon={<FaCalendarCheck />}
+                            active={pathname === '/nurse/manage-vaccine-forms'}
+                        >
+                            <NavLink to="/nurse/manage-vaccine-forms">Quản lý phiếu tiêm chủng</NavLink>
+                        </MenuItem>
                     </Menu>
                 </SidebarContent>
 

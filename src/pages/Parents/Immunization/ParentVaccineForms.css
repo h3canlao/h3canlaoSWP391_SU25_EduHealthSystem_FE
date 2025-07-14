@@ -1,0 +1,29 @@
+.parent-vaccine-forms {
+  padding: 24px;
+  background-color: #f5f7fa;
+  min-height: 100vh;
+}
+.parent-vaccine-forms .ant-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.parent-vaccine-forms .ant-card-body {
+  padding: 32px;
+}
+.parent-vaccine-forms .ant-table {
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 16px;
+}
+.parent-vaccine-forms .ant-table-thead > tr > th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #2c3e50;
+}
+.parent-vaccine-forms .ant-table-tbody > tr:hover > td {
+  background-color: #f0f8ff;
+}
+.parent-vaccine-forms .ant-typography {
+  color: #1d3557;
+  font-weight: 700;
+} 
