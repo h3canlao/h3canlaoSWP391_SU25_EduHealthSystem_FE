@@ -63,17 +63,23 @@ const SideBar = ({ collapsed, toggleSidebar }) => {
                             </MenuItem>
                         </SubMenu>
                         <SubMenu title="Vắc xin" icon={<FaShieldAlt />}>
-                            <MenuItem
+                            {/* <MenuItem
                                 icon={<FaShieldAlt />}
                                 active={pathname === '/parents/vaccine-overview'}
                             >
                                 <NavLink to="/parents/vaccine-overview">Overview</NavLink>
-                            </MenuItem>
-                            <MenuItem
+                            </MenuItem> */}
+                            {/* <MenuItem
                                 icon={<FaShieldAlt />}
                                 active={pathname === '/parents/vaccine-history'}
                             >
                                 <NavLink to="/parents/vaccine-history">History</NavLink>
+                            </MenuItem> */}
+                            <MenuItem
+                                icon={<FaShieldAlt />}
+                                active={pathname === '/parents/vaccine-forms'}
+                            >
+                                <NavLink to="/parents/vaccine-forms">Theo dõi sau tiêm chủng</NavLink>
                             </MenuItem>
                         </SubMenu>
                         <SubMenu title="Medical" icon={<FaUserMd />}>
@@ -94,12 +100,12 @@ const SideBar = ({ collapsed, toggleSidebar }) => {
                         >
                             <NavLink to="/parents/counseling-records">Theo dõi lịch tư vấn sức khỏe</NavLink>
                         </MenuItem>
-                        <MenuItem className='notification-menu-item'
+                        {/* <MenuItem className='notification-menu-item'
                             icon={<FaBell />}
                             active={pathname === '/parents/notifications'}
                         >
                             <NavLink to="/parents/notifications">Notifications</NavLink>
-                        </MenuItem>
+                        </MenuItem> */}
                     </Menu>
                 </SidebarContent>
 

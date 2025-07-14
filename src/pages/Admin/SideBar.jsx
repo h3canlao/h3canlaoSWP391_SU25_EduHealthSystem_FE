@@ -43,15 +43,15 @@ const SideBar = ({ collapsed, toggleSidebar }) => {
 
       <SidebarContent className="sidebar-content">
         <Menu iconShape="circle">
-          <MenuItem icon={<FaTachometerAlt />}>
+          {/* <MenuItem icon={<FaTachometerAlt />}>
             <NavLink to="/admin/dashboard">Dashboard & Report</NavLink>
-          </MenuItem>
+          </MenuItem> */}
 
           {/* Manage Users and Products */}
           <SubMenu icon={<FaGem />} title="Manage">
-            <MenuItem icon={<FaUserCircle />} active={pathname === "/admin/manage-users"}>
+            {/* <MenuItem icon={<FaUserCircle />} active={pathname === "/admin/manage-users"}>
               <NavLink to="/admin/manage-users">User</NavLink>
-            </MenuItem>
+            </MenuItem> */}
             <MenuItem icon={<FaClinicMedical />} active={pathname === "/admin/manage-medicalSupply"}>
               <NavLink to="/admin/manage-medicalSupply">Manage Medical Supply</NavLink>
             </MenuItem>
@@ -73,19 +73,19 @@ const SideBar = ({ collapsed, toggleSidebar }) => {
           
 
           {/* Xác nhận */}
-          <SubMenu icon={<FaSyringe />} title="Xác nhận">
+          {/* <SubMenu icon={<FaSyringe />} title="Xác nhận">
             <MenuItem>
               <NavLink to="/admin/vaccinations/confirm">Xác nhận tiêm chủng</NavLink>
             </MenuItem>
             <MenuItem>
               <NavLink to="/admin/medications/confirm">Xác nhận thuốc từ PH</NavLink>
             </MenuItem>
-          </SubMenu>
+          </SubMenu> */}
 
           {/* Medical Events */}
-          <MenuItem icon={<FaFirstAid />}>
+          {/* <MenuItem icon={<FaFirstAid />}>
             <NavLink to="/admin/events">MED Event</NavLink>
-          </MenuItem>
+          </MenuItem> */}
         </Menu>
       </SidebarContent>
       <SidebarFooter

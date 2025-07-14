@@ -34,6 +34,9 @@ import PendingMedications from "./pages/SchoolNurse/PendingMedications/PendingMe
 import HealthCheckups from "./pages/SchoolNurse/HealthCheckups/HealthCheckups";
 import CounselingAppointments from "./pages/SchoolNurse/HealthCheckups/CounselingAppointments";
 import Dashboard from "./pages/SchoolNurse/Dashboard";
+import NurseVaccineForms from "./pages/SchoolNurse/VaccineForms/NurseVaccineForms";
+import NurseManageVaccineForms from "./pages/SchoolNurse/VaccineForms/NurseManageVaccineForms";
+import ParentVaccineForms from "./pages/Parents/Immunization/ParentVaccineForms";
 
 const Router = () => {
   return (
@@ -56,10 +59,11 @@ const Router = () => {
           <Route path="notifications" element={<Notifications />} />
           <Route path="student-profiles" element={<StudentProfiles />} />
           <Route path="counseling-records" element={<ParentCounselingRecords />} />
+          <Route path="vaccine-forms" element={<ParentVaccineForms />} />
         </Route>
         {/* Admin Routes */}
         <Route path="/admin" element={<Admin />}>
-        <Route path="manage-users" element={<ManageUser />} />
+          <Route path="manage-users" element={<ManageUser />} />
           <Route path="manage-medication" element={<MedicationManager />} />
           <Route path="manage-medicalSupply" element={<MedicalSupplyManager />} />
           <Route path="manage-vaccinationCampaign" element={<VaccinationCampaignAdmin />} />
@@ -75,6 +79,8 @@ const Router = () => {
           <Route path="pending-medications" element={<PendingMedications />} />
           <Route path="health-checkups" element={<HealthCheckups />} />
           <Route path="counseling-appointments" element={<CounselingAppointments />} />
+          <Route path="vaccine-forms" element={<NurseVaccineForms />} />
+          <Route path="manage-vaccine-forms" element={<NurseManageVaccineForms />} />
         </Route>
       </Routes>
       <ToastContainer
