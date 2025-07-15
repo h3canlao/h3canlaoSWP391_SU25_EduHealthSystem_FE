@@ -1,0 +1,57 @@
+/* Button */
+.ant-btn, .custom-btn {
+  border-radius: 8px !important;
+  font-weight: 600;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(79, 195, 247, 0.08);
+}
+.ant-btn-primary, .custom-btn-primary {
+  background: #A7FFEB !important;
+  color: #263238 !important;
+  border: none !important;
+}
+.ant-btn-primary:hover, .custom-btn-primary:hover {
+  background: #4FC3F7 !important;
+  color: #263238 !important;
+}
+
+/* Card */
+.ant-card, .custom-card {
+  border-radius: 16px !important;
+  box-shadow: 0 2px 12px rgba(79, 195, 247, 0.08);
+  background: #fff !important;
+}
+
+/* Table */
+.ant-table {
+  border-radius: 12px !important;
+  overflow: hidden;
+}
+.ant-table-thead > tr > th {
+  background: #E3FDFD !important;
+  color: #263238 !important;
+  font-weight: 600;
+}
+.ant-table-tbody > tr:hover > td {
+  background: #A7FFEB !important;
+}
+
+/* Modal */
+.ant-modal-content, .custom-modal {
+  border-radius: 16px !important;
+}
+.ant-modal-header {
+  background: #E3FDFD !important;
+  border-radius: 16px 16px 0 0 !important;
+}
+
+/* Input, Select */
+.ant-input, .ant-select-selector, .custom-input {
+  border-radius: 8px !important;
+  border: 1px solid #B0BEC5 !important;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.ant-input:focus, .ant-select-focused .ant-select-selector, .custom-input:focus {
+  border-color: #4FC3F7 !important;
+  box-shadow: 0 0 0 2px rgba(79, 195, 247, 0.15) !important;
+} 

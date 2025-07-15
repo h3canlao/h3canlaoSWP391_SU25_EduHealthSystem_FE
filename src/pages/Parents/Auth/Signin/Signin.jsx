@@ -10,8 +10,7 @@ import "antd/dist/reset.css";
 const { Title, Text, Link } = Typography;
 
 export default function Signin() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  // Đã loại bỏ state email, password
   const navigate = useNavigate();
 
   // Hàm xử lý đăng nhập
@@ -71,8 +70,6 @@ export default function Signin() {
               rules={[{ required: true, type: "email", message: "Please enter your email!" }]}
             >
               <Input
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
                 size="large"
                 autoComplete="email"
                 placeholder="Enter your email"
@@ -86,8 +83,7 @@ export default function Signin() {
               rules={[{ required: true, message: "Please enter your password!" }]}
             >
               <Input.Password
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                className="fix-input-pw"
                 size="large"
                 autoComplete="current-password"
                 placeholder="Enter your password"

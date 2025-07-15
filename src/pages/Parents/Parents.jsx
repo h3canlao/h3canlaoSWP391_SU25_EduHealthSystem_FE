@@ -1,28 +1,8 @@
-import SideBar from "./SideBar";
-import './Parents.css';
-import { FaBars } from 'react-icons/fa';
-import { useState } from "react";
+import React from "react";
+import MainLayout from "@/layouts/MainLayout";
 import { Outlet } from "react-router-dom";
+import SideBar from "./SideBar";
 
-const Parents = (props) => {
-    const [collapsed, setCollapsed] = useState(false);
-
-    const toggleSidebar = () => {
-        setCollapsed(!collapsed);
-    }
-
-    return (
-        <div className="parents-container">
-            <div className="parents-sidebar">
-                <SideBar collapsed={collapsed} toggleSidebar={toggleSidebar} />
-            </div>
-            <div className="parents-content">
-
-                <div className="parents-main">
-                    <Outlet />
-                </div>             
-            </div>
-        </div>
-    )
+export default function Parents() {
+  return <MainLayout sidebar={<SideBar />}><Outlet /></MainLayout>;
 }
-export default Parents;

@@ -1,32 +1,8 @@
-import SideBar from "./SideBar";
-import './Admin.css';
-import { FaBars } from 'react-icons/fa';
-import { useState } from "react";
+import React from "react";
+import MainLayout from "@/layouts/MainLayout";
 import { Outlet } from "react-router-dom";
+import SideBar from "./SideBar";
 
-const Admin = (props) => {
-    const [collapsed, setCollapsed] = useState(false);
-
-    const toggleSidebar = () => {
-        setCollapsed(!collapsed);
-    }
-
-    return (
-        <div className="admin-container">
-            <div className={`admin-sidebar${collapsed ? ' collapsed' : ''}`}>
-                <SideBar collapsed={collapsed} toggleSidebar={toggleSidebar} />
-            </div>
-            <div className="admin-content">
-                <div className="admin-header">
-                    {!collapsed && (
-                        <FaBars className="toggle-icon" onClick={toggleSidebar} style={{ cursor: 'pointer' }} />
-                    )}
-                </div>
-                <div className="admin-main">
-                    <Outlet />
-                </div>             
-            </div>
-        </div>
-    )
+export default function Admin() {
+  return <MainLayout sidebar={<SideBar />}><Outlet /></MainLayout>;
 }
-export default Admin;
