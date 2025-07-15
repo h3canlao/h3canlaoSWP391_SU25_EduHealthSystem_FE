@@ -215,8 +215,8 @@ const ParentCheckupSchedules = () => {
         confirmLoading={submitting}
         footer={[
           <Button key="cancel" onClick={() => setConsentModal({ open: false, schedule: null })}>Hủy</Button>,
-          <Button key="accept" type="primary" loading={submitting} onClick={() => { setConsentStatus(1); handleConsent(); }}>Đồng ý</Button>,
-          <Button key="reject" danger loading={submitting} onClick={() => { setConsentStatus(2); handleConsent(); }}>Từ chối</Button>,
+          <Button key="accept" type="primary" loading={submitting} onClick={() => { setConsentStatus(2); handleConsent(); }}>Đồng ý</Button>,
+          <Button key="reject" danger loading={submitting} onClick={() => { setConsentStatus(1); handleConsent(); }}>Từ chối</Button>,
         ]}
       >
         <div style={{ marginBottom: 12 }}>Bạn muốn đồng ý hay từ chối lịch khám này? (Có thể nhập ghi chú)</div>

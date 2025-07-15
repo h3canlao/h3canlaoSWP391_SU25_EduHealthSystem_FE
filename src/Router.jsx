@@ -87,7 +87,7 @@ const Router = () => {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="create-vaccine-schedule" element={<CreateVaccineSchedule />} />
           <Route path="create-checkup-schedule" element={<CreateCheckupSchedule />} />
-          <Route path="pending-medications" element={<PendingMedications />} />
+          <Route path="pending-medications" element={<PendingMedications />} /> 
           <Route path="health-checkups" element={<HealthCheckups />} />
           <Route path="counseling-appointments" element={<CounselingAppointments />} />
           <Route path="vaccine-forms" element={<NurseVaccineForms />} />

@@ -483,10 +483,14 @@ const CheckupRecordModal = ({ schedule, onClose, onRecordCreated }) => {
                             String(date.getDate()).padStart(2, '0') + 'T' +
                             String(date.getHours()).padStart(2, '0') + ':' +
                             String(date.getMinutes()).padStart(2, '0') + ':00';
-                          console.log('appointmentDate:', localISO);
                           setFollowUpData(prev => ({
                             ...prev,
                             appointmentDate: localISO
+                          }));
+                        } else {
+                          setFollowUpData(prev => ({
+                            ...prev,
+                            appointmentDate: ''
                           }));
                         }
                       }}
