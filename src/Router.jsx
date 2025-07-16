@@ -42,7 +42,8 @@ import MedicationDetail from "./pages/Admin/Medication/MedicationDetail";
 import VaccinationCampaignDetail from "./pages/Admin/VaccinationCampaign/VaccinationCampaignDetail";
 import VaccinationScheduleDetail from "./pages/Admin/VaccinationSchedule/VaccinationScheduleDetail";
 import VaccineTypeDetail from "./pages/Admin/Vaccine/VaccineTypeDetail";
-
+import CheckupCampaignAdmin from "./pages/Admin/CheckupCampaign/CheckupCampaignAdmin";
+import CheckupCampaignDetail from "./pages/Admin/CheckupCampaign/CheckupCampaignDetail";
 
 const Router = () => {
   return (
@@ -80,6 +81,8 @@ const Router = () => {
           <Route path="manage-vaccinationSchedule/:id" element={<VaccinationScheduleDetail />} />
           <Route path="manage-vaccine" element={<VaccineManager />} />
           <Route path="manage-vaccineType/:id" element={<VaccineTypeDetail />} />
+          <Route path="manage-checkupCampaign" element={<CheckupCampaignAdmin />} />
+          <Route path="manage-checkupCampaign/:id" element={<CheckupCampaignDetail />} />
         </Route>
         {/* SchoolNurse Routes */}
         <Route path="/nurse" element={<SchoolNurse />}>
@@ -87,7 +90,7 @@ const Router = () => {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="create-vaccine-schedule" element={<CreateVaccineSchedule />} />
           <Route path="create-checkup-schedule" element={<CreateCheckupSchedule />} />
-          <Route path="pending-medications" element={<PendingMedications />} /> 
+          <Route path="pending-medications" element={<PendingMedications />} />
           <Route path="health-checkups" element={<HealthCheckups />} />
           <Route path="counseling-appointments" element={<CounselingAppointments />} />
           <Route path="vaccine-forms" element={<NurseVaccineForms />} />

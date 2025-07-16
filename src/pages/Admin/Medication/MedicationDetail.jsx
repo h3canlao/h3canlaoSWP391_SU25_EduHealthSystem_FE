@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getMedicationById } from "@/services/medicationApi";
-import { Card, Descriptions, Button, Spin, Tag, message } from "antd";
+import { Card, Descriptions, Button, Spin, Tag, message, Table } from "antd"; // Import Table
 import dayjs from "dayjs";
 
 const MedicationDetail = () => {
@@ -30,11 +30,58 @@ const MedicationDetail = () => {
   const formatDate = (dateStr) =>
     dateStr ? dayjs(dateStr).format("DD/MM/YYYY HH:mm") : "";
 
+  // Columns for the Lots Table
+  const lotColumns = [
+    {
+      title: "Số lô",
+      dataIndex: "lotNumber",
+      key: "lotNumber",
+    },
+    {
+      title: "Số lượng",
+      dataIndex: "quantity",
+      key: "quantity",
+    },
+    {
+      title: "Vị trí lưu trữ",
+      dataIndex: "storageLocation",
+      key: "storageLocation",
+    },
+    {
+      title: "Ngày hết hạn",
+      dataIndex: "expiryDate",
+      key: "expiryDate",
+      render: (dateStr) => dayjs(dateStr).format("DD/MM/YYYY"),
+    },
+    {
+      title: "Trạng thái hết hạn",
+      dataIndex: "expiryStatus",
+      key: "expiryStatus",
+      render: (status) => {
+        let color = '';
+        if (status === 'Còn hạn') {
+          color = 'green';
+        } else if (status === 'Sắp hết hạn') { // Assuming you might have this status
+          color = 'orange';
+        } else if (status === 'Đã hết hạn') {
+          color = 'red';
+        }
+        return <Tag color={color}>{status}</Tag>;
+      },
+    },
+    {
+      title: "Ngày tạo lô",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (dateStr) => formatDate(dateStr),
+    },
+  ];
+
   return (
     <Card
       title={<span style={{ fontWeight: 700 }}>Chi tiết thuốc: {data.name}</span>}
       extra={<Button onClick={() => navigate(-1)}>Quay lại</Button>}
-      style={{  margin: "0 24px" }}
+      style={{ margin: "0 24px" }}
       bodyStyle={{ padding: 24 }}
       headStyle={{ fontSize: 20 }}
     >
@@ -51,6 +98,21 @@ const MedicationDetail = () => {
         <Descriptions.Item label="Ngày tạo">{formatDate(data.createdAt)}</Descriptions.Item>
         <Descriptions.Item label="Ngày cập nhật">{formatDate(data.updatedAt)}</Descriptions.Item>
       </Descriptions>
+
+      {data.lots && data.lots.length > 0 && (
+        <>
+          <br />
+          <h3>Chi tiết lô hàng</h3>
+          <Table
+            columns={lotColumns}
+            dataSource={data.lots}
+            rowKey="id"
+            pagination={false}
+            bordered
+            size="small"
+          />
+        </>
+      )}
     </Card>
   );
 };

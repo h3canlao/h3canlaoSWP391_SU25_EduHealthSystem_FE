@@ -107,7 +107,7 @@ const MedicationAdmin = () => {
       key: "actions",
       render: (_, record) => (
         <>
-          <Button type="link" onClick={() => navigate(`/admin/manage-medication/${record.id}`)}>
+          <Button disabled={filterType === "deleted"} type="link" onClick={() => navigate(`/admin/manage-medication/${record.id}`)}>
             Chi tiết
           </Button>
           {filterType !== "deleted" && (
