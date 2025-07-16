@@ -92,9 +92,9 @@ const ParentCheckupRecords = () => {
                   <div className="student-meta">Mã HS: {student.studentCode} | Lớp: {student.grade}{student.section}</div>
                 </div>
               </div>
-              <div className="student-records">
+              <div className="student-records" style={{display: 'flex', flexDirection: 'row', gap: 20, overflowX: 'auto', flexWrap: 'nowrap'}}>
                 {records.map(record => (
-                  <Card key={record.id} className="record-card" hoverable>
+                  <Card key={record.id} className="record-card" hoverable style={{minWidth: 320, maxWidth: 370, flex: '0 0 320px'}}>
                     <div className="record-details">
                       <div className="detail-row"><FaCalendar className="detail-icon" /><span className="label">Ngày khám:</span><span className="value">{formatDate(record.examinedAt)} {formatTime(record.examinedAt)}</span></div>
                       <div className="detail-row"><FaRuler className="detail-icon" /><span className="label">Chiều cao:</span><span className="value">{record.heightCm} cm</span></div>

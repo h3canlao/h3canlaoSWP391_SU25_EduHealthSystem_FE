@@ -27,21 +27,21 @@ import VaccineManager from "./pages/Admin/Vaccine/VaccineManager";
 
 // SchoolNurse imports
 import SchoolNurse from "./pages/SchoolNurse/SchoolNurse";
-import CreateVaccineSchedule from "./pages/SchoolNurse/CreateVaccineSchedule/CreateVaccineSchedule";
-import CreateCheckupSchedule from "./pages/SchoolNurse/CreateCheckupSchedule/CreateCheckupSchedule";
 import PendingMedications from "./pages/SchoolNurse/PendingMedications/PendingMedications";
 import HealthCheckups from "./pages/SchoolNurse/HealthCheckups/HealthCheckups";
 import CounselingAppointments from "./pages/SchoolNurse/HealthCheckups/CounselingAppointments";
 import Dashboard from "./pages/SchoolNurse/Dashboard";
 
-import NurseVaccineForms from "./pages/SchoolNurse/VaccineForms/NurseVaccineForms";
-import NurseManageVaccineForms from "./pages/SchoolNurse/VaccineForms/NurseManageVaccineForms";
+
 import ParentVaccineForms from "./pages/Parents/Immunization/ParentVaccineForms";
 import MedicalSupplyDetail from "./pages/Admin/MedicalSupply/MedicalSupplyAdminDetail";
 import MedicationDetail from "./pages/Admin/Medication/MedicationDetail";
 import VaccinationCampaignDetail from "./pages/Admin/VaccinationCampaign/VaccinationCampaignDetail";
 import VaccinationScheduleDetail from "./pages/Admin/VaccinationSchedule/VaccinationScheduleDetail";
 import VaccineTypeDetail from "./pages/Admin/Vaccine/VaccineTypeDetail";
+import HealthEventForm from "./pages/SchoolNurse/HealthEvent/HealthEventForm";
+import VaccinationSchedules from "./pages/SchoolNurse/Vaccination/VaccinationSchedules";
+import VaccinationScheduleInfo from "./pages/SchoolNurse/Vaccination/VaccinationScheduleInfo";
 
 
 const Router = () => {
@@ -85,13 +85,12 @@ const Router = () => {
         <Route path="/nurse" element={<SchoolNurse />}>
           <Route index element={<Dashboard />} />
           <Route path="dashboard" element={<Dashboard />} />
-          <Route path="create-vaccine-schedule" element={<CreateVaccineSchedule />} />
-          <Route path="create-checkup-schedule" element={<CreateCheckupSchedule />} />
           <Route path="pending-medications" element={<PendingMedications />} /> 
           <Route path="health-checkups" element={<HealthCheckups />} />
           <Route path="counseling-appointments" element={<CounselingAppointments />} />
-          <Route path="vaccine-forms" element={<NurseVaccineForms />} />
-          <Route path="manage-vaccine-forms" element={<NurseManageVaccineForms />} />
+          <Route path="vaccination-schedules" element={<VaccinationSchedules />} />
+          <Route path="vaccination-schedules/:id" element={<VaccinationScheduleInfo />} />
+          <Route path="health-event" element={<HealthEventForm />} />
         </Route>
       </Routes>
       <ToastContainer

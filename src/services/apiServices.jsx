@@ -40,7 +40,7 @@ const verifyEmail = async (userId, token) => {
   return axios.get(`${BASE_URL}/Auth/confirm-email`, { params: { userId, token } });
 };
 
-// Lấy tất cả học sinh
+// Lấy tất cả học sinh (dùng chung cho mọi vai trò)
 const getAllStudents = async () => {
   return axios.get(`${BASE_URL}/students`, { headers: getAuthHeaders() });
 };
@@ -223,6 +223,33 @@ export const getCheckupRecordsByStaffId = async (staffId) => {
   });
 };
 
+// Lấy lịch khám sức khỏe của tất cả con (my-children)
+const getCheckupSchedulesMyChildren = async () => {
+  return axios.get(`${BASE_URL}/CheckupSchedule/my-children`, {
+    headers: getAuthHeaders()
+  });
+};
+
+// Khai báo sự kiện y tế
+export const createHealthEvent = async (data) => {
+  return await axios.post(`${BASE_URL}/HealthEvent`, data);
+};
+
+// Lấy danh sách lịch tiêm chủng
+export const getVaccinationSchedules = async () => {
+  return axios.get(`${BASE_URL}/VaccinationSchedule`, { headers: getAuthHeaders() });
+};
+
+// Lấy chi tiết lịch tiêm chủng
+export const getVaccinationScheduleDetail = async (id) => {
+  return axios.get(`${BASE_URL}/VaccinationSchedule/${id}`, { headers: getAuthHeaders() });
+};
+
+// Tạo record tiêm chủng
+export const createVaccinationRecord = async (data) => {
+  return axios.post(`${BASE_URL}/VaccinationRecord`, data, { headers: getAuthHeaders() });
+};
+
 export {
   postSignin,
   postRegister,
@@ -254,4 +281,5 @@ export {
   addCounselingAppointmentNote,
   getCheckupSchedulesByStudentId,
   consentCheckupSchedule,
+  getCheckupSchedulesMyChildren,
 };

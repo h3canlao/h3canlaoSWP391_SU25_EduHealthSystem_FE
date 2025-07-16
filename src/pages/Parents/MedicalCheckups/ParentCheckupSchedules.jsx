@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getStudentsByParentId, getCheckupSchedulesByStudentId, consentCheckupSchedule } from '../../../services/apiServices';
+import { getStudentsByParentId, getCheckupSchedulesByStudentId, consentCheckupSchedule, getCheckupSchedulesMyChildren } from '../../../services/apiServices';
 import { getUserInfo } from '../../../services/handleStorageApi';
 import { Card, Avatar, Tag, Spin, Empty, Modal, Input, Button, message } from 'antd';
 import { FaUser, FaCalendar, FaStethoscope, FaInfoCircle, FaIdBadge, FaChalkboardTeacher, FaClock, FaFlag } from 'react-icons/fa';
@@ -22,32 +22,9 @@ const ParentCheckupSchedules = () => {
   const fetchCheckupSchedules = async () => {
     try {
       setLoading(true);
-      
-      // Lấy thông tin user từ token
-      const userInfo = getUserInfo();
-      const userId = JSON.parse(atob(userInfo.accessToken.split('.')[1]))?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
-      
-      // Lấy danh sách học sinh của parent
-      const studentsResponse = await getStudentsByParentId(userId);
-      const students = Array.isArray(studentsResponse.data.data) ? studentsResponse.data.data : [];
-      
-      // Lấy lịch khám cho tất cả học sinh
-      const allSchedules = [];
-      for (const student of students) {
-        try {
-          const scheduleResponse = await getCheckupSchedulesByStudentId(student.id);
-          if (Array.isArray(scheduleResponse.data.data)) {
-            allSchedules.push(...scheduleResponse.data.data);
-          }
-        } catch (error) {
-          // Nếu lỗi là 400 (không có lịch), bỏ qua, không log
-          if (!(error && error.response && error.response.status === 400)) {
-            console.error(`Error fetching schedules for student ${student.id}:`, error);
-          }
-        }
-      }
-      
-      setSchedules(allSchedules);
+      // Gọi API mới lấy tất cả lịch khám của các con
+      const res = await getCheckupSchedulesMyChildren();
+      setSchedules(Array.isArray(res.data.data) ? res.data.data : []);
     } catch (error) {
       console.error('Error fetching checkup schedules:', error);
     } finally {
@@ -162,7 +139,7 @@ const ParentCheckupSchedules = () => {
                     {schedule.studentName}
                   </div>
                   <div className="schedule-details">
-                    <div className="detail-row">
+                    {/* <div className="detail-row">
                       <FaIdBadge className="detail-icon" />
                       <span className="label">Mã học sinh:</span>
                       <span className="value">{schedule.studentCode}</span>
@@ -171,7 +148,7 @@ const ParentCheckupSchedules = () => {
                       <FaChalkboardTeacher className="detail-icon" />
                       <span className="label">Lớp:</span>
                       <span className="value">{schedule.grade}{schedule.section}</span>
-                    </div>
+                    </div> */}
                     <div className="detail-row">
                       <FaCalendar className="detail-icon" />
                       <span className="label">Ngày khám:</span>
