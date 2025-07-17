@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Typography, Spin, Empty, Card, Tag, Modal, Select, message } from 'antd';
+import { Button, Typography, Spin, Empty, Card, Tag, Modal, Select, message, Input } from 'antd';
 import { ClockCircleOutlined, CheckCircleOutlined, CarOutlined, HomeOutlined, EditOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import { getPendingMedicationDeliveries, updateMedicationDeliveryStatus } from '../../../services/apiServices';
 import { getAccessToken } from '../../../services/handleStorageApi';
@@ -13,6 +13,7 @@ const PendingMedications = () => {
   const [loading, setLoading] = useState(false);
   const [updateModal, setUpdateModal] = useState({ visible: false, medication: null, loading: false });
   const [selectedStatus, setSelectedStatus] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const token = getAccessToken();
 
@@ -34,6 +35,12 @@ const PendingMedications = () => {
   useEffect(() => {
     fetchPendingMedications();
   }, [token]);
+
+  // Lọc danh sách đơn thuốc theo searchTerm
+  const filteredMedications = medications.filter(med =>
+    med.medicationName?.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '')
+      .includes(searchTerm.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, ''))
+  );
 
   // Xử lý cập nhật trạng thái
   const handleUpdateStatus = async () => {
@@ -135,18 +142,24 @@ const PendingMedications = () => {
         <Title level={3}>Quản Lý Đơn Thuốc Đang Chờ</Title>
         <Text type="secondary">Theo dõi và cập nhật trạng thái các đơn thuốc từ phụ huynh</Text>
       </div>
-      
+      <Input
+        placeholder="Tìm kiếm tên thuốc..."
+        value={searchTerm}
+        onChange={e => setSearchTerm(e.target.value)}
+        style={{ marginBottom: 20, maxWidth: 350 }}
+        allowClear
+      />
       {loading ? (
         <div style={{ textAlign: 'center', padding: '40px' }}>
           <Spin size="large" />
         </div>
-      ) : medications.length === 0 ? (
+      ) : filteredMedications.length === 0 ? (
         <Card>
           <Empty description="Không có đơn thuốc nào đang chờ xử lý." />
         </Card>
       ) : (
         <div className="medications-container">
-          {medications.map(renderMedicationCard)}
+          {filteredMedications.map(renderMedicationCard)}
         </div>
       )}
 

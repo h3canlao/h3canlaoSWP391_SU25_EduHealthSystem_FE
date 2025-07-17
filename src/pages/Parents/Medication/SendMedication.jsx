@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Typography, Spin, Empty, Tabs, Card, Tag, List, Modal, Steps } from 'antd';
+import { Button, Typography, Spin, Empty, Tabs, Card, Tag, List, Modal, Steps, Input } from 'antd';
 import { PlusOutlined, ClockCircleOutlined, CheckCircleOutlined, InfoCircleOutlined, SolutionOutlined, GiftOutlined, CarOutlined, HomeOutlined, ShoppingCartOutlined, CreditCardOutlined, EnvironmentOutlined, DesktopOutlined, ExperimentOutlined, UserOutlined, DownOutlined, UpOutlined } from '@ant-design/icons';
 import { getAllParentMedicationDelivery, getStudentsByParentId } from '../../../services/apiServices';
 import { getAccessToken, getUserInfo } from '../../../services/handleStorageApi';
@@ -16,6 +16,7 @@ const SendMedication = () => {
   const [showModal, setShowModal] = useState(false);
   const [activeTab, setActiveTab] = useState('pending');
   const [detailModal, setDetailModal] = useState({ visible: false, medication: null });
+  const [searchTerm, setSearchTerm] = useState("");
 
   const userInfo = getUserInfo();
   let parentId = null;
@@ -68,12 +69,22 @@ const SendMedication = () => {
 
   // Map status to tag and step
   const statusMap = {
-    Ordered: { color: statusColors[0], icon: <DesktopOutlined />, text: 'Ordered', step: 0 },
-    Confirmed: { color: statusColors[1], icon: <CheckCircleOutlined />, text: 'Confirmed', step: 1 },
-    'In Transit': { color: statusColors[2], icon: <CarOutlined />, text: 'In Transit', step: 2 },
-    Delivered: { color: statusColors[3], icon: <HomeOutlined />, text: 'Delivered', step: 3 },
+    Ordered: { color: statusColors[0], icon: <DesktopOutlined />, text: 'Đã gửi', step: 0 },
+    Confirmed: { color: statusColors[1], icon: <CheckCircleOutlined />, text: 'Đã xác nhận', step: 1 },
+    'In Transit': { color: statusColors[2], icon: <CarOutlined />, text: 'Từ chối', step: 2 }, // Tag góc phải sẽ là 'Từ chối'
+    Delivered: { color: statusColors[3], icon: <HomeOutlined />, text: 'Đã giao', step: 3 },
   };
-  const statusList = ['Ordered', 'Confirmed', 'In Transit', 'Delivered'];
+  // Step trạng thái vẫn giữ nguyên, không có "Từ chối" trong step
+  const statusList = ['Ordered', 'Confirmed', 'Delivered'];
+
+  // Lọc danh sách đơn thuốc theo searchTerm
+  // Đảo ngược để đơn mới nhất lên đầu
+  const filteredMedications = medications
+    .slice().reverse()
+    .filter(med =>
+      med.medicationName?.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '')
+        .includes(searchTerm.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, ''))
+    );
 
   // Card render
   const renderMedicationCard = (med) => {
@@ -105,7 +116,7 @@ const SendMedication = () => {
               color={statusMap[med.status]?.color}
               style={{ fontSize: 16, padding: '6px 16px', borderRadius: 8, marginBottom: 8 }}
             >
-              {statusMap[med.status]?.text || med.status}
+              {med.status === 'In Transit' ? 'Từ chối' : (statusMap[med.status]?.text || med.status)}
             </Tag>
           </div>
         </div>
@@ -126,8 +137,9 @@ const SendMedication = () => {
           <div style={{ maxWidth: 700, width: '100%' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {statusList.map((status, idx) => {
+                // Step chỉ gồm Đã gửi, Đã xác nhận, Đã giao
                 const activeStep = statusMap[med.status]?.step || 0;
-                const isActive = idx <= activeStep;
+                const isActive = idx <= activeStep && med.status !== 'In Transit';
                 return (
                   <React.Fragment key={status}>
                     <div style={{
@@ -201,14 +213,21 @@ const SendMedication = () => {
             Gửi thuốc
           </Button>
         </div>
+        <Input
+          placeholder="Tìm kiếm tên thuốc..."
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+          style={{ marginBottom: 20, maxWidth: 350 }}
+          allowClear
+        />
         {loading || studentLoading ? (
           <Spin size="large" style={{ display: 'block', margin: '40px auto' }} />
-        ) : medications.length === 0 ? (
+        ) : filteredMedications.length === 0 ? (
           <Empty description="Không có đơn thuốc." />
         ) : (
           <div className="medication-list-scroll" style={{ maxHeight: 'calc(93vh - 120px)', overflowY: 'auto', paddingRight: 8 }}>
             <List
-              dataSource={medications}
+              dataSource={filteredMedications}
               renderItem={renderMedicationCard}
               className="medication-list"
             />

@@ -283,6 +283,12 @@ const getHealthEventsMyChild = async () => {
   return axios.get(`${BASE_URL}/HealthEvent/myChild`, { headers: getAuthHeaders() });
 };
 
+export const declareVaccination = (payload) => {
+  return axios.post(`${BASE_URL}/parent/vaccinations`, payload, {
+    headers: getAuthHeaders()
+  });
+};
+
 export {
   postSignin,
   postRegister,

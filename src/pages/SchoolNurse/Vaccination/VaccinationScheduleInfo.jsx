@@ -67,15 +67,26 @@ export default function VaccinationScheduleInfo() {
     }
   };
 
-  const columns = [
+  // Chia danh sách học sinh thành 2 nhóm
+  const studentsChuaTiem = detail?.sessionStudents?.filter(s => s.statusName === 'Registered') || [];
+  const studentsDaTiem = detail?.sessionStudents?.filter(s => s.statusName !== 'Registered') || [];
+
+  // Cột cho bảng chưa tiêm (có nút ghi nhận)
+  const columnsChuaTiem = [
     { title: "Học sinh", dataIndex: "studentName", key: "studentName", render: (text) => <><UserOutlined /> {text}</> },
     { title: "Mã HS", dataIndex: "studentCode", key: "studentCode" },
     { title: "Trạng thái", dataIndex: "statusName", key: "statusName", render: (text) => <Tag color={text === "Registered" ? "orange" : "green"}>{text}</Tag> },
     { title: "Ghi nhận", key: "action", render: (_, record) => (
-      <Button type="primary" icon={<FormOutlined />} onClick={() => openRecordModal(record)} disabled={record.statusName !== "Registered"}>
+      <Button type="primary" icon={<FormOutlined />} onClick={() => openRecordModal(record)}>
         Ghi nhận tiêm chủng
       </Button>
     ) },
+  ];
+  // Cột cho bảng đã tiêm (không có nút ghi nhận)
+  const columnsDaTiem = [
+    { title: "Học sinh", dataIndex: "studentName", key: "studentName", render: (text) => <><UserOutlined /> {text}</> },
+    { title: "Mã HS", dataIndex: "studentCode", key: "studentCode" },
+    { title: "Trạng thái", dataIndex: "statusName", key: "statusName", render: (text) => <Tag color={"green"}>{text}</Tag> },
   ];
 
   return (
@@ -94,10 +105,10 @@ export default function VaccinationScheduleInfo() {
             <div><UserOutlined /> Tổng học sinh: <b>{detail.totalStudents}</b> &nbsp; <CheckCircleOutlined style={{ color: "#52c41a" }} /> Đã tiêm: <b>{detail.completedRecords}</b></div>
           </Card>
           <Card style={{ borderRadius: 16 }}>
-            <Title level={5} style={{ marginBottom: 16 }}><UserOutlined /> Danh sách học sinh cần tiêm</Title>
+            <Title level={5} style={{ marginBottom: 16 }}><UserOutlined /> Danh sách học sinh</Title>
             <Table
-              dataSource={detail.sessionStudents}
-              columns={columns}
+              dataSource={studentsChuaTiem}
+              columns={columnsChuaTiem}
               rowKey="id"
               pagination={false}
             />
