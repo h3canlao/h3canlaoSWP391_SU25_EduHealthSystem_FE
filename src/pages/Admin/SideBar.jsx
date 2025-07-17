@@ -10,6 +10,7 @@ import {
   FormOutlined,
   SolutionOutlined,
   DashboardOutlined,
+  SafetyCertificateOutlined,
 } from "@ant-design/icons";
 import Sidebar from "@/components/Sidebar";
 
@@ -39,7 +40,7 @@ const routes = [
   },
   {
     key: "checkup",
-    icon: <FileProtectOutlined />,
+    icon: <SafetyCertificateOutlined />,
     label: "Khám định kỳ",
     children: [
       { key: "/admin/manage-checkupCampaign", icon: <HistoryOutlined />, label: "Chiến dịch khám" },
