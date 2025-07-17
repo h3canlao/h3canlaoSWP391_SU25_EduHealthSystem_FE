@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { postSignin, currentUsers } from "@/services/apiServices";
 import {  setUserInfo, setAccessToken } from '../../../../services/handleStorageApi';
 import "./Signin.css";
+import { getUserRole } from "@/services/handleStorageApi";
+
 import "antd/dist/reset.css";
 
 const { Title, Text, Link } = Typography;
@@ -12,6 +14,7 @@ const { Title, Text, Link } = Typography;
 export default function Signin() {
   // Đã loại bỏ state email, password
   const navigate = useNavigate();
+
 
   // Hàm xử lý đăng nhập
   const handleSignin = async (values) => {
@@ -36,14 +39,19 @@ export default function Signin() {
       console.log(token)
       setAccessToken(token);
       if (res.data.isSuccess === true) {
-
         const currentUser = await currentUsers();
-        console.log(currentUser)
         if (currentUser.data.isSuccess) {
             setUserInfo(currentUser.data.data);
         }
+        // Lấy lại role từ token mới
+        const newRole = getUserRole();
+        console.log("Role:", newRole);
         toast.success('Login successfully.');
-        navigate('/');
+        // Điều hướng theo role
+        if (newRole === "Parent") navigate("/parents");
+        else if (newRole === "Admin") navigate("/admin");
+        else if (newRole === "SchoolNurse") navigate("/nurse");
+        else navigate("/");
       }
     } catch (error) {
       toast.error(error.res?.data?.message || 'An error occurred during registration!');
