@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Modal, Form, Input, InputNumber, Space, Switch, Popconfirm, message, Tag } from "antd";
+import { Table, Button, Modal, Form, Input, InputNumber, Space, Switch, Popconfirm, message, Tag, Select } from "antd";
 import {
   getVaccineTypes,
   createVaccineType,
@@ -10,6 +10,8 @@ import {
   toggleVaccineTypeStatus,
 } from "@/services/vaccineManagerApi";
 import { useNavigate } from "react-router-dom";
+
+const { Option } = Select;
 
 const defaultVaccineType = {
   code: "",
@@ -29,11 +31,17 @@ const VaccineTypeTab = () => {
   const [form] = Form.useForm();
   const [showDeleted, setShowDeleted] = useState(false);
 
+  // Thêm state để lọc theo trạng thái
+  const [isActiveFilter, setIsActiveFilter] = useState(null); // null: tất cả, true: đang kích hoạt, false: không kích hoạt
+
   // --- Fetch data ---
   const fetchData = async () => {
     setLoading(true);
     try {
-      const res = showDeleted ? await getDeletedVaccineTypes() : await getVaccineTypes();
+      const params = {
+        isActive: isActiveFilter, // Thêm tham số lọc vào request
+      };
+      const res = showDeleted ? await getDeletedVaccineTypes() : await getVaccineTypes(params);
       setData(res.data.data || res.data || []);
     } catch {
       message.error("Không tải được danh sách loại vaccine");
@@ -43,7 +51,7 @@ const VaccineTypeTab = () => {
 
   useEffect(() => {
     fetchData();
-  }, [showDeleted]);
+  }, [showDeleted, isActiveFilter]); // Cập nhật useEffect để lắng nghe thay đổi của isActiveFilter
 
   // --- Modal ---
   const openModal = (record = null) => {
@@ -113,7 +121,8 @@ const VaccineTypeTab = () => {
     { title: "Mã", dataIndex: "code" },
     { title: "Tên", dataIndex: "name" },
     { title: "Nhóm", dataIndex: "group" },
-
+    { title: "Tuổi khuyến nghị (tháng)", dataIndex: "recommendedAgeMonths" },
+    { title: "Khoảng cách tiêm (ngày)", dataIndex: "minIntervalDays" },
     {
       title: "Kích hoạt",
       dataIndex: "isActive",
@@ -148,34 +157,46 @@ const VaccineTypeTab = () => {
 
   return (
     <div style={{ margin: "0 24px" }}>
-      <Space style={{ marginBottom: 8 }}>
-        <Button type="primary" onClick={() => openModal()}>
-          Thêm loại vaccine
-        </Button>
-        <Button onClick={() => setShowDeleted((v) => !v)} type={showDeleted ? "primary" : "default"}>
-          {showDeleted ? "Xem danh sách" : "Xem đã xoá"}
-        </Button>
-        {!showDeleted ? (
-          <Popconfirm
-            title="Xoá các loại vaccine đã chọn? Nếu đang có lô vaccine sử dụng sẽ không xóa được."
-            disabled={!selectedRowKeys.length}
-            onConfirm={handleDelete}
-          >
-            <Button danger disabled={!selectedRowKeys.length}>
-              Xoá nhiều
-            </Button>
-          </Popconfirm>
-        ) : (
-          <Popconfirm
-            title="Khôi phục các loại vaccine đã chọn?"
-            disabled={!selectedRowKeys.length}
-            onConfirm={handleRestore}
-          >
-            <Button type="primary" disabled={!selectedRowKeys.length}>
-              Phục hồi
-            </Button>
-          </Popconfirm>
-        )}
+      <Space style={{ marginBottom: 8, display: "flex", justifyContent: "space-between" }}>
+        <Space>
+          <Button type="primary" onClick={() => openModal()}>
+            Thêm loại vaccine
+          </Button>
+          <Button onClick={() => setShowDeleted((v) => !v)} type={showDeleted ? "primary" : "default"}>
+            {showDeleted ? "Xem danh sách" : "Xem đã xoá"}
+          </Button>
+          {!showDeleted ? (
+            <Popconfirm
+              title="Xoá các loại vaccine đã chọn? Nếu đang có lô vaccine sử dụng sẽ không xóa được."
+              disabled={!selectedRowKeys.length}
+              onConfirm={handleDelete}
+            >
+              <Button danger disabled={!selectedRowKeys.length}>
+                Xoá nhiều
+              </Button>
+            </Popconfirm>
+          ) : (
+            <Popconfirm
+              title="Khôi phục các loại vaccine đã chọn?"
+              disabled={!selectedRowKeys.length}
+              onConfirm={handleRestore}
+            >
+              <Button type="primary" disabled={!selectedRowKeys.length}>
+                Phục hồi
+              </Button>
+            </Popconfirm>
+          )}
+        </Space>
+        {/* Thêm bộ lọc trạng thái */}
+        <Select
+          placeholder="Lọc theo trạng thái"
+          style={{ width: 200 }}
+          allowClear
+          onChange={(value) => setIsActiveFilter(value)}
+        >
+          <Option value={true}>Đang kích hoạt</Option>
+          <Option value={false}>Không kích hoạt</Option>
+        </Select>
       </Space>
       <Table
         rowKey="id"
