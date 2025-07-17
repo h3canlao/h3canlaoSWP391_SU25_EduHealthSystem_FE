@@ -60,7 +60,7 @@
 
 .records-list {
   display: flex;
-  flex-direction: column;
+  flex-direction: row!important;
   gap: 32px;
 }
 
@@ -120,12 +120,22 @@
 }
 .record-details {
   margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  align-items: flex-start;
 }
 .detail-row {
   display: flex;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 0;
   font-size: 14px;
+  /* Đặt chiều rộng tối thiểu để không bị bóp quá nhỏ */
+  min-width: 220px;
+  /* Đặt chiều rộng tối đa để không bị quá dài */
+  max-width: 260px;
+  /* Khoảng cách giữa các detail-row */
+  margin-right: 12px;
 }
 .detail-icon {
   width: 18px;
@@ -152,6 +162,15 @@
     min-width: unset;
     max-width: unset;
     width: 100%;
+  }
+  .record-details {
+    flex-direction: column;
+    gap: 6px 0;
+  }
+  .detail-row {
+    min-width: unset;
+    max-width: unset;
+    margin-right: 0;
   }
 }
 @media (max-width: 600px) {

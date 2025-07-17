@@ -1,0 +1,102 @@
+import React, { useEffect, useState } from "react";
+import { Tabs, Table, Typography, Tag, Spin, message } from "antd";
+import { getHealthEvents } from "@/services/apiServices";
+import HealthEventForm from "./HealthEventForm";
+
+const { Title } = Typography;
+
+const EVENT_TYPE_MAP = {
+  Accident: "Tai nạn",
+  Fever: "Sốt",
+  Fall: "Ngã",
+  Disease: "Bệnh",
+  Other: "Khác",
+  VaccineReaction: "Phản ứng vắc xin"
+};
+const EVENT_STATUS_MAP = {
+  InProgress: { color: "blue", text: "Đang xử lý" },
+  Completed: { color: "green", text: "Hoàn thành" },
+  Cancelled: { color: "red", text: "Đã hủy" }
+};
+
+export default function HealthEventTabs() {
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchEvents = () => {
+    setLoading(true);
+    getHealthEvents()
+      .then(res => setEvents(res.data?.data || []))
+      .catch(() => message.error("Không lấy được danh sách sự kiện y tế"))
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+
+  const columns = [
+    {
+      title: "Học sinh",
+      dataIndex: "studentName",
+      key: "studentName",
+      width: 140
+    },
+    {
+      title: "Loại sự kiện",
+      dataIndex: "eventType",
+      key: "eventType",
+      width: 120,
+      render: v => EVENT_TYPE_MAP[v] || v
+    },
+    {
+      title: "Mô tả",
+      dataIndex: "description",
+      key: "description",
+      width: 200
+    },
+    {
+      title: "Thời gian",
+      dataIndex: "occurredAt",
+      key: "occurredAt",
+      width: 160,
+      render: v => v ? new Date(v).toLocaleString("vi-VN") : ""
+    },
+    {
+      title: "Trạng thái",
+      dataIndex: "eventStatus",
+      key: "eventStatus",
+      width: 120,
+      render: v => {
+        const status = EVENT_STATUS_MAP[v] || { color: "default", text: v };
+        return <Tag color={status.color}>{status.text}</Tag>;
+      }
+    }
+  ];
+
+  return (
+    <div style={{ maxWidth: 900, margin: "0 auto", background: "#fff", borderRadius: 16, boxShadow: "0 2px 12px rgba(79,195,247,0.08)", padding: 32 }}>
+      <Title level={3} style={{ color: "#4FC3F7", marginBottom: 24 }}>Quản lý sự kiện y tế</Title>
+      <Tabs defaultActiveKey="1" items={[
+        {
+          key: "1",
+          label: "Danh sách sự kiện",
+          children: loading ? <Spin /> : (
+            <Table
+              columns={columns}
+              dataSource={events}
+              rowKey="id"
+              pagination={{ pageSize: 8 }}
+              bordered
+            />
+          )
+        },
+        {
+          key: "2",
+          label: "Tạo sự kiện mới",
+          children: <HealthEventForm />
+        }
+      ]} />
+    </div>
+  );
+} 
