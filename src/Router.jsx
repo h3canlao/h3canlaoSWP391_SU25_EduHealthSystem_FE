@@ -30,7 +30,6 @@ import HealthCheckups from "./pages/SchoolNurse/HealthCheckups/HealthCheckups";
 import CounselingAppointments from "./pages/SchoolNurse/HealthCheckups/CounselingAppointments";
 import Dashboard from "./pages/SchoolNurse/Dashboard";
 
-
 import MedicalSupplyDetail from "./pages/Admin/MedicalSupply/MedicalSupplyAdminDetail";
 import MedicationDetail from "./pages/Admin/Medication/MedicationDetail";
 import VaccinationCampaignDetail from "./pages/Admin/VaccinationCampaign/VaccinationCampaignDetail";
@@ -62,7 +61,7 @@ function ProtectedRoute({ children, allowedRoles }) {
 
 import CheckupCampaignAdmin from "./pages/Admin/CheckupCampaign/CheckupCampaignAdmin";
 import CheckupCampaignDetail from "./pages/Admin/CheckupCampaign/CheckupCampaignDetail";
-
+import CheckupScheduleAdmin from "./pages/Admin/CheckupSchedule/CheckupScheduleAdmin";
 
 const Router = () => {
   return (
@@ -75,11 +74,14 @@ const Router = () => {
         <Route path="/confirm-email" element={<ConfirmEmail />} />
 
         {/* Parents Routes */}
-        <Route path="/parents" element={
-          <ProtectedRoute allowedRoles={["Parent"]}>
-            <Parents />
-          </ProtectedRoute>
-        }>
+        <Route
+          path="/parents"
+          element={
+            <ProtectedRoute allowedRoles={["Parent"]}>
+              <Parents />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<StudentProfiles />} />
           <Route path="checkup-schedules" element={<ParentCheckupSchedules />} />
           <Route path="checkup-records" element={<ParentCheckupRecords />} />
@@ -93,11 +95,14 @@ const Router = () => {
           <Route path="health-events" element={<ParentHealthEvents />} />
         </Route>
         {/* Admin Routes */}
-        <Route path="/admin" element={
-          <ProtectedRoute allowedRoles={["Admin"]}>
-            <Admin />
-          </ProtectedRoute>
-        }>
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute allowedRoles={["Admin"]}>
+              <Admin />
+            </ProtectedRoute>
+          }
+        >
           <Route path="manage-users" element={<ManageUser />} />
           <Route path="manage-medication" element={<MedicationManager />} />
           <Route path="manage-medication/:id" element={<MedicationDetail />} />
@@ -111,16 +116,20 @@ const Router = () => {
           <Route path="manage-vaccineType/:id" element={<VaccineTypeDetail />} />
           <Route path="manage-checkupCampaign" element={<CheckupCampaignAdmin />} />
           <Route path="manage-checkupCampaign/:id" element={<CheckupCampaignDetail />} />
+          <Route path="manage-checkupSchedule" element={<CheckupScheduleAdmin />} />
         </Route>
         {/* SchoolNurse Routes */}
-        <Route path="/nurse" element={
-          <ProtectedRoute allowedRoles={["SchoolNurse"]}>
-            <SchoolNurse />
-          </ProtectedRoute>
-        }>
+        <Route
+          path="/nurse"
+          element={
+            <ProtectedRoute allowedRoles={["SchoolNurse"]}>
+              <SchoolNurse />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<Dashboard />} />
           <Route path="dashboard" element={<Dashboard />} />
-          <Route path="pending-medications" element={<PendingMedications />} /> 
+          <Route path="pending-medications" element={<PendingMedications />} />
           <Route path="pending-medications" element={<PendingMedications />} />
           <Route path="health-checkups" element={<HealthCheckups />} />
           <Route path="counseling-appointments" element={<CounselingAppointments />} />
