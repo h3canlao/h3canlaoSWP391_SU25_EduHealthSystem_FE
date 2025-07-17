@@ -64,6 +64,7 @@ import CheckupCampaignDetail from "./pages/Admin/CheckupCampaign/CheckupCampaign
 import CheckupScheduleAdmin from "./pages/Admin/CheckupSchedule/CheckupScheduleAdmin";
 import GeneralDashboard from "./pages/Admin/GeneralDashboard";
 import UserManagement from "./pages/Admin/Features/ManageUser";
+import CheckupScheduleDetail from "./pages/Admin/CheckupSchedule/CheckupScheduleDetail";
 
 const Router = () => {
   return (
@@ -120,6 +121,7 @@ const Router = () => {
           <Route path="manage-checkupCampaign" element={<CheckupCampaignAdmin />} />
           <Route path="manage-checkupCampaign/:id" element={<CheckupCampaignDetail />} />
           <Route path="manage-checkupSchedule" element={<CheckupScheduleAdmin />} />
+          <Route path="manage-checkupSchedule/:id" element={<CheckupScheduleDetail />} />
           <Route path="staff" element={<UserManagement />} />
         </Route>
         {/* SchoolNurse Routes */}
