@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { Table, Button, Modal, Form, Input, InputNumber, Space, Switch, Popconfirm, message, Tag, Select } from "antd";
+import React, { useState, useEffect } from "react";
+import { Table, Button, Modal, Form, Input, InputNumber, Space, Switch, Popconfirm, message, Tag } from "antd";
 import {
   getVaccineTypes,
   createVaccineType,
@@ -10,9 +10,6 @@ import {
   toggleVaccineTypeStatus,
 } from "@/services/vaccineManagerApi";
 import { useNavigate } from "react-router-dom";
-import { debounce } from "lodash";
-
-const { Option } = Select;
 
 const defaultVaccineType = {
   code: "",
@@ -32,62 +29,21 @@ const VaccineTypeTab = () => {
   const [form] = Form.useForm();
   const [showDeleted, setShowDeleted] = useState(false);
 
-  // Thêm các state mới cho search và filter
-  const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 });
-  const [searchTerm, setSearchTerm] = useState("");
-  const [isActiveFilter, setIsActiveFilter] = useState(null); // null: All, true: Active, false: Inactive
-
   // --- Fetch data ---
-  const fetchData = async (
-    page = pagination.current,
-    pageSize = pagination.pageSize,
-    term = searchTerm,
-    active = isActiveFilter
-  ) => {
+  const fetchData = async () => {
     setLoading(true);
     try {
-      const params = {
-        pageNumber: page,
-        pageSize: pageSize,
-        searchTerm: term,
-        isActive: active,
-      };
-
-      const res = showDeleted ? await getDeletedVaccineTypes(params) : await getVaccineTypes(params);
-
+      const res = showDeleted ? await getDeletedVaccineTypes() : await getVaccineTypes();
       setData(res.data.data || res.data || []);
-      setPagination({
-        ...pagination,
-        total: res.data.totalCount || res.data.length, // Giả sử API trả về totalCount
-        current: page,
-        pageSize: pageSize,
-      });
-    } catch (e) {
-      console.error(e);
+    } catch {
       message.error("Không tải được danh sách loại vaccine");
     }
     setLoading(false);
   };
 
   useEffect(() => {
-    // Reset pagination and fetch data whenever search/filter/deleted state changes
-    setPagination((prev) => ({ ...prev, current: 1 }));
-    fetchData(1, pagination.pageSize, searchTerm, isActiveFilter);
-  }, [showDeleted, searchTerm, isActiveFilter]);
-
-  // Handle table changes (e.g., pagination)
-  const handleTableChange = (newPagination) => {
-    setPagination(newPagination);
-    fetchData(newPagination.current, newPagination.pageSize);
-  };
-
-  // Debounce the search input to avoid excessive API calls
-  const debouncedSetSearchTerm = useCallback(
-    debounce((value) => {
-      setSearchTerm(value);
-    }, 500),
-    []
-  );
+    fetchData();
+  }, [showDeleted]);
 
   // --- Modal ---
   const openModal = (record = null) => {
@@ -192,53 +148,34 @@ const VaccineTypeTab = () => {
 
   return (
     <div style={{ margin: "0 24px" }}>
-      <Space style={{ marginBottom: 8, display: "flex", justifyContent: "space-between" }}>
-        <Space>
-          <Button type="primary" onClick={() => openModal()}>
-            Thêm loại vaccine
-          </Button>
-          <Button onClick={() => setShowDeleted((v) => !v)} type={showDeleted ? "primary" : "default"}>
-            {showDeleted ? "Xem danh sách" : "Xem đã xoá"}
-          </Button>
-          {!showDeleted ? (
-            <Popconfirm
-              title="Xoá các loại vaccine đã chọn? Nếu đang có lô vaccine sử dụng sẽ không xóa được."
-              disabled={!selectedRowKeys.length}
-              onConfirm={handleDelete}
-            >
-              <Button danger disabled={!selectedRowKeys.length}>
-                Xoá nhiều
-              </Button>
-            </Popconfirm>
-          ) : (
-            <Popconfirm
-              title="Khôi phục các loại vaccine đã chọn?"
-              disabled={!selectedRowKeys.length}
-              onConfirm={handleRestore}
-            >
-              <Button type="primary" disabled={!selectedRowKeys.length}>
-                Phục hồi
-              </Button>
-            </Popconfirm>
-          )}
-        </Space>
-        {/* Thêm phần search và filter */}
-        <Space>
-          <Input
-            placeholder="Tìm kiếm..."
-            onChange={(e) => debouncedSetSearchTerm(e.target.value)}
-            style={{ width: 250 }}
-          />
-          <Select
-            placeholder="Trạng thái"
-            style={{ width: 120 }}
-            allowClear
-            onChange={(value) => setIsActiveFilter(value)}
+      <Space style={{ marginBottom: 8 }}>
+        <Button type="primary" onClick={() => openModal()}>
+          Thêm loại vaccine
+        </Button>
+        <Button onClick={() => setShowDeleted((v) => !v)} type={showDeleted ? "primary" : "default"}>
+          {showDeleted ? "Xem danh sách" : "Xem đã xoá"}
+        </Button>
+        {!showDeleted ? (
+          <Popconfirm
+            title="Xoá các loại vaccine đã chọn? Nếu đang có lô vaccine sử dụng sẽ không xóa được."
+            disabled={!selectedRowKeys.length}
+            onConfirm={handleDelete}
           >
-            <Option value={true}>Kích hoạt</Option>
-            <Option value={false}>Không kích hoạt</Option>
-          </Select>
-        </Space>
+            <Button danger disabled={!selectedRowKeys.length}>
+              Xoá nhiều
+            </Button>
+          </Popconfirm>
+        ) : (
+          <Popconfirm
+            title="Khôi phục các loại vaccine đã chọn?"
+            disabled={!selectedRowKeys.length}
+            onConfirm={handleRestore}
+          >
+            <Button type="primary" disabled={!selectedRowKeys.length}>
+              Phục hồi
+            </Button>
+          </Popconfirm>
+        )}
       </Space>
       <Table
         rowKey="id"
@@ -249,11 +186,6 @@ const VaccineTypeTab = () => {
           selectedRowKeys,
           onChange: setSelectedRowKeys,
         }}
-        pagination={{
-          ...pagination,
-          showTotal: (total) => `Tổng ${total} mục`,
-        }}
-        onChange={handleTableChange}
       />
       <Modal
         open={modalVisible}
@@ -264,10 +196,10 @@ const VaccineTypeTab = () => {
         okText={editing ? "Cập nhật" : "Thêm mới"}
       >
         <Form form={form} layout="vertical" initialValues={defaultVaccineType}>
-          <Form.Item name="code" label="Mã" rules={[{ required: true, message: "Vui lòng nhập mã" }]}>
+          <Form.Item name="code" label="Mã" rules={[{ required: true }]}>
             <Input disabled={!!editing} />
           </Form.Item>
-          <Form.Item name="name" label="Tên" rules={[{ required: true, message: "Vui lòng nhập tên" }]}>
+          <Form.Item name="name" label="Tên" rules={[{ required: true }]}>
             <Input disabled={!!editing} />
           </Form.Item>
           <Form.Item name="group" label="Nhóm">
