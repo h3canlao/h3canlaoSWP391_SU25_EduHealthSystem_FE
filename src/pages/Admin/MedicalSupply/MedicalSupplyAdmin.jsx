@@ -51,7 +51,7 @@ const MedicalSupplyAdmin = () => {
         // lấy vật tư sắp hết
         const res = await getLowStockMedicalSupplies();
         setData(res.data?.data || []);
-        setPagination(prev => ({ ...prev, total: (res.data?.data?.length ?? 0) }));
+        setPagination(prev => ({ ...prev, total: 100 }));
       } else {
         const res = await getMedicalSupplies({
           pageNumber: params.pageNumber || pagination.current,
@@ -64,7 +64,7 @@ const MedicalSupplyAdmin = () => {
         setPagination({
           current: params.pageNumber || pagination.current,
           pageSize: params.pageSize || pagination.pageSize,
-          total: res.data.totalRecords || 0,
+          total:  100,
         });
       }
     } catch (err) {
@@ -235,7 +235,7 @@ const MedicalSupplyAdmin = () => {
         loading={loading}
         columns={columns}
         dataSource={data}
-        pagination={filterType === "lowStock" ? false : pagination}
+        pagination={pagination}
         rowSelection={filterType === "deleted" ? {
           selectedRowKeys,
           onChange: setSelectedRowKeys
