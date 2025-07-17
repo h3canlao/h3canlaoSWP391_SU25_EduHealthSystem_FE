@@ -67,7 +67,7 @@ const MedicationLotAdmin = () => {
       setData(res.data?.data || []);
       setPagination((prev) => ({
         ...prev,
-        total: res.data?.totalRecords || (res.data?.data ? res.data.data.length : 0),
+        total: 100,
         current: params.pageNumber || pagination.current,
       }));
     } catch (error) {

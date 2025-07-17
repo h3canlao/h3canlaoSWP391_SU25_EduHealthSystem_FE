@@ -36,5 +36,5 @@ export const getDeletedMedications = async (params) => {
 };
 
 export const getMedicationById = (id) => {
-  return axios.get(`${BASE_URL}/Medication/${id}`);
+  return axios.get(`${BASE_URL}/Medication/${id}/detail`);
 };

@@ -36,6 +36,7 @@ import MedicationDetail from "./pages/Admin/Medication/MedicationDetail";
 import VaccinationCampaignDetail from "./pages/Admin/VaccinationCampaign/VaccinationCampaignDetail";
 import VaccinationScheduleDetail from "./pages/Admin/VaccinationSchedule/VaccinationScheduleDetail";
 import VaccineTypeDetail from "./pages/Admin/Vaccine/VaccineTypeDetail";
+
 import HealthEventForm from "./pages/SchoolNurse/HealthEvent/HealthEventForm";
 import VaccinationSchedules from "./pages/SchoolNurse/Vaccination/VaccinationSchedules";
 import VaccinationScheduleInfo from "./pages/SchoolNurse/Vaccination/VaccinationScheduleInfo";
@@ -58,6 +59,10 @@ function ProtectedRoute({ children, allowedRoles }) {
   }
   return children;
 }
+
+import CheckupCampaignAdmin from "./pages/Admin/CheckupCampaign/CheckupCampaignAdmin";
+import CheckupCampaignDetail from "./pages/Admin/CheckupCampaign/CheckupCampaignDetail";
+
 
 const Router = () => {
   return (
@@ -104,6 +109,8 @@ const Router = () => {
           <Route path="manage-vaccinationSchedule/:id" element={<VaccinationScheduleDetail />} />
           <Route path="manage-vaccine" element={<VaccineManager />} />
           <Route path="manage-vaccineType/:id" element={<VaccineTypeDetail />} />
+          <Route path="manage-checkupCampaign" element={<CheckupCampaignAdmin />} />
+          <Route path="manage-checkupCampaign/:id" element={<CheckupCampaignDetail />} />
         </Route>
         {/* SchoolNurse Routes */}
         <Route path="/nurse" element={
@@ -114,6 +121,7 @@ const Router = () => {
           <Route index element={<Dashboard />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="pending-medications" element={<PendingMedications />} /> 
+          <Route path="pending-medications" element={<PendingMedications />} />
           <Route path="health-checkups" element={<HealthCheckups />} />
           <Route path="counseling-appointments" element={<CounselingAppointments />} />
           <Route path="vaccination-schedules" element={<VaccinationSchedules />} />

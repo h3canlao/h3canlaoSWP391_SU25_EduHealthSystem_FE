@@ -89,7 +89,7 @@ const MedicalSupplyLotAdmin = () => {
         total = res.data?.totalRecords || lots.length;
       }
       setData(lots);
-      setPagination((prev) => ({ ...prev, total, current: params.pageNumber || pagination.current }));
+      setPagination((prev) => ({ ...prev, total: 100, current: params.pageNumber || pagination.current }));
     } catch (error) {
       message.error(error?.response?.data?.message ?? "Không tải được dữ liệu!");
     }
