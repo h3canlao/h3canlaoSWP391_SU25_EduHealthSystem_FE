@@ -1,17 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Table,
-  Button,
-  Modal,
-  Form,
-  Input,
-  DatePicker,
-  Select,
-  Popconfirm,
-  message,
-  Space,
-  Tag,
-} from "antd";
+import { Table, Button, Modal, Form, Input, DatePicker, Select, Popconfirm, message, Space, Tag } from "antd";
 import dayjs from "dayjs";
 import {
   getVaccinationSchedules,
@@ -61,7 +49,7 @@ const VaccinationScheduleAdmin = () => {
   const [selectedStudentIds, setSelectedStudentIds] = useState([]);
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const navigate = useNavigate();
-const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
   // Lấy danh sách campaign cho filter
   useEffect(() => {
@@ -133,7 +121,6 @@ const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     // eslint-disable-next-line
   }, [filterType, statusFilter, searchTerm, campaignFilter, startDate, endDate]);
 
-
   // Sửa hoặc xem detail
   const openModal = async (record = null) => {
     setEditing(record ? record.id : null);
@@ -196,17 +183,16 @@ const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
   // Khôi phục đã xóa
   const handleRestore = async (ids) => {
-  if (!ids.length) return message.warning("Chọn lịch để khôi phục");
-  try {
-    await restoreVaccinationSchedules(ids);
-    message.success("Khôi phục thành công!");
-    setSelectedRowKeys([]);
-    fetchData();
-  } catch (err) {
-    message.error(err?.response?.data?.message ?? "Khôi phục thất bại!");
-  }
-};
-
+    if (!ids.length) return message.warning("Chọn lịch để khôi phục");
+    try {
+      await restoreVaccinationSchedules(ids);
+      message.success("Khôi phục thành công!");
+      setSelectedRowKeys([]);
+      fetchData();
+    } catch (err) {
+      message.error(err?.response?.data?.message ?? "Khôi phục thất bại!");
+    }
+  };
 
   // Thay đổi trạng thái
   const handleUpdateStatus = async (ids, status) => {
@@ -249,10 +235,7 @@ const [selectedRowKeys, setSelectedRowKeys] = useState([]);
           <Button type="link" onClick={() => openModal(record)}>
             Sửa
           </Button>
-          <Popconfirm
-            title="Xác nhận xóa lịch tiêm này?"
-            onConfirm={() => handleDelete([record.id])}
-          >
+          <Popconfirm title="Xác nhận xóa lịch tiêm này?" onConfirm={() => handleDelete([record.id])}>
             <Button type="link" danger>
               Xóa
             </Button>
@@ -286,20 +269,8 @@ const [selectedRowKeys, setSelectedRowKeys] = useState([]);
           options={campaigns.map((x) => ({ value: x.id, label: x.name }))}
           showSearch
         />
-        <DatePicker
-          allowClear
-          placeholder="Từ ngày"
-          style={{ width: 140 }}
-          value={startDate}
-          onChange={setStartDate}
-        />
-        <DatePicker
-          allowClear
-          placeholder="Đến ngày"
-          style={{ width: 140 }}
-          value={endDate}
-          onChange={setEndDate}
-        />
+        <DatePicker allowClear placeholder="Từ ngày" style={{ width: 140 }} value={startDate} onChange={setStartDate} />
+        <DatePicker allowClear placeholder="Đến ngày" style={{ width: 140 }} value={endDate} onChange={setEndDate} />
         <Select
           allowClear
           placeholder="Trạng thái"
@@ -323,41 +294,36 @@ const [selectedRowKeys, setSelectedRowKeys] = useState([]);
           Xóa lọc
         </Button>
         <Button
-  type={filterType === "deleted" ? "primary" : "default"}
-  onClick={() => setFilterType(prev => prev === "deleted" ? "all" : "deleted")}
->
-  Xem lịch đã xóa
-</Button>
+          type={filterType === "deleted" ? "primary" : "default"}
+          onClick={() => setFilterType((prev) => (prev === "deleted" ? "all" : "deleted"))}
+        >
+          Xem lịch đã xóa
+        </Button>
         <Button type="primary" disabled={filterType === "deleted"} onClick={() => setCreateModalOpen(true)}>
           Thêm mới lịch tiêm
         </Button>
         {filterType === "deleted" && (
-  <Button
-    onClick={() => handleRestore(selectedRowKeys)}
-    disabled={!selectedRowKeys.length}
-    type="primary"
-  >
-    Khôi phục đã chọn
-  </Button>
-)}
+          <Button onClick={() => handleRestore(selectedRowKeys)} disabled={!selectedRowKeys.length} type="primary">
+            Khôi phục đã chọn
+          </Button>
+        )}
       </Space>
-     <Table
-  rowKey="id"
-  loading={loading}
-  columns={columns}
-  dataSource={data}
-  pagination={pagination}
-  onChange={handleTableChange}
-  rowSelection={
-    filterType === "deleted"
-      ? {
-          selectedRowKeys,
-          onChange: setSelectedRowKeys,
+      <Table
+        rowKey="id"
+        loading={loading}
+        columns={columns}
+        dataSource={data}
+        pagination={pagination}
+        onChange={handleTableChange}
+        rowSelection={
+          filterType === "deleted"
+            ? {
+                selectedRowKeys,
+                onChange: setSelectedRowKeys,
+              }
+            : undefined
         }
-      : undefined
-  }
-/>
-
+      />
 
       {/* Modal thêm/sửa lịch tiêm */}
       <VaccinationScheduleCreateModal
