@@ -62,6 +62,8 @@ function ProtectedRoute({ children, allowedRoles }) {
 import CheckupCampaignAdmin from "./pages/Admin/CheckupCampaign/CheckupCampaignAdmin";
 import CheckupCampaignDetail from "./pages/Admin/CheckupCampaign/CheckupCampaignDetail";
 import CheckupScheduleAdmin from "./pages/Admin/CheckupSchedule/CheckupScheduleAdmin";
+import GeneralDashboard from "./pages/Admin/GeneralDashboard";
+import UserManagement from "./pages/Admin/Features/ManageUser";
 
 const Router = () => {
   return (
@@ -103,6 +105,7 @@ const Router = () => {
             </ProtectedRoute>
           }
         >
+          <Route path="dashboard" element={<GeneralDashboard />} />
           <Route path="manage-users" element={<ManageUser />} />
           <Route path="manage-medication" element={<MedicationManager />} />
           <Route path="manage-medication/:id" element={<MedicationDetail />} />
@@ -117,6 +120,7 @@ const Router = () => {
           <Route path="manage-checkupCampaign" element={<CheckupCampaignAdmin />} />
           <Route path="manage-checkupCampaign/:id" element={<CheckupCampaignDetail />} />
           <Route path="manage-checkupSchedule" element={<CheckupScheduleAdmin />} />
+          <Route path="staff" element={<UserManagement />} />
         </Route>
         {/* SchoolNurse Routes */}
         <Route

@@ -9,11 +9,12 @@ import {
   HistoryOutlined,
   FormOutlined,
   SolutionOutlined,
+  DashboardOutlined,
 } from "@ant-design/icons";
 import Sidebar from "@/components/Sidebar";
 
 const routes = [
-  // { key: "/admin/manage-users", icon: <UserOutlined />, label: "Quản lý người dùng" },
+  { key: "/admin/dashboard", icon: <DashboardOutlined />, label: "Tổng quan" },
   {
     key: "medication",
     icon: <AppstoreOutlined />,
