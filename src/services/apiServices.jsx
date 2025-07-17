@@ -232,7 +232,7 @@ const getCheckupSchedulesMyChildren = async () => {
 
 // Khai báo sự kiện y tế
 export const createHealthEvent = async (data) => {
-  return await axios.post(`${BASE_URL}/HealthEvent`, data);
+  return await axios.post(`${BASE_URL}/HealthEvent`, data, { headers: getAuthHeaders() });
 };
 
 // Lấy danh sách lịch tiêm chủng
@@ -248,6 +248,39 @@ export const getVaccinationScheduleDetail = async (id) => {
 // Tạo record tiêm chủng
 export const createVaccinationRecord = async (data) => {
   return axios.post(`${BASE_URL}/VaccinationRecord`, data, { headers: getAuthHeaders() });
+};
+
+// Lấy danh sách lịch tiêm cần xác nhận
+export const getPendingVaccinationConsents = () =>
+  axios.get(`${BASE_URL}/parent/vaccinations/pending-consent`, { headers: getAuthHeaders() });
+
+// Gửi xác nhận đồng ý/không đồng ý tiêm
+export const acceptVaccinationConsent = (payload) =>
+  axios.post(`${BASE_URL}/session-students/parent/accept-vaccine`, payload, { headers: getAuthHeaders() });
+
+// Lấy tất cả lịch tiêm của con
+export const getVaccinationSchedulesMyChildren = () =>
+  axios.get(`${BASE_URL}/VaccinationSchedule/my-children`, { headers: getAuthHeaders() });
+
+// Lấy danh sách lô vật tư y tế
+const getMedicalSupplyLots = async () => {
+  return axios.get(`${BASE_URL}/MedicalSupplyLot`, { headers: getAuthHeaders() });
+};
+
+// Cập nhật điều trị cho sự kiện y tế
+const updateHealthEventTreatment = async (data) => {
+  // data: { healthEventId, supplyUsages: [{ medicalSupplyLotId, quantityUsed, notes }] }
+  return axios.put(`${BASE_URL}/HealthEvent/treatment`, data, { headers: getAuthHeaders() });
+};
+
+// Lấy danh sách sự kiện y tế
+const getHealthEvents = async () => {
+  return axios.get(`${BASE_URL}/HealthEvent`, { headers: getAuthHeaders() });
+};
+
+// Lấy danh sách sự kiện y tế của con (dành cho phụ huynh)
+const getHealthEventsMyChild = async () => {
+  return axios.get(`${BASE_URL}/HealthEvent/myChild`, { headers: getAuthHeaders() });
 };
 
 export {
@@ -282,4 +315,8 @@ export {
   getCheckupSchedulesByStudentId,
   consentCheckupSchedule,
   getCheckupSchedulesMyChildren,
+  getMedicalSupplyLots,
+  updateHealthEventTreatment,
+  getHealthEvents,
+  getHealthEventsMyChild,
 };

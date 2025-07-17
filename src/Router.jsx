@@ -11,8 +11,6 @@ import SendMedication from "./pages/Parents/Medication/SendMedication";
 import Notifications from "./pages/Parents/Notifications/Notifications";
 import StudentProfiles from "./pages/Parents/StudentProfiles/StudentProfiles";
 import Parents from "./pages/Parents/Parents";
-import VaccineOverview from "./pages/Parents/Immunization/VaccineOverview";
-import VaccineHistory from "./pages/Parents/Immunization/VaccineHistory";
 import ParentCheckupSchedules from "./pages/Parents/MedicalCheckups/ParentCheckupSchedules";
 import ParentCheckupRecords from "./pages/Parents/MedicalCheckups/ParentCheckupRecords";
 import Admin from "./pages/Admin/Admin";
@@ -33,7 +31,6 @@ import CounselingAppointments from "./pages/SchoolNurse/HealthCheckups/Counselin
 import Dashboard from "./pages/SchoolNurse/Dashboard";
 
 
-import ParentVaccineForms from "./pages/Parents/Immunization/ParentVaccineForms";
 import MedicalSupplyDetail from "./pages/Admin/MedicalSupply/MedicalSupplyAdminDetail";
 import MedicationDetail from "./pages/Admin/Medication/MedicationDetail";
 import VaccinationCampaignDetail from "./pages/Admin/VaccinationCampaign/VaccinationCampaignDetail";
@@ -42,6 +39,11 @@ import VaccineTypeDetail from "./pages/Admin/Vaccine/VaccineTypeDetail";
 import HealthEventForm from "./pages/SchoolNurse/HealthEvent/HealthEventForm";
 import VaccinationSchedules from "./pages/SchoolNurse/Vaccination/VaccinationSchedules";
 import VaccinationScheduleInfo from "./pages/SchoolNurse/Vaccination/VaccinationScheduleInfo";
+
+import ParentVaccinationConsent from "./pages/Parents/Immunization/ParentVaccinationConsent";
+import ParentVaccinationSchedules from "./pages/Parents/Immunization/ParentVaccinationSchedules";
+import HealthEventTabs from "./pages/SchoolNurse/HealthEvent/HealthEventTabs";
+import ParentHealthEvents from "./pages/Parents/ParentHealthEvents";
 
 
 const Router = () => {
@@ -56,16 +58,17 @@ const Router = () => {
 
         {/* Parents Routes */}
         <Route path="/parents" element={<Parents />}>
-          <Route path="vaccine-overview" element={<VaccineOverview />} />
-          <Route path="vaccine-history" element={<VaccineHistory />} />
+
           <Route path="checkup-schedules" element={<ParentCheckupSchedules />} />
           <Route path="checkup-records" element={<ParentCheckupRecords />} />
           <Route path="send-medication" element={<SendMedication />} />
-          <Route path="confirm-medications" element={<SendMedication />} />
+          <Route path="confirmok-medications" element={<SendMedication />} />
           <Route path="notifications" element={<Notifications />} />
           <Route path="student-profiles" element={<StudentProfiles />} />
           <Route path="counseling-records" element={<ParentCounselingRecords />} />
-          <Route path="vaccine-forms" element={<ParentVaccineForms />} />
+          <Route path="vaccine-consent" element={<ParentVaccinationConsent />} />
+          <Route path="vaccination-schedules" element={<ParentVaccinationSchedules />} />
+          <Route path="health-events" element={<ParentHealthEvents />} />
         </Route>
         {/* Admin Routes */}
         <Route path="/admin" element={<Admin />}>
@@ -90,7 +93,7 @@ const Router = () => {
           <Route path="counseling-appointments" element={<CounselingAppointments />} />
           <Route path="vaccination-schedules" element={<VaccinationSchedules />} />
           <Route path="vaccination-schedules/:id" element={<VaccinationScheduleInfo />} />
-          <Route path="health-event" element={<HealthEventForm />} />
+          <Route path="health-event" element={<HealthEventTabs />} />
         </Route>
       </Routes>
       <ToastContainer

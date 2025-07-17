@@ -34,7 +34,7 @@ const routes = [
     ]
   },
   { key: "/nurse/pending-medications", icon: <MedicineBoxOutlined />, label: "Thuốc chờ xử lý" },
-  { key: "/nurse/health-event", icon: <PlusCircleOutlined />, label: "Khai báo sự kiện y tế" },
+  { key: "/nurse/health-event", icon: <PlusCircleOutlined />, label: "Sự kiện y tế" },
 ];
 
 export default function SideBar() {
