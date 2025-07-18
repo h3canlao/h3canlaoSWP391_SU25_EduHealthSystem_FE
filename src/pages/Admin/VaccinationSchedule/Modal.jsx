@@ -1,25 +1,25 @@
 import React, { useEffect, useState } from "react";
-import {
-  Modal, Form, Input, DatePicker, Select, Switch, message
-} from "antd";
+import { Modal, Form, Input, DatePicker, Select, Switch, message } from "antd";
 import { createVaccinationSchedule } from "@/services/vaccinationSchedule";
 import { getVaccineTypes } from "@/services/vaccineManagerApi";
-import { getStudents, getGrades } from "@/services/vaccinationHelperApi";
+import { getStudents, getGrades, getSections } from "@/services/vaccinationHelperApi";
 import { getVaccinationCampaigns } from "@/services/vaccinationCampaignApi";
 
 const VaccinationScheduleCreateModal = ({ visible, onClose, onCreated }) => {
   const [form] = Form.useForm();
   const [vaccineTypes, setVaccineTypes] = useState([]);
   const [grades, setGrades] = useState([]);
+  const [sections, setSections] = useState([]);
   const [students, setStudents] = useState([]);
   const [campaigns, setCampaigns] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    getVaccineTypes().then(res => setVaccineTypes(res.data.data || res.data || []));
-    getGrades().then(res => setGrades(res.data.data || res.data || []));
-    getStudents().then(res => setStudents(res.data.data || res.data || []));
-    getVaccinationCampaigns().then(res => setCampaigns(res.data.data || res.data || []));
+    getVaccineTypes().then((res) => setVaccineTypes(res.data.data || res.data || []));
+    getGrades().then((res) => setGrades(res.data.data || res.data || []));
+    getSections().then((res) => setSections(res.data.data || res.data || []));
+    getStudents().then((res) => setStudents(res.data.data || res.data || []));
+    getVaccinationCampaigns().then((res) => setCampaigns(res.data.data || res.data || []));
   }, []);
 
   const handleOk = async () => {
@@ -59,11 +59,15 @@ const VaccinationScheduleCreateModal = ({ visible, onClose, onCreated }) => {
       destroyOnClose
     >
       <Form form={form} layout="vertical">
-        <Form.Item name="campaignId" label="Chiến dịch" rules={[{ required: true, message: "Vui lòng chọn chiến dịch!" }]}>
+        <Form.Item
+          name="campaignId"
+          label="Chiến dịch"
+          rules={[{ required: true, message: "Vui lòng chọn chiến dịch!" }]}
+        >
           <Select
-            options={campaigns.map(c => ({
+            options={campaigns.map((c) => ({
               value: c.id,
-              label: c.name || c.title || c.campaignName || c.id
+              label: c.name || c.title || c.campaignName || c.id,
             }))}
             showSearch
             placeholder="Chọn chiến dịch"
@@ -71,7 +75,7 @@ const VaccinationScheduleCreateModal = ({ visible, onClose, onCreated }) => {
         </Form.Item>
         <Form.Item name="vaccinationTypeId" label="Loại vaccine" rules={[{ required: true }]}>
           <Select
-            options={vaccineTypes.map(v => ({ value: v.id, label: v.name }))}
+            options={vaccineTypes.map((v) => ({ value: v.id, label: v.name }))}
             showSearch
             placeholder="Chọn loại vaccine"
           />
@@ -82,7 +86,7 @@ const VaccinationScheduleCreateModal = ({ visible, onClose, onCreated }) => {
         <Form.Item name="grades" label="Khối">
           <Select
             mode="multiple"
-            options={grades.map(g => ({ value: g, label: g }))}
+            options={grades.map((g) => ({ value: g, label: g }))}
             allowClear
             placeholder="Chọn khối"
           />
@@ -91,7 +95,7 @@ const VaccinationScheduleCreateModal = ({ visible, onClose, onCreated }) => {
           <Select
             mode="multiple"
             // Bạn có thể lấy danh sách section từ grades nếu muốn
-            options={[]} // tùy thuộc vào dữ liệu của bạn
+            options={sections.map((g) => ({ value: g, label: g }))} // tùy thuộc vào dữ liệu của bạn
             allowClear
             placeholder="Chọn lớp"
           />
@@ -99,7 +103,7 @@ const VaccinationScheduleCreateModal = ({ visible, onClose, onCreated }) => {
         <Form.Item name="studentIds" label="Chọn học sinh">
           <Select
             mode="multiple"
-            options={students.map(st => ({
+            options={students.map((st) => ({
               value: st.id,
               label: `${st.lastName} ${st.firstName} (${st.studentCode})`,
             }))}

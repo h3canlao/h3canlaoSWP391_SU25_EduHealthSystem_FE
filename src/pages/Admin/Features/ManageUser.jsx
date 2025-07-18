@@ -1,78 +1,380 @@
-import React, { useState, useEffect } from 'react';
-import TableUser from './TableUser';
-import ModalNurse from './Modals/ModalNurse';
-import ModalUser from './Modals/ModalUser';
-import './ManageUser.css';
-    const ManageUser = () => 
-        {
-        const [listUsers, setListUser] = useState([]);
-        const [showModalUser, setShowModalUser] = useState(false);
-        const [showModalNurse, setShowModalNurse] = useState(false);
-        const [dataUserView, setDataUserView] = useState({});
+import React, { useEffect, useState } from "react";
+import {
+  Table,
+  Button,
+  Modal,
+  Form,
+  Input,
+  Select,
+  Popconfirm,
+  message,
+  Space,
+  Card,
+  Typography,
+  Tag,
+  Statistic,
+  Row,
+  Col,
+} from "antd";
+import {
+  PlusOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  UserOutlined,
+  TeamOutlined,
+  UserSwitchOutlined,
+  LockOutlined,
+  UnlockOutlined,
+} from "@ant-design/icons";
+import axios from "axios";
 
-        useEffect(() => {
-            fetchAllUsers();
-        }, []);
+const { Title } = Typography;
+const { Option } = Select;
 
+const BASE_URL = "https://localhost:7096/api";
 
-    const fetchAllUsers = async () => {
-        const sampleUsers = [
-            { id: 1, fullName: "Nguyễn Thị Mai", roles: ["Nurse"], email: "mai.nurse@gmail.com", username: "nguyenthimai", password: "123", dateCreated: "04/10/2023", status: "Active", avatar: "https://cdn11.dienmaycholon.vn/filewebdmclnew/public/userupload/files/Image%20FP_2024/avatar-dep-8.jpg", theme: "dark" },
-            { id: 2, fullName: "Trần Văn An", roles: ["Student"], email: "an.student@gmail.com", username: "tranvanan", password: "456", dateCreated: "06/03/2022", status: "Active", avatar: "https://cdn11.dienmaycholon.vn/filewebdmclnew/public/userupload/files/Image%20FP_2024/avatar-dep-8.jpg", theme: "light" },
-            { id: 3, fullName: "Lê Thị Hồng", roles: ["Nurse"], email: "hong.nurse@gmail.com", username: "lethihong", password: "789", dateCreated: "01/12/2021", status: "Suspended", avatar: "https://cdn11.dienmaycholon.vn/filewebdmclnew/public/userupload/files/Image%20FP_2024/avatar-dep-8.jpg", theme: "dark" },
-            { id: 4, fullName: "Phạm Minh Tuấn", roles: ["Student"], email: "tuan.student@gmail.com", username: "phamminhtuan", password: "abc", dateCreated: "08/09/2020", status: "Inactive", avatar: "https://cdn11.dienmaycholon.vn/filewebdmclnew/public/userupload/files/Image%20FP_2024/avatar-dep-8.jpg", theme: "light" },
-            { id: 5, fullName: "Hoàng Lan", roles: ["Nurse", "Student"], email: "lan.multirole@gmail.com", username: "hoanglan", password: "def", dateCreated: "12/08/2019", status: "Active", avatar: "https://cdn11.dienmaycholon.vn/filewebdmclnew/public/userupload/files/Image%20FP_2024/avatar-dep-8.jpg", theme: "dark" },
-            { id: 6, fullName: "Vũ Minh Châu", roles: ["Student"], email: "chau.student@gmail.com", username: "vuminhchau", password: "ghi", dateCreated: "02/05/2021", status: "Active", avatar: "https://cdn11.dienmaycholon.vn/filewebdmclnew/public/userupload/files/Image%20FP_2024/avatar-dep-8.jpg", theme: "light" },
-            { id: 7, fullName: "Đặng Quốc Bảo", roles: ["Nurse"], email: "bao.nurse@gmail.com", username: "dangquocbao", password: "jkl", dateCreated: "11/11/2022", status: "Active", avatar: "https://cdn11.dienmaycholon.vn/filewebdmclnew/public/userupload/files/Image%20FP_2024/avatar-dep-8.jpg", theme: "dark" },
-            { id: 8, fullName: "Ngô Thị Thu", roles: ["Student"], email: "thu.student@gmail.com", username: "ngothithu", password: "mno", dateCreated: "07/07/2020", status: "Inactive", avatar: "https://cdn11.dienmaycholon.vn/filewebdmclnew/public/userupload/files/Image%20FP_2024/avatar-dep-8.jpg", theme: "light" },
-            { id: 9, fullName: "Phan Văn Hùng", roles: ["Nurse"], email: "hung.nurse@gmail.com", username: "phanvanhung", password: "pqr", dateCreated: "03/03/2023", status: "Suspended", avatar: "https://cdn11.dienmaycholon.vn/filewebdmclnew/public/userupload/files/Image%20FP_2024/avatar-dep-8.jpg", theme: "dark" },
-            { id: 10, fullName: "Lý Thị Kim", roles: ["Student"], email: "kim.student@gmail.com", username: "lythikim", password: "stu", dateCreated: "09/09/2021", status: "Active", avatar: "https://cdn11.dienmaycholon.vn/filewebdmclnew/public/userupload/files/Image%20FP_2024/avatar-dep-8.jpg", theme: "light" },
-            { id: 11, fullName: "Trịnh Văn Sơn", roles: ["Nurse"], email: "son.nurse@gmail.com", username: "trinhvanson", password: "vwx", dateCreated: "05/05/2022", status: "Active", avatar: "https://cdn11.dienmaycholon.vn/filewebdmclnew/public/userupload/files/Image%20FP_2024/avatar-dep-8.jpg", theme: "dark" },
-            { id: 12, fullName: "Đỗ Thị Hạnh", roles: ["Student"], email: "hanh.student@gmail.com", username: "dothihanh", password: "yz1", dateCreated: "10/10/2020", status: "Inactive", avatar: "https://cdn11.dienmaycholon.vn/filewebdmclnew/public/userupload/files/Image%20FP_2024/avatar-dep-8.jpg", theme: "light" },
-            { id: 13, fullName: "Nguyễn Văn Cường", roles: ["Nurse", "Student"], email: "cuong.multirole@gmail.com", username: "nguyenvancuong", password: "234", dateCreated: "01/01/2019", status: "Active", avatar: "https://cdn11.dienmaycholon.vn/filewebdmclnew/public/userupload/files/Image%20FP_2024/avatar-dep-8.jpg", theme: "dark" },
-            { id: 14, fullName: "Phạm Thị Hoa", roles: ["Student"], email: "hoa.student@gmail.com", username: "phamthihoa", password: "567", dateCreated: "12/12/2022", status: "Active", avatar: "https://cdn11.dienmaycholon.vn/filewebdmclnew/public/userupload/files/Image%20FP_2024/avatar-dep-8.jpg", theme: "light" },
-            { id: 15, fullName: "Trần Quốc Toàn", roles: ["Nurse"], email: "toan.nurse@gmail.com", username: "tranquoctoan", password: "890", dateCreated: "06/06/2021", status: "Suspended", avatar: "https://cdn11.dienmaycholon.vn/filewebdmclnew/public/userupload/files/Image%20FP_2024/avatar-dep-8.jpg", theme: "dark" },
-            { id: 16, fullName: "Lê Thị Bích", roles: ["Student"], email: "bich.student@gmail.com", username: "lethibich", password: "abc1", dateCreated: "03/03/2020", status: "Inactive", avatar: "https://cdn11.dienmaycholon.vn/filewebdmclnew/public/userupload/files/Image%20FP_2024/avatar-dep-8.jpg", theme: "light" },
-            { id: 17, fullName: "Hoàng Văn Phúc", roles: ["Nurse", "Student"], email: "phuc.multirole@gmail.com", username: "hoangvanphuc", password: "def2", dateCreated: "08/08/2019", status: "Active", avatar: "https://cdn11.dienmaycholon.vn/filewebdmclnew/public/userupload/files/Image%20FP_2024/avatar-dep-8.jpg", theme: "dark" }
-        ];
-
-        setListUser(sampleUsers);
-    };
-
-
-    const handleClickBtnView = (user) => {
-        setDataUserView(user);
-        if (user.roles.includes("Nurse")) {
-            setShowModalNurse(true);
-        } else if (user.roles.includes("Student")) {
-            setShowModalUser(true);
-        }
-    };
-
-    return (
-        <div className='manage-user-container'>
-            <div className='table-user-container'>
-                <TableUser
-                    listUsers={listUsers}
-                    handleClickBtnView={handleClickBtnView}
-                    handleClickBtnUpdate={() => {}}
-                    handleClickBtnDelete={() => {}}
-                />
-            </div>
-
-            <ModalNurse
-                show={showModalNurse}
-                setShow={setShowModalNurse}
-                dataUpdate={dataUserView}
-            />
-
-            <ModalUser
-                show={showModalUser}
-                setShow={setShowModalUser}
-                dataUpdate={dataUserView}
-            />
-        </div>
-    );
+// Các service functions sử dụng API thực tế dựa trên các hình ảnh đã được cung cấp
+const userServices = {
+  getUsers: async (params) => {
+    return axios.get(`${BASE_URL}/User`, { params });
+  },
+  updateUser: async (id, data) => {
+    return axios.patch(`${BASE_URL}/User/${id}`, data);
+  },
+  deleteUsers: async (ids) => {
+    return axios.delete(`${BASE_URL}/User/bulk`, { data: { ids } });
+  },
+  lockUser: async (id) => {
+    return axios.put(`${BASE_URL}/User/lock`, null, { params: { id } });
+  },
+  unlockUser: async (id) => {
+    return axios.put(`${BASE_URL}/User/unlock`, null, { params: { id } });
+  },
+  createUser: async (data) => {
+    // Giả định API POST /api/User để tạo người dùng
+    return axios.post(`${BASE_URL}/User`, data);
+  },
 };
 
-export default ManageUser;
+const UserManagement = () => {
+  const [data, setData] = useState([]);
+  const [roles, setRoles] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
+  const [form] = Form.useForm();
+  const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [roleFilter, setRoleFilter] = useState(null);
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [roleCounts, setRoleCounts] = useState({});
+
+  const fetchData = async (params = {}) => {
+    setLoading(true);
+    try {
+      const usersRes = await userServices.getUsers({
+        pageNumber: params.current || pagination.current,
+        pageSize: params.pageSize || pagination.pageSize,
+        searchTerm: searchTerm,
+        roleId: roleFilter,
+      });
+
+      const userList = usersRes.data.data || [];
+      setData(userList);
+
+      const uniqueRoles = [...new Set(userList.flatMap((user) => user.roles))];
+      setRoles(uniqueRoles);
+
+      const counts = {};
+      userList.forEach((user) => {
+        user.roles.forEach((role) => {
+          counts[role] = (counts[role] || 0) + 1;
+        });
+      });
+      setRoleCounts(counts);
+
+      setPagination((prev) => ({
+        ...prev,
+        current: params.current || pagination.current,
+        pageSize: params.pageSize || pagination.pageSize,
+        total: 100,
+      }));
+    } catch (err) {
+      message.error(err?.response?.data?.message || "Không tải được dữ liệu!");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData({ current: 1 });
+  }, [searchTerm, roleFilter]);
+
+  const handleTableChange = (pag) => {
+    setPagination(pag);
+    fetchData({ current: pag.current, pageSize: pag.pageSize });
+  };
+
+  const handleCreate = () => {
+    setEditingUser(null);
+    form.resetFields();
+    setModalVisible(true);
+  };
+
+  const handleEdit = (record) => {
+    setEditingUser(record);
+    form.setFieldsValue({
+      firstName: record.firstName,
+      lastName: record.lastName,
+      email: record.email,
+      gender: record.gender,
+      phoneNumbers: record.phoneNumbers,
+      roles: record.roles,
+    });
+    setModalVisible(true);
+  };
+
+  const handleBulkDelete = async () => {
+    try {
+      await userServices.deleteUsers(selectedRowKeys);
+      message.success("Xóa người dùng thành công!");
+      setSelectedRowKeys([]);
+      fetchData();
+    } catch (err) {
+      message.error(err?.response?.data?.message || "Xóa thất bại!");
+    }
+  };
+
+  const handleLockUser = async (id) => {
+    try {
+      await userServices.lockUser(id);
+      message.success("Khóa tài khoản thành công!");
+      fetchData();
+    } catch (err) {
+      message.error(err?.response?.data?.message || "Khóa tài khoản thất bại!");
+    }
+  };
+
+  const handleUnlockUser = async (id) => {
+    try {
+      await userServices.unlockUser(id);
+      message.success("Mở khóa tài khoản thành công!");
+      fetchData();
+    } catch (err) {
+      message.error(err?.response?.data?.message || "Mở khóa tài khoản thất bại!");
+    }
+  };
+
+  const handleSave = async () => {
+    try {
+      const values = await form.validateFields();
+      if (editingUser) {
+        // Chỉ gửi các trường được hỗ trợ bởi API PATCH
+        const updatePayload = {
+          firstName: values.firstName,
+          lastName: values.lastName,
+          email: values.email,
+          gender: values.gender,
+          phoneNumbers: values.phoneNumbers,
+          roles: values.roles,
+        };
+        await userServices.updateUser(editingUser.id, updatePayload);
+        message.success("Cập nhật người dùng thành công!");
+      } else {
+        await userServices.createUser(values);
+        message.success("Tạo người dùng thành công!");
+      }
+      setModalVisible(false);
+      fetchData();
+    } catch (err) {
+      message.error(err?.response?.data?.message || "Có lỗi xảy ra!");
+    }
+  };
+
+  const columns = [
+    { title: "Tên", dataIndex: "fullName", key: "fullName" },
+    { title: "Email", dataIndex: "email", key: "email" },
+    {
+      title: "Vai trò",
+      dataIndex: "roles",
+      key: "roles",
+      render: (roles) => (
+        <Space>
+          {roles.map((role) => {
+            let color = "";
+            if (role === "Admin") color = "geekblue";
+            if (role === "Parent") color = "green";
+            if (role === "SchoolNurse") color = "gold";
+            return (
+              <Tag color={color} key={role}>
+                {role.toUpperCase()}
+              </Tag>
+            );
+          })}
+        </Space>
+      ),
+    },
+    {
+      title: "Trạng thái",
+      dataIndex: "isLocked",
+      key: "isLocked",
+      render: (isLocked) => <Tag color={isLocked ? "red" : "green"}>{isLocked ? "Đã khóa" : "Hoạt động"}</Tag>,
+    },
+    {
+      title: "Thao tác",
+      key: "actions",
+      render: (_, record) => (
+        <Space size="middle">
+          <Button type="primary" icon={<EditOutlined />} onClick={() => handleEdit(record)}>
+            Sửa
+          </Button>
+          <Popconfirm
+            title={`Xác nhận ${record.isLocked ? "mở khóa" : "khóa"} tài khoản này?`}
+            onConfirm={() => (record.isLocked ? handleUnlockUser(record.id) : handleLockUser(record.id))}
+            okText={record.isLocked ? "Mở khóa" : "Khóa"}
+            cancelText="Hủy"
+          >
+            <Button
+              type="primary"
+              danger={!record.isLocked}
+              icon={record.isLocked ? <UnlockOutlined /> : <LockOutlined />}
+            >
+              {record.isLocked ? "Mở khóa" : "Khóa"}
+            </Button>
+          </Popconfirm>
+        </Space>
+      ),
+    },
+  ];
+
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: setSelectedRowKeys,
+  };
+
+  return (
+    <div style={{ padding: "24px" }}>
+      <Title level={2}>Quản lý Người dùng</Title>
+
+      <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+        <Col xs={24} sm={8} lg={6}>
+          <Card>
+            <Statistic title="Quản trị viên" value={roleCounts.Admin || 0} prefix={<UserSwitchOutlined />} />
+          </Card>
+        </Col>
+        <Col xs={24} sm={8} lg={6}>
+          <Card>
+            <Statistic title="Phụ huynh" value={roleCounts.Parent || 0} prefix={<TeamOutlined />} />
+          </Card>
+        </Col>
+        <Col xs={24} sm={8} lg={6}>
+          <Card>
+            <Statistic title="Y tá học đường" value={roleCounts.SchoolNurse || 0} prefix={<UserOutlined />} />
+          </Card>
+        </Col>
+      </Row>
+
+      <Card
+        extra={
+          <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
+            Thêm mới
+          </Button>
+        }
+      >
+        <Space style={{ marginBottom: 16, flexWrap: "wrap" }}>
+          <Input.Search
+            placeholder="Tìm theo tên, email..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{ width: 250 }}
+            allowClear
+          />
+          <Select placeholder="Lọc theo vai trò" style={{ width: 180 }} allowClear onChange={setRoleFilter}>
+            {roles.map((role) => (
+              <Option key={role} value={role}>
+                {role}
+              </Option>
+            ))}
+          </Select>
+          <Popconfirm
+            title={`Bạn có chắc chắn muốn xóa ${selectedRowKeys.length} người dùng đã chọn?`}
+            onConfirm={handleBulkDelete}
+            okText="Xóa"
+            cancelText="Hủy"
+          >
+            <Button type="primary" danger disabled={selectedRowKeys.length === 0} icon={<DeleteOutlined />}>
+              Xóa đã chọn
+            </Button>
+          </Popconfirm>
+        </Space>
+        <Table
+          rowKey="id"
+          loading={loading}
+          columns={columns}
+          dataSource={data}
+          pagination={pagination}
+          onChange={handleTableChange}
+          rowSelection={rowSelection}
+        />
+      </Card>
+
+      <Modal
+        title={editingUser ? "Sửa thông tin người dùng" : "Thêm người dùng mới"}
+        visible={modalVisible}
+        onCancel={() => setModalVisible(false)}
+        onOk={handleSave}
+        destroyOnClose={true}
+      >
+        <Form form={form} layout="vertical">
+          <Form.Item name="firstName" label="Họ" rules={[{ required: true, message: "Vui lòng nhập họ!" }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="lastName" label="Tên" rules={[{ required: true, message: "Vui lòng nhập tên!" }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="email"
+            label="Email"
+            rules={[
+              { required: true, message: "Vui lòng nhập email!" },
+              { type: "email", message: "Email không hợp lệ!" },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          {/* Trường password chỉ hiển thị khi thêm mới */}
+          {!editingUser && (
+            <Form.Item
+              name="password"
+              label="Mật khẩu"
+              rules={[{ required: true, message: "Vui lòng nhập mật khẩu!" }]}
+            >
+              <Input.Password />
+            </Form.Item>
+          )}
+          <Form.Item name="gender" label="Giới tính" rules={[{ required: true, message: "Vui lòng chọn giới tính!" }]}>
+            <Select placeholder="Chọn giới tính">
+              <Option value="Male">Nam</Option>
+              <Option value="Female">Nữ</Option>
+              <Option value="Other">Khác</Option>
+            </Select>
+          </Form.Item>
+          <Form.Item name="phoneNumbers" label="Số điện thoại">
+            <Input />
+          </Form.Item>
+          <Form.Item name="roles" label="Vai trò" rules={[{ required: true, message: "Vui lòng chọn vai trò!" }]}>
+            <Select mode="multiple" placeholder="Chọn vai trò">
+              {roles.map((role) => (
+                <Option key={role} value={role}>
+                  {role}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+        </Form>
+      </Modal>
+    </div>
+  );
+};
+
+export default UserManagement;

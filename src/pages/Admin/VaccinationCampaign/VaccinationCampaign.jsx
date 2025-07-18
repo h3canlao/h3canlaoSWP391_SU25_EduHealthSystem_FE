@@ -297,9 +297,9 @@ const VaccinationCampaignAdmin = () => {
           <Form.Item name="endDate" label="Ngày kết thúc" rules={[{ required: true, message: "Chọn ngày kết thúc" }]}>
             <DatePicker showTime style={{ width: "100%" }} />
           </Form.Item>
-          <Form.Item name="status" label="Trạng thái" initialValue={0}>
+          {/* <Form.Item name="status" label="Trạng thái" initialValue={0}>
             <Select options={statusOptions} />
-          </Form.Item>
+          </Form.Item> */}
           <Form.Item name="schoolYear" label="Năm học" rules={[{ required: true, message: "Nhập năm học" }]}>
             <Input placeholder="VD: 2024-2025" />
           </Form.Item>

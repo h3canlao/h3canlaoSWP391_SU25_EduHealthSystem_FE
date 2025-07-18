@@ -1,15 +1,25 @@
 import React, { useState, useEffect } from "react";
+import { Table, Button, Modal, Form, Input, InputNumber, Space, Switch, Popconfirm, message, Tag, Select } from "antd";
 import {
-  Table, Button, Modal, Form, Input, InputNumber, Space, Switch, Popconfirm, message, Tag,
-} from "antd";
-import {
-  getVaccineTypes, createVaccineType, updateVaccineType, deleteVaccineTypes,
-  getDeletedVaccineTypes, restoreVaccineTypes, toggleVaccineTypeStatus
+  getVaccineTypes,
+  createVaccineType,
+  updateVaccineType,
+  deleteVaccineTypes,
+  getDeletedVaccineTypes,
+  restoreVaccineTypes,
+  toggleVaccineTypeStatus,
 } from "@/services/vaccineManagerApi";
 import { useNavigate } from "react-router-dom";
 
+const { Option } = Select;
+
 const defaultVaccineType = {
-  code: "", name: "", group: "", recommendedAgeMonths: null, minIntervalDays: null, isActive: true,
+  code: "",
+  name: "",
+  group: "",
+  recommendedAgeMonths: null,
+  minIntervalDays: null,
+  isActive: true,
 };
 
 const VaccineTypeTab = () => {
@@ -21,13 +31,17 @@ const VaccineTypeTab = () => {
   const [form] = Form.useForm();
   const [showDeleted, setShowDeleted] = useState(false);
 
+  // Thêm state để lọc theo trạng thái
+  const [isActiveFilter, setIsActiveFilter] = useState(null); // null: tất cả, true: đang kích hoạt, false: không kích hoạt
+
   // --- Fetch data ---
   const fetchData = async () => {
     setLoading(true);
     try {
-      const res = showDeleted
-        ? await getDeletedVaccineTypes()
-        : await getVaccineTypes();
+      const params = {
+        isActive: isActiveFilter, // Thêm tham số lọc vào request
+      };
+      const res = showDeleted ? await getDeletedVaccineTypes() : await getVaccineTypes(params);
       setData(res.data.data || res.data || []);
     } catch {
       message.error("Không tải được danh sách loại vaccine");
@@ -35,7 +49,9 @@ const VaccineTypeTab = () => {
     setLoading(false);
   };
 
-  useEffect(() => { fetchData(); }, [showDeleted]);
+  useEffect(() => {
+    fetchData();
+  }, [showDeleted, isActiveFilter]); // Cập nhật useEffect để lắng nghe thay đổi của isActiveFilter
 
   // --- Modal ---
   const openModal = (record = null) => {
@@ -77,16 +93,16 @@ const VaccineTypeTab = () => {
 
   // --- Phục hồi nhiều ---
   const handleRestore = async () => {
-  if (!selectedRowKeys.length) return;
-  try {
-    await restoreVaccineTypes(selectedRowKeys);
-    message.success("Đã phục hồi!");
-    setSelectedRowKeys([]);
-    fetchData();
-  } catch {
-    message.error("Phục hồi thất bại!");
-  }
-};
+    if (!selectedRowKeys.length) return;
+    try {
+      await restoreVaccineTypes(selectedRowKeys);
+      message.success("Đã phục hồi!");
+      setSelectedRowKeys([]);
+      fetchData();
+    } catch {
+      message.error("Phục hồi thất bại!");
+    }
+  };
 
   // --- Toggle status ---
   const handleToggleStatus = async (record) => {
@@ -100,7 +116,7 @@ const VaccineTypeTab = () => {
   };
 
   // --- Table columns ---
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const columns = [
     { title: "Mã", dataIndex: "code" },
     { title: "Tên", dataIndex: "name" },
@@ -110,54 +126,77 @@ const VaccineTypeTab = () => {
     {
       title: "Kích hoạt",
       dataIndex: "isActive",
-      render: (v, r) =>
-        <Switch checked={v} onChange={() => handleToggleStatus(r)} disabled={showDeleted} />
+      render: (v, r) => <Switch checked={v} onChange={() => handleToggleStatus(r)} disabled={showDeleted} />,
     },
     {
-      title: "Thao tác", render: (record, r) => (
+      title: "Thao tác",
+      render: (record, r) => (
         <Space>
-          <Button  onClick={() => {
-            navigate(`/admin/manage-vaccineType/${record.id}`)
-            console.log("tét")
-          }}>Chi tiết</Button>
+          <Button
+            onClick={() => {
+              navigate(`/admin/manage-vaccineType/${record.id}`);
+              console.log("tét");
+            }}
+          >
+            Chi tiết
+          </Button>
           {!showDeleted && (
-            <Popconfirm title="Xoá loại vaccine này? Nếu đang có lô vaccine sử dụng sẽ không xóa được."
-              onConfirm={() => deleteVaccineTypes([r.id], true).then(fetchData)}>
-              <Button danger type="link">Xoá</Button>
+            <Popconfirm
+              title="Xoá loại vaccine này? Nếu đang có lô vaccine sử dụng sẽ không xóa được."
+              onConfirm={() => deleteVaccineTypes([r.id], false).then(fetchData)}
+            >
+              <Button danger type="link">
+                Xoá
+              </Button>
             </Popconfirm>
           )}
         </Space>
-      )
-    }
+      ),
+    },
   ];
 
   return (
-    <div style={{margin: '0 24px'}}>
-      <Space style={{ marginBottom: 8 }}>
-        <Button type="primary" onClick={() => openModal()}>Thêm loại vaccine</Button>
-        <Button
-          onClick={() => setShowDeleted(v => !v)}
-          type={showDeleted ? "primary" : "default"}
+    <div style={{ margin: "0 24px" }}>
+      <Space style={{ marginBottom: 8, display: "flex", justifyContent: "space-between" }}>
+        <Space>
+          <Button type="primary" onClick={() => openModal()}>
+            Thêm loại vaccine
+          </Button>
+          <Button onClick={() => setShowDeleted((v) => !v)} type={showDeleted ? "primary" : "default"}>
+            {showDeleted ? "Xem danh sách" : "Xem đã xoá"}
+          </Button>
+          {!showDeleted ? (
+            <Popconfirm
+              title="Xoá các loại vaccine đã chọn? Nếu đang có lô vaccine sử dụng sẽ không xóa được."
+              disabled={!selectedRowKeys.length}
+              onConfirm={handleDelete}
+            >
+              <Button danger disabled={!selectedRowKeys.length}>
+                Xoá nhiều
+              </Button>
+            </Popconfirm>
+          ) : (
+            <Popconfirm
+              title="Khôi phục các loại vaccine đã chọn?"
+              disabled={!selectedRowKeys.length}
+              onConfirm={handleRestore}
+            >
+              <Button type="primary" disabled={!selectedRowKeys.length}>
+                Phục hồi
+              </Button>
+            </Popconfirm>
+          )}
+        </Space>
+        {/* Thêm bộ lọc trạng thái */}
+        <Select
+          placeholder="Lọc theo trạng thái"
+          style={{ width: 200 }}
+          allowClear
+          onChange={(value) => setIsActiveFilter(value)}
         >
-          {showDeleted ? "Xem danh sách" : "Xem đã xoá"}
-        </Button>
-        {!showDeleted ? (
-          <Popconfirm
-            title="Xoá các loại vaccine đã chọn? Nếu đang có lô vaccine sử dụng sẽ không xóa được."
-            disabled={!selectedRowKeys.length}
-            onConfirm={handleDelete}
-          >
-            <Button danger disabled={!selectedRowKeys.length}>Xoá nhiều</Button>
-          </Popconfirm>
-        ) : (
-          <Popconfirm
-            title="Khôi phục các loại vaccine đã chọn?"
-            disabled={!selectedRowKeys.length}
-            onConfirm={handleRestore}
-          >
-            <Button type="primary" disabled={!selectedRowKeys.length}>Phục hồi</Button>
-          </Popconfirm>
-        )}
+          <Option value={true}>Đang kích hoạt</Option>
+          <Option value={false}>Không kích hoạt</Option>
+        </Select>
       </Space>
       <Table
         rowKey="id"
@@ -178,10 +217,10 @@ const VaccineTypeTab = () => {
         okText={editing ? "Cập nhật" : "Thêm mới"}
       >
         <Form form={form} layout="vertical" initialValues={defaultVaccineType}>
-          <Form.Item name="code" label="Mã" rules={[{ required: true }]} >
+          <Form.Item name="code" label="Mã" rules={[{ required: true }]}>
             <Input disabled={!!editing} />
           </Form.Item>
-          <Form.Item name="name" label="Tên" rules={[{ required: true }]} >
+          <Form.Item name="name" label="Tên" rules={[{ required: true }]}>
             <Input disabled={!!editing} />
           </Form.Item>
           <Form.Item name="group" label="Nhóm">
