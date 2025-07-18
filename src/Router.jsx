@@ -69,10 +69,13 @@ import GeneralDashboard from "./pages/Admin/GeneralDashboard";
 import UserManagement from "./pages/Admin/Features/ManageUser";
 import CheckupScheduleDetail from "./pages/Admin/CheckupSchedule/CheckupScheduleDetail";
 
+import Homepage from "./pages/Homepage";
+
 const Router = () => {
   return (
     <>
       <Routes>
+        <Route path="/" element={<Homepage />} />
         <Route path="/signin" element={<Signin />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forget-password" element={<ForgetPassword />} />

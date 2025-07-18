@@ -17,7 +17,7 @@ const EVENT_TYPE = [
 ];
 const EVENT_CATEGORY = [
   { label: "Tiêm chủng", value: 0 }, // Vaccination
-  { label: "Tư vấn", value: 1 },    // Consultation
+  { label: "Tư vấn", value: 0 },    // Consultation
 ];
 
 export default function HealthEventForm() {
@@ -71,7 +71,7 @@ export default function HealthEventForm() {
   };
 
   return (
-    <div style={{ maxWidth: 600, margin: "0 auto", background: "#fff", borderRadius: 16, boxShadow: "0 2px 12px rgba(79,195,247,0.08)", padding: 32 }}>
+    <div style={{ maxWidth: 800, width:800, margin: "0 auto", background: "#fff", borderRadius: 16, boxShadow: "0 2px 12px rgba(79,195,247,0.08)", padding: 32 }}>
       <Steps current={step} style={{ marginBottom: 32 }}>
         <Steps.Step title="Khai báo sự kiện" />
         <Steps.Step title="Vật tư y tế sử dụng" />
