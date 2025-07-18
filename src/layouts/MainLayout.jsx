@@ -38,7 +38,9 @@ export default function MainLayout({ children, sidebar }) {
             margin: 0,
             padding: 24,
             background: colors.lightGray,
-            minHeight: "calc(100vh - 64px - 50px)",
+            minHeight: "100px",
+            maxHeight: "900px",
+            overflowY: "auto",
           }}
         >
           {children}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Tabs, Table, Typography, Tag, Spin, message } from "antd";
+import { Tabs, Table, Typography, Tag, Spin, message, Input } from "antd";
 import { getHealthEvents } from "@/services/apiServices";
 import HealthEventForm from "./HealthEventForm";
 
@@ -22,6 +22,7 @@ const EVENT_STATUS_MAP = {
 export default function HealthEventTabs() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const fetchEvents = () => {
     setLoading(true);
@@ -34,6 +35,12 @@ export default function HealthEventTabs() {
   useEffect(() => {
     fetchEvents();
   }, []);
+
+  // Lọc danh sách sự kiện theo tên học sinh
+  const filteredEvents = events.filter(ev =>
+    ev.studentName?.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '')
+      .includes(searchTerm.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, ''))
+  );
 
   const columns = [
     {
@@ -82,13 +89,22 @@ export default function HealthEventTabs() {
           key: "1",
           label: "Danh sách sự kiện",
           children: loading ? <Spin /> : (
-            <Table
-              columns={columns}
-              dataSource={events}
-              rowKey="id"
-              pagination={{ pageSize: 8 }}
-              bordered
-            />
+            <>
+              <Input
+                placeholder="Tìm kiếm tên học sinh..."
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                style={{ marginBottom: 20, maxWidth: 350 }}
+                allowClear
+              />
+              <Table
+                columns={columns}
+                dataSource={filteredEvents}
+                rowKey="id"
+                pagination={{ pageSize: 8 }}
+                bordered
+              />
+            </>
           )
         },
         {

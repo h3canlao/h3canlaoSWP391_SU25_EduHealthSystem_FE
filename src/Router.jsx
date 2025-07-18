@@ -44,6 +44,7 @@ import ParentVaccinationConsent from "./pages/Parents/Immunization/ParentVaccina
 import ParentVaccinationSchedules from "./pages/Parents/Immunization/ParentVaccinationSchedules";
 import HealthEventTabs from "./pages/SchoolNurse/HealthEvent/HealthEventTabs";
 import ParentHealthEvents from "./pages/Parents/ParentHealthEvents";
+import ParentVaccinationRecords from "./pages/Parents/Immunization/ParentVaccinationRecords";
 
 import { getUserRole } from "@/services/handleStorageApi";
 
@@ -61,6 +62,8 @@ function ProtectedRoute({ children, allowedRoles }) {
 
 import CheckupCampaignAdmin from "./pages/Admin/CheckupCampaign/CheckupCampaignAdmin";
 import CheckupCampaignDetail from "./pages/Admin/CheckupCampaign/CheckupCampaignDetail";
+
+import VaccinationRecords from "./pages/SchoolNurse/Vaccination/VaccinationRecords";
 import CheckupScheduleAdmin from "./pages/Admin/CheckupSchedule/CheckupScheduleAdmin";
 import GeneralDashboard from "./pages/Admin/GeneralDashboard";
 import UserManagement from "./pages/Admin/Features/ManageUser";
@@ -95,6 +98,7 @@ const Router = () => {
           <Route path="counseling-records" element={<ParentCounselingRecords />} />
           <Route path="vaccine-consent" element={<ParentVaccinationConsent />} />
           <Route path="vaccination-schedules" element={<ParentVaccinationSchedules />} />
+          <Route path="vaccination-records" element={<ParentVaccinationRecords />} />
           <Route path="health-events" element={<ParentHealthEvents />} />
         </Route>
         {/* Admin Routes */}
@@ -141,6 +145,7 @@ const Router = () => {
           <Route path="counseling-appointments" element={<CounselingAppointments />} />
           <Route path="vaccination-schedules" element={<VaccinationSchedules />} />
           <Route path="vaccination-schedules/:id" element={<VaccinationScheduleInfo />} />
+          <Route path="vaccination-records" element={<VaccinationRecords />} />
           <Route path="health-event" element={<HealthEventTabs />} />
         </Route>
       </Routes>

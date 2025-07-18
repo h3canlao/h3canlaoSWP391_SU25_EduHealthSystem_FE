@@ -11,7 +11,6 @@ const ParentCheckupSchedules = () => {
   const [schedules, setSchedules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [consentModal, setConsentModal] = useState({ open: false, schedule: null });
-  const [consentStatus, setConsentStatus] = useState(2);
   const [consentNote, setConsentNote] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -64,19 +63,14 @@ const ParentCheckupSchedules = () => {
     });
   };
 
-  // Gửi consent
-  const handleConsent = async () => {
+  // Gửi consent với status truyền trực tiếp
+  const handleConsent = async (status) => {
     if (!consentModal.schedule) return;
     setSubmitting(true);
     try {
-      console.log('Gửi consent:', {
-        scheduleId: consentModal.schedule.id,
-        consentStatus,
-        consentNote
-      });
       await consentCheckupSchedule(
         consentModal.schedule.id,
-        consentStatus,
+        status,
         consentNote
       );
       message.success("Gửi xác nhận thành công!");
@@ -187,13 +181,10 @@ const ParentCheckupSchedules = () => {
         open={consentModal.open}
         title={<span>Xác nhận lịch khám</span>}
         onCancel={() => setConsentModal({ open: false, schedule: null })}
-        onOk={handleConsent}
-        okText={consentStatus === 2 ? "Đồng ý" : "Từ chối"}
-        confirmLoading={submitting}
         footer={[
           <Button key="cancel" onClick={() => setConsentModal({ open: false, schedule: null })}>Hủy</Button>,
-          <Button key="accept" type="primary" loading={submitting} onClick={() => { setConsentStatus(2); handleConsent(); }}>Đồng ý</Button>,
-          <Button key="reject" danger loading={submitting} onClick={() => { setConsentStatus(1); handleConsent(); }}>Từ chối</Button>,
+          <Button key="accept" type="primary" loading={submitting} onClick={() => handleConsent(1)}>Đồng ý</Button>,
+          <Button key="reject" danger loading={submitting} onClick={() => handleConsent(2)}>Từ chối</Button>,
         ]}
       >
         <div style={{ marginBottom: 12 }}>Bạn muốn đồng ý hay từ chối lịch khám này? (Có thể nhập ghi chú)</div>

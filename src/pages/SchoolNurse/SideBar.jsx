@@ -29,8 +29,7 @@ const routes = [
     icon: <AppstoreOutlined />, label: "Tiêm chủng",
     children: [
       { key: "/nurse/vaccination-schedules", icon: <ScheduleOutlined />, label: "Lịch tiêm chủng" },
-      { key: "/nurse/vaccine-forms", icon: <FileProtectOutlined />, label: "Phiếu tiêm chủng" },
-      { key: "/nurse/manage-vaccine-forms", icon: <AppstoreOutlined />, label: "Quản lý phiếu tiêm chủng" },
+      { key: "/nurse/vaccination-records", icon: <HistoryOutlined />, label: "Theo dõi phiếu tiêm chủng" },
     ]
   },
   { key: "/nurse/pending-medications", icon: <MedicineBoxOutlined />, label: "Thuốc chờ xử lý" },
@@ -41,4 +40,4 @@ export default function SideBar() {
   const userInfo = { name: "Y tá", email: "nurse@email.com" };
   const onLogout = () => {};
   return <Sidebar routes={routes} userInfo={userInfo} onLogout={onLogout} />;
-}
+} 

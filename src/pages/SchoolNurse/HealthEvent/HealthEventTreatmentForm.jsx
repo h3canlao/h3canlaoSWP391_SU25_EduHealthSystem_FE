@@ -56,7 +56,15 @@ export default function HealthEventTreatmentForm({ healthEventId, onFinish }) {
                       rules={[{ required: true, message: "Chọn vật tư" }]}
                       style={{ flex: 2, minWidth: 220, marginBottom: 0 }}
                     >
-                      <Select placeholder="Chọn vật tư y tế">
+                      <Select
+                        placeholder="Chọn vật tư y tế"
+                        showSearch
+                        filterOption={(input, option) =>
+                          (option?.children || "").toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').includes(
+                            input.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '')
+                          )
+                        }
+                      >
                         {lots.map(lot => (
                           <Select.Option key={lot.id} value={lot.id}>
                             {lot.medicalSupplyName} ({lot.lotNumber})

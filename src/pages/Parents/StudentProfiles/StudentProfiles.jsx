@@ -73,10 +73,10 @@ const StudentProfiles = () => {
     } catch (error) {
       if (error.response?.data?.message === "Không tìm thấy hồ sơ sức khỏe nào dựa trên mã học sinh này.") {
         confirm({
-          title: "Create Health Profile?",
-          content: `No health profile found for ${student.firstName}. Would you like to create one?`,
-          okText: "Create",
-          cancelText: "Cancel",
+          title: "Bạn có muốn khai báo sức khỏe không?",
+          content: `Không tìm thấy khai báo sức khỏe của ${student.firstName} ${student.lastName}. Bạn có muốn tạo không?`,
+          okText: "Tạo",
+          cancelText: "Hủy",
           onOk: async () => {
             try {
               const newProfile = { studentCode: student.studentCode };

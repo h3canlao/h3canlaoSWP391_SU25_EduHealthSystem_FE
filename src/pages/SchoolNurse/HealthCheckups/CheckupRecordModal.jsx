@@ -164,11 +164,11 @@ const CheckupRecordModal = ({ schedule, onClose, onRecordCreated }) => {
         toast.success('Tạo hồ sơ khám thành công!');
         onRecordCreated();
       } else {
-        toast.error(response.data.message || 'Có lỗi xảy ra khi tạo hồ sơ khám');
+        toast.error(response.data.message || 'Phụ huynh cần phài đồng ý để tạo hồ sơ');
       }
     } catch (error) {
       console.error('Error creating checkup record:', error);
-      toast.error('Có lỗi xảy ra khi tạo hồ sơ khám');
+      toast.error('Phụ huynh cần phài đồng ý để tạo hồ sơ');
     } finally {
       setLoading(false);
     }
