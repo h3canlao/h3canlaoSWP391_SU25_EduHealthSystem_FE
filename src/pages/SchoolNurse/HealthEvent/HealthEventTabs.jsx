@@ -82,7 +82,7 @@ export default function HealthEventTabs() {
   ];
 
   return (
-    <div style={{ maxWidth: 900, margin: "0 auto", background: "#fff", borderRadius: 16, boxShadow: "0 2px 12px rgba(79,195,247,0.08)", padding: 32 }}>
+    <div style={{ maxWidth: 1200, width:1200, margin: "0 auto", background: "#fff", borderRadius: 16, boxShadow: "0 2px 12px rgba(79,195,247,0.08)", padding: 32 }}>
       <Title level={3} style={{ color: "#4FC3F7", marginBottom: 24 }}>Quản lý sự kiện y tế</Title>
       <Tabs defaultActiveKey="1" items={[
         {
