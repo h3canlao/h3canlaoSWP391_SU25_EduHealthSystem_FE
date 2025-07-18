@@ -83,50 +83,61 @@ const ParentCheckupRecords = () => {
         </div>
       ) : (
         <div className="records-list">
-          {records.map(({ student, records }) => (
-            <div className="student-record-group" key={student.id}>
-              <div className="student-info">
-                <Avatar size={56} src={student.image} className="student-avatar" />
-                <div>
-                  <div className="student-name"><FaUser className="student-icon" />{student.fullName || (student.firstName + ' ' + student.lastName)}</div>
-                  <div className="student-meta">Mã HS: {student.studentCode} | Lớp: {student.grade}{student.section}</div>
+          {records.map(({ student, records }) => {
+            console.log('Student image:', student.image); // Debug log
+            return (
+              <div className="student-record-group" key={student.id}>
+                <div className="student-info">
+                  <Avatar 
+                    size={56} 
+                    src={student.image || "https://static.vecteezy.com/system/resources/previews/012/941/843/non_2x/illustration-of-boy-avatar-student-s-character-face-vector.jpg"} 
+                    className="student-avatar"
+                    onError={(e) => {
+                      console.log('Avatar load error for student:', student.id, 'image:', student.image);
+                      e.target.src = "https://static.vecteezy.com/system/resources/previews/012/941/843/non_2x/illustration-of-boy-avatar-student-s-character-face-vector.jpg";
+                    }}
+                  />
+                  <div>
+                    <div className="student-name"><FaUser className="student-icon" />{student.fullName || (student.firstName + ' ' + student.lastName)}</div>
+                    <div className="student-meta">Mã HS: {student.studentCode} | Lớp: {student.grade}{student.section}</div>
+                  </div>
+                </div>
+                <div className="student-records" style={{display: 'flex', flexDirection: 'row', gap: 20, overflowX: 'auto', flexWrap: 'nowrap'}}>
+                  {records.map(record => (
+                    <Card key={record.id} className="record-card" hoverable style={{minWidth: 320, maxWidth: 370, flex: '0 0 320px'}}>
+                      <div className="record-details">
+                        <div className="detail-row"><FaCalendar className="detail-icon" /><span className="label">Ngày khám:</span><span className="value">{formatDate(record.examinedAt)} {formatTime(record.examinedAt)}</span></div>
+                        <div className="detail-row"><FaRuler className="detail-icon" /><span className="label">Chiều cao:</span><span className="value">{record.heightCm} cm</span></div>
+                        <div className="detail-row"><FaWeight className="detail-icon" /><span className="label">Cân nặng:</span><span className="value">{record.weightKg} kg</span></div>
+                        <div className="detail-row">
+                          <FaEye className="detail-icon" />
+                          <span className="label">Thị lực trái:</span>
+                          <span className="value">{visionLevelMap[record.visionLeft] ?? record.visionLeft}</span>
+                        </div>
+                        <div className="detail-row">
+                          <FaEye className="detail-icon" />
+                          <span className="label">Thị lực phải:</span>
+                          <span className="value">{visionLevelMap[record.visionRight] ?? record.visionRight}</span>
+                        </div>
+                        <div className="detail-row">
+                          <FaVolumeUp className="detail-icon" />
+                          <span className="label">Thính lực:</span>
+                          <span className="value">{hearingLevelMap[record.hearing] ?? record.hearing}</span>
+                        </div>
+                        <div className="detail-row">
+                          <FaHeartbeat className="detail-icon" />
+                          <span className="label">Huyết áp:</span>
+                          <span className="value">{record.bloodPressureDiastolic}</span>
+                        </div>
+                        <div className="detail-row"><FaComments className="detail-icon" /><span className="label">Ghi chú:</span><span className="value">{record.remarks || '-'}</span></div>
+                        <div className="detail-row"><FaNotesMedical className="detail-icon" /><span className="label">Trạng thái:</span><span className="value"><Tag color={statusMap[record.status]?.color || 'default'}>{statusMap[record.status]?.text || 'Không xác định'}</Tag></span></div>
+                      </div>
+                    </Card>
+                  ))}
                 </div>
               </div>
-              <div className="student-records" style={{display: 'flex', flexDirection: 'row', gap: 20, overflowX: 'auto', flexWrap: 'nowrap'}}>
-                {records.map(record => (
-                  <Card key={record.id} className="record-card" hoverable style={{minWidth: 320, maxWidth: 370, flex: '0 0 320px'}}>
-                    <div className="record-details">
-                      <div className="detail-row"><FaCalendar className="detail-icon" /><span className="label">Ngày khám:</span><span className="value">{formatDate(record.examinedAt)} {formatTime(record.examinedAt)}</span></div>
-                      <div className="detail-row"><FaRuler className="detail-icon" /><span className="label">Chiều cao:</span><span className="value">{record.heightCm} cm</span></div>
-                      <div className="detail-row"><FaWeight className="detail-icon" /><span className="label">Cân nặng:</span><span className="value">{record.weightKg} kg</span></div>
-                      <div className="detail-row">
-                        <FaEye className="detail-icon" />
-                        <span className="label">Thị lực trái:</span>
-                        <span className="value">{visionLevelMap[record.visionLeft] ?? record.visionLeft}</span>
-                      </div>
-                      <div className="detail-row">
-                        <FaEye className="detail-icon" />
-                        <span className="label">Thị lực phải:</span>
-                        <span className="value">{visionLevelMap[record.visionRight] ?? record.visionRight}</span>
-                      </div>
-                      <div className="detail-row">
-                        <FaVolumeUp className="detail-icon" />
-                        <span className="label">Thính lực:</span>
-                        <span className="value">{hearingLevelMap[record.hearing] ?? record.hearing}</span>
-                      </div>
-                      <div className="detail-row">
-                        <FaHeartbeat className="detail-icon" />
-                        <span className="label">Huyết áp:</span>
-                        <span className="value">{record.bloodPressureDiastolic}</span>
-                      </div>
-                      <div className="detail-row"><FaComments className="detail-icon" /><span className="label">Ghi chú:</span><span className="value">{record.remarks || '-'}</span></div>
-                      <div className="detail-row"><FaNotesMedical className="detail-icon" /><span className="label">Trạng thái:</span><span className="value"><Tag color={statusMap[record.status]?.color || 'default'}>{statusMap[record.status]?.text || 'Không xác định'}</Tag></span></div>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

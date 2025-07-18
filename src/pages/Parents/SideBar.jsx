@@ -14,7 +14,11 @@ import {
 import Sidebar from "@/components/Sidebar";
 
 const routes = [
+  { key: "/parents/student-profiles", icon: <UserOutlined />, label: "Hồ sơ học sinh" },
+  { key: "/parents/send-medication", icon: <MedicineBoxOutlined />, label: "Gửi thuốc" },
+
   {
+    
     key: "health",
     icon: <SolutionOutlined />, label: "Khám sức khỏe",
     children: [
@@ -24,17 +28,16 @@ const routes = [
       { key: "/parents/health-events", icon: <HistoryOutlined />, label: "Sự kiện y tế" },
     ]
   },
+
   {
     key: "vaccination",
     icon: <MedicineBoxOutlined />, label: "Tiêm chủng",
     children: [
       { key: "/parents/vaccine-consent", icon: <CheckCircleOutlined />, label: "Chờ xác nhận" },
-      { key: "/parents/vaccination-schedules", icon: <CalendarOutlined />, label: "Lịch tiêm của con" }
+      { key: "/parents/vaccination-schedules", icon: <CalendarOutlined />, label: "Lịch tiêm của con" },
+      { key: "/parents/vaccination-records", icon: <HistoryOutlined />, label: "Theo dõi tiêm chủng" },
     ]
   },
-  { key: "/parents/send-medication", icon: <MedicineBoxOutlined />, label: "Gửi thuốc" },
-  // { key: "/parents/notifications", icon: <BellOutlined />, label: "Thông báo" },
-  { key: "/parents/student-profiles", icon: <UserOutlined />, label: "Hồ sơ học sinh" },
 ];
 
 export default function SideBar() {

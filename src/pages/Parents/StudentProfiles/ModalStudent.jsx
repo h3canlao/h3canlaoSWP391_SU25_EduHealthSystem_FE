@@ -6,6 +6,7 @@ import "./ModalStudent.css";
 import { toast } from "react-toastify";
 import Select from "react-select";
 
+
 const StudentStaticProfile = ({ studentInfo }) => (
   <div className="text-center">
     <div className="student-profile-image-container">

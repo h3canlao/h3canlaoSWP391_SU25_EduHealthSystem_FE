@@ -180,7 +180,7 @@ const consentCheckupSchedule = async (scheduleId, consentStatus, notes) => {
 
 // Lấy danh sách nurse profiles
 const getNurseProfiles = async () => {
-  return axios.get(`${BASE_URL}/NurseProfile`, {
+  return axios.get(`${BASE_URL}/NurseProfile/all`, {
     headers: getAuthHeaders()
   });
 };
@@ -289,6 +289,15 @@ export const declareVaccination = (payload) => {
   });
 };
 
+export const getVaccinationRecordsByStudentId = (studentId) => {
+  return axios.get(`${BASE_URL}/VaccinationRecord/student/${studentId}`, { headers: getAuthHeaders() });
+};
+
+export const getAllVaccinationRecords = () => {
+  return axios.get(`${BASE_URL}/VaccinationRecord/get-all-vaccination-records`, { headers: getAuthHeaders() });
+};
+
+
 export {
   postSignin,
   postRegister,
@@ -326,3 +335,4 @@ export {
   getHealthEvents,
   getHealthEventsMyChild,
 };
+

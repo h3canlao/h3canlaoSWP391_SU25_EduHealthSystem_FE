@@ -84,7 +84,15 @@ export default function HealthEventForm() {
           {loading ? <Spin /> : (
             <Form layout="vertical" onFinish={onFinish}>
               <Form.Item label="Học sinh" name="studentId" rules={[{ required: true, message: "Chọn học sinh" }]}> 
-                <Select placeholder="Chọn học sinh">
+                <Select
+                  placeholder="Chọn học sinh"
+                  showSearch
+                  filterOption={(input, option) =>
+                    (option?.children || "").toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').includes(
+                      input.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '')
+                    )
+                  }
+                >
                   {students.map(s => (
                     <Option key={s.id} value={s.id}>{s.lastName + " " + s.firstName}</Option>
                   ))}
