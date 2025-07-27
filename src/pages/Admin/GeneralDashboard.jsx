@@ -174,7 +174,7 @@ const GeneralDashboard = () => {
   };
 
   return (
-    <div style={{ padding: "24px" }}>
+    <div style={{ padding: "24px", paddingTop: 0 }}>
       <Title level={2}>Dashboard Tổng Quan</Title>
 
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }} justify="center">
