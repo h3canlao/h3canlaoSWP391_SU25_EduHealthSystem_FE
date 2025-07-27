@@ -49,6 +49,18 @@ function getMaxDate(dateStr) {
   return `${y}-${m}-${day}T18:00`;
 }
 
+// Hàm lấy userId từ JWT token
+function getUserIdFromToken() {
+  const token = localStorage.getItem('accessToken');
+  if (!token) return '';
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] || payload.userId || payload.sub || '';
+  } catch {
+    return '';
+  }
+}
+
 const CheckupRecordModal = ({ schedule, onClose, onRecordCreated }) => {
   const [formData, setFormData] = useState({
     scheduleId: schedule?.id || '',
@@ -58,7 +70,7 @@ const CheckupRecordModal = ({ schedule, onClose, onRecordCreated }) => {
     visionRight: '',
     hearing: '',
     bloodPressureDiastolic: '',
-    examinedByNurseId: '',
+    examinedByNurseId: getUserIdFromToken(), // Sử dụng ID của y tá đang đăng nhập
     examinedAt: new Date().toISOString().slice(0, 16),
     remarks: '',
     status: 0,
@@ -69,7 +81,7 @@ const CheckupRecordModal = ({ schedule, onClose, onRecordCreated }) => {
   const [loading, setLoading] = useState(false);
   const [showFollowUp, setShowFollowUp] = useState(false);
   const [followUpData, setFollowUpData] = useState({
-    staffUserId: '',
+    staffUserId: getUserIdFromToken(), // Sử dụng ID của y tá đang đăng nhập
     appointmentDate: '',
     duration: 30,
     purpose: ''
@@ -81,19 +93,18 @@ const CheckupRecordModal = ({ schedule, onClose, onRecordCreated }) => {
 
   useEffect(() => {
     setShowFollowUp(formData.status === 2);
+    // Removed automatic date copying
   }, [formData.status]);
 
   const fetchNurses = async () => {
     try {
       const response = await getNurseProfiles();
+      console.log('Nurse profiles response:', response.data);
       if (response.data.isSuccess) {
         setNurses(response.data.data);
-        if (response.data.data.length > 0) {
-          setFormData(prev => ({
-            ...prev,
-            examinedByNurseId: response.data.data[0].userId
-          }));
-        }
+        // No need to set default nurse ID as we're using the current user's ID
+      } else {
+        toast.error('Không thể tải danh sách y tá');
       }
     } catch (error) {
       console.error('Error fetching nurses:', error);
@@ -142,9 +153,20 @@ const CheckupRecordModal = ({ schedule, onClose, onRecordCreated }) => {
 
     try {
       setLoading(true);
-      // Set thời gian khám là hiện tại
+      
+      // Set thời gian khám là thời gian thực tại thời điểm submit
+      const now = new Date();
+      
+      // Format thành chuỗi ISO với định dạng yyyy-MM-ddTHH:mm:ss
+      const currentTimeISO = now.getFullYear() + '-' +
+        String(now.getMonth() + 1).padStart(2, '0') + '-' +
+        String(now.getDate()).padStart(2, '0') + 'T' +
+        String(now.getHours()).padStart(2, '0') + ':' +
+        String(now.getMinutes()).padStart(2, '0') + ':00';
+      
       const submitData = {
         ...formData,
+        examinedAt: currentTimeISO, // Sử dụng thời gian hiện tại khi submit
         heightCm: parseFloat(formData.heightCm) || 0,
         weightKg: parseFloat(formData.weightKg) || 0,
         visionLeft: parseFloat(formData.visionLeft) || 0,
@@ -153,7 +175,7 @@ const CheckupRecordModal = ({ schedule, onClose, onRecordCreated }) => {
         bloodPressureDiastolic: parseFloat(formData.bloodPressureDiastolic) || 0,
         counselingAppointment: formData.status === 2 ? [{
           ...followUpData,
-          appointmentDate: toISOStringLocal(followUpData.appointmentDate),
+          appointmentDate: followUpData.appointmentDate, // Giữ nguyên định dạng ngày hẹn đã chọn
           duration: parseInt(followUpData.duration)
         }] : []
       };
@@ -162,13 +184,14 @@ const CheckupRecordModal = ({ schedule, onClose, onRecordCreated }) => {
       
       if (response.data.isSuccess) {
         toast.success('Tạo hồ sơ khám thành công!');
+        // Chỉ gọi onRecordCreated() để xử lý cập nhật dữ liệu và đóng modal
         onRecordCreated();
       } else {
-        toast.error(response.data.message || 'Phụ huynh cần phài đồng ý để tạo hồ sơ');
+        toast.error(response.data.message || 'Phụ huynh cần phải đồng ý để tạo hồ sơ');
       }
     } catch (error) {
       console.error('Error creating checkup record:', error);
-      toast.error('Phụ huynh cần phài đồng ý để tạo hồ sơ');
+      toast.error('Phụ huynh cần phải đồng ý để tạo hồ sơ');
     } finally {
       setLoading(false);
     }
@@ -286,54 +309,48 @@ const CheckupRecordModal = ({ schedule, onClose, onRecordCreated }) => {
                     <FaEye />
                     Thị lực trái
                   </label>
-                  <select
+                  <input 
+                    type="number"
                     name="visionLeft"
                     value={formData.visionLeft}
                     onChange={handleInputChange}
-                    required
-                  >
-                    <option value="">Chọn mức</option>
-                    <option value={0}>Bình thường</option>
-                    <option value={1}>Nhẹ</option>
-                    <option value={2}>Trung bình</option>
-                    <option value={3}>Nặng</option>
-                  </select>
+                    min="1"
+                    max="10"
+                    step="1"
+                    style={{ width: "100%" }}
+                  />
                 </div>
                 <div className="form-group">
                   <label>
                     <FaEye />
                     Thị lực phải
                   </label>
-                  <select
+                  <input 
+                    type="number"
                     name="visionRight"
                     value={formData.visionRight}
                     onChange={handleInputChange}
-                    required
-                  >
-                    <option value="">Chọn mức</option>
-                    <option value={0}>Bình thường</option>
-                    <option value={1}>Nhẹ</option>
-                    <option value={2}>Trung bình</option>
-                    <option value={3}>Nặng</option>
-                  </select>
+                    min="1"
+                    max="10"
+                    step="1"
+                    style={{ width: "100%" }}
+                  />
                 </div>
                 <div className="form-group">
                   <label>
                     <FaVolumeUp />
                     Thính lực
                   </label>
-                  <select
+                  <input 
+                    type="number"
                     name="hearing"
                     value={formData.hearing}
                     onChange={handleInputChange}
-                    required
-                  >
-                    <option value="">Chọn mức</option>
-                    <option value={0}>Bình thường</option>
-                    <option value={1}>Nhẹ</option>
-                    <option value={2}>Trung bình</option>
-                    <option value={3}>Nặng</option>
-                  </select>
+                    min="1"
+                    max="10"
+                    step="1"
+                    style={{ width: "100%" }}
+                  />
                 </div>
                 <div className="form-group">
                   <label>
@@ -359,55 +376,7 @@ const CheckupRecordModal = ({ schedule, onClose, onRecordCreated }) => {
                 Thông Tin Khám
               </h3>
               <div className="form-grid">
-                <div className="form-group">
-                  <label>
-                    <FaUserMd />
-                    Y tá khám
-                  </label>
-                  <select
-                    name="examinedByNurseId"
-                    value={formData.examinedByNurseId}
-                    onChange={handleInputChange}
-                    required
-                  >
-                    <option value="">Chọn y tá</option>
-                    {nurses.map(nurse => (
-                      <option key={nurse.userId} value={nurse.userId}>
-                        {nurse.name} - {nurse.position}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>
-                    <FaCalendar />
-                    Thời gian khám
-                  </label>
-                  <DatePicker
-                    selected={formData.examinedAt ? new Date(formData.examinedAt) : null}
-                    onChange={date => {
-                      if (date) {
-                        // Format local ISO string yyyy-MM-ddTHH:mm:ss
-                        const localISO = date.getFullYear() + '-' +
-                          String(date.getMonth() + 1).padStart(2, '0') + '-' +
-                          String(date.getDate()).padStart(2, '0') + 'T' +
-                          String(date.getHours()).padStart(2, '0') + ':' +
-                          String(date.getMinutes()).padStart(2, '0') + ':00';
-                        console.log('examinedAt:', localISO);
-                        setFormData(prev => ({
-                          ...prev,
-                          examinedAt: localISO
-                        }));
-                      }
-                    }}
-                    showTimeSelect
-                    timeFormat="HH:mm"
-                    timeIntervals={15}
-                    dateFormat="yyyy-MM-dd HH:mm"
-                    placeholderText="Chọn ngày và giờ khám"
-                    className="react-datepicker__input"
-                  />
-                </div>
+                {/* Y tá khám field removed - using current logged-in user automatically */}
                 <div className="form-group">
                   <label>
                     <FaComments />
@@ -425,6 +394,7 @@ const CheckupRecordModal = ({ schedule, onClose, onRecordCreated }) => {
                     <option value={3}>Chuyển viện</option>
                   </select>
                 </div>
+                {/* Removed thời gian khám field */}
               </div>
               <div className="form-group full-width">
                 <label>
@@ -449,25 +419,6 @@ const CheckupRecordModal = ({ schedule, onClose, onRecordCreated }) => {
                   Thông Tin Hẹn Tái Khám
                 </h3>
                 <div className="form-grid">
-                  <div className="form-group">
-                    <label>
-                      <FaUserMd />
-                      Nhân viên tư vấn
-                    </label>
-                    <select
-                      name="staffUserId"
-                      value={followUpData.staffUserId}
-                      onChange={handleFollowUpChange}
-                      required
-                    >
-                      <option value="">Chọn nhân viên</option>
-                      {nurses.map(nurse => (
-                        <option key={nurse.userId} value={nurse.userId}>
-                          {nurse.name} - {nurse.position}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
                   <div className="form-group">
                     <label>
                       <FaCalendarAlt />
@@ -515,6 +466,25 @@ const CheckupRecordModal = ({ schedule, onClose, onRecordCreated }) => {
                     >
                       {[30,60,90,120,150,180,210,240].map(val => (
                         <option key={val} value={val}>{val} phút</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label>
+                      <FaUserMd />
+                      Nhân viên tư vấn
+                    </label>
+                    <select
+                      name="staffUserId"
+                      value={followUpData.staffUserId}
+                      onChange={handleFollowUpChange}
+                      required
+                    >
+                      <option value="">Chọn nhân viên</option>
+                      {nurses.map(nurse => (
+                        <option key={nurse.userId} value={nurse.userId}>
+                          {nurse.name} - {nurse.position}
+                        </option>
                       ))}
                     </select>
                   </div>

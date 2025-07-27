@@ -297,6 +297,27 @@ export const getAllVaccinationRecords = () => {
   return axios.get(`${BASE_URL}/VaccinationRecord/get-all-vaccination-records`, { headers: getAuthHeaders() });
 };
 
+// Update vaccination record
+export const updateVaccinationRecord = async (id, data) => {
+  console.log(`Sending update to: ${BASE_URL}/VaccinationRecord/${id}`);
+  console.log("With data:", data);
+  
+  if (!id) {
+    throw new Error("ID is required for updating vaccination record");
+  }
+  
+  return axios.put(`${BASE_URL}/VaccinationRecord/${id}`, data, { headers: getAuthHeaders() });
+};
+
+// Get vaccination records by schedule ID
+export const getVaccinationRecordsByScheduleId = async (scheduleId) => {
+  return axios.get(`${BASE_URL}/VaccinationRecord/schedule/${scheduleId}`, { headers: getAuthHeaders() });
+};
+
+// Get list of nurses
+export const getNurses = async () => {
+  return axios.get(`${BASE_URL}/NurseProfile/all`, { headers: getAuthHeaders() });
+};
 
 export {
   postSignin,

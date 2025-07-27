@@ -8,7 +8,6 @@ import "react-toastify/dist/ReactToastify.css";
 import ConfirmEmail from "@/pages/Parents/Auth/2FA/ConfirmEmail/confirmEmail";
 
 import SendMedication from "./pages/Parents/Medication/SendMedication";
-import Notifications from "./pages/Parents/Notifications/Notifications";
 import StudentProfiles from "./pages/Parents/StudentProfiles/StudentProfiles";
 import Parents from "./pages/Parents/Parents";
 import ParentCheckupSchedules from "./pages/Parents/MedicalCheckups/ParentCheckupSchedules";
@@ -36,7 +35,6 @@ import VaccinationCampaignDetail from "./pages/Admin/VaccinationCampaign/Vaccina
 import VaccinationScheduleDetail from "./pages/Admin/VaccinationSchedule/VaccinationScheduleDetail";
 import VaccineTypeDetail from "./pages/Admin/Vaccine/VaccineTypeDetail";
 
-import HealthEventForm from "./pages/SchoolNurse/HealthEvent/HealthEventForm";
 import VaccinationSchedules from "./pages/SchoolNurse/Vaccination/VaccinationSchedules";
 import VaccinationScheduleInfo from "./pages/SchoolNurse/Vaccination/VaccinationScheduleInfo";
 
@@ -95,8 +93,7 @@ const Router = () => {
           <Route path="checkup-schedules" element={<ParentCheckupSchedules />} />
           <Route path="checkup-records" element={<ParentCheckupRecords />} />
           <Route path="send-medication" element={<SendMedication />} />
-          <Route path="confirmok-medications" element={<SendMedication />} />
-          <Route path="notifications" element={<Notifications />} />
+          <Route path="confirm-medications" element={<SendMedication />} />
           <Route path="student-profiles" element={<StudentProfiles />} />
           <Route path="counseling-records" element={<ParentCounselingRecords />} />
           <Route path="vaccine-consent" element={<ParentVaccinationConsent />} />
