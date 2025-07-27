@@ -225,9 +225,9 @@ const UserManagement = () => {
       key: "actions",
       render: (_, record) => (
         <Space size="middle">
-          <Button type="primary" icon={<EditOutlined />} onClick={() => handleEdit(record)}>
+          {/* <Button type="primary" icon={<EditOutlined />} onClick={() => handleEdit(record)}>
             Sửa
-          </Button>
+          </Button> */}
           <Popconfirm
             title={`Xác nhận ${record.isLocked ? "mở khóa" : "khóa"} tài khoản này?`}
             onConfirm={() => (record.isLocked ? handleUnlockUser(record.id) : handleLockUser(record.id))}
