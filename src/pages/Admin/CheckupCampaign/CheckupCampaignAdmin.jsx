@@ -83,25 +83,6 @@ const CheckupCampaignAdmin = () => {
   const navigate = useNavigate();
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
-  // Hàm xử lý hành động (start, complete, cancel)
-  const handleStatusAction = async (id, actionType) => {
-    try {
-      if (actionType === "start") {
-        await startCheckupCampaign(id);
-        message.success("Chiến dịch đã được bắt đầu!");
-      } else if (actionType === "complete") {
-        await completeCheckupCampaign(id);
-        message.success("Chiến dịch đã hoàn thành!");
-      } else if (actionType === "cancel") {
-        await cancelCheckupCampaign(id);
-        message.success("Chiến dịch đã bị hủy!");
-      }
-      fetchData();
-    } catch (err) {
-      message.error(err?.response?.data?.message ?? "Có lỗi xảy ra khi cập nhật trạng thái!");
-    }
-  };
-
   // Table columns
   const columns = [
     { title: "Tên chiến dịch", dataIndex: "name", key: "name" },
@@ -187,7 +168,7 @@ const CheckupCampaignAdmin = () => {
         endDate: values.endDate ? values.endDate.toISOString() : null,
       };
       if (editing) {
-        await updateCheckupCampaign(editing, payload);
+        await updateCheckupCampaign(editing, { ...payload, id: editing });
         message.success("Cập nhật thành công!");
       } else {
         await createCheckupCampaign(payload);

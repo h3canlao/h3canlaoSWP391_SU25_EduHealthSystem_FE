@@ -1,6 +1,9 @@
 import axios from "axios";
 const BASE_URL = "https://localhost:7096/api";
-
+const getAuthHeaders = () => {
+  const token = localStorage.getItem("accessToken");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
 // Lấy tất cả lô (có param filter, paging, search, expired, includeDeleted)
 export const getMedicalSupplyLots = (params) => {
   return axios.get(`${BASE_URL}/MedicalSupplyLot`, { params });
@@ -23,7 +26,7 @@ export const deleteMedicalSupplyLots = (ids, isPermanent = false) => {
 
 // Khôi phục nhiều
 export const restoreMedicalSupplyLots = (ids) => {
-  return axios.post(`${BASE_URL}/MedicalSupplyLot/restore`, { ids });
+  return axios.post(`${BASE_URL}/MedicalSupplyLot/restore`, { ids }, { headers: getAuthHeaders() });
 };
 
 // Lấy các lô sắp hết hạn hoặc hết hạn

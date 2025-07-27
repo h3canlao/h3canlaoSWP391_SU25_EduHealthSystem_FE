@@ -30,18 +30,33 @@ const VaccineTypeTab = () => {
   const [editing, setEditing] = useState(null);
   const [form] = Form.useForm();
   const [showDeleted, setShowDeleted] = useState(false);
-
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 100,
+  });
   // Thêm state để lọc theo trạng thái
   const [isActiveFilter, setIsActiveFilter] = useState(null); // null: tất cả, true: đang kích hoạt, false: không kích hoạt
 
   // --- Fetch data ---
-  const fetchData = async () => {
+  const fetchData = async (params = {}) => {
     setLoading(true);
     try {
-      const params = {
+      const params2 = {
         isActive: isActiveFilter, // Thêm tham số lọc vào request
       };
-      const res = showDeleted ? await getDeletedVaccineTypes() : await getVaccineTypes(params);
+      const res = showDeleted
+        ? await getDeletedVaccineTypes()
+        : await getVaccineTypes({
+            ...params2,
+            pageNumber: params.current || pagination.current,
+            pageSize: params.pageSize || pagination.pageSize,
+          });
+      setPagination((prev) => ({
+        ...prev,
+        current: params.current || prev.current,
+        pageSize: params.pageSize || prev.pageSize,
+      }));
       setData(res.data.data || res.data || []);
     } catch {
       message.error("Không tải được danh sách loại vaccine");
@@ -114,7 +129,9 @@ const VaccineTypeTab = () => {
       message.error("Lỗi đổi trạng thái!");
     }
   };
-
+  const handleTableChange = (newPagination) => {
+    fetchData({ current: newPagination.current, pageSize: newPagination.pageSize });
+  };
   // --- Table columns ---
   const navigate = useNavigate();
   const columns = [
@@ -207,6 +224,8 @@ const VaccineTypeTab = () => {
           selectedRowKeys,
           onChange: setSelectedRowKeys,
         }}
+        pagination={pagination}
+        onChange={handleTableChange}
       />
       <Modal
         open={modalVisible}

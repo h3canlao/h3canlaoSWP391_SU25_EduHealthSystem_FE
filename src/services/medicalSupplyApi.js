@@ -1,6 +1,9 @@
 import axios from "axios";
 const BASE_URL = "https://localhost:7096/api";
-
+const getAuthHeaders = () => {
+  const token = localStorage.getItem("accessToken");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
 export const getMedicalSupplies = async (params) => {
   return axios.get(`${BASE_URL}/MedicalSupply`, { params });
 };
@@ -25,7 +28,7 @@ export const deleteMedicalSupplies = async (ids, isPermanent = false) => {
 };
 
 export const restoreMedicalSupplies = async (ids) => {
-  return axios.post(`${BASE_URL}/MedicalSupply/restore`, { ids });
+  return axios.post(`${BASE_URL}/MedicalSupply/restore`, { ids }, { headers: getAuthHeaders() });
 };
 
 export const getLowStockMedicalSupplies = async () => {

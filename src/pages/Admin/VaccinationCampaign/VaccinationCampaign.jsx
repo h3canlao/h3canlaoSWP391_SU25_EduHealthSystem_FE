@@ -163,7 +163,7 @@ const VaccinationCampaignAdmin = () => {
         endDate: values.endDate ? values.endDate.toISOString() : null,
       };
       if (editing) {
-        await updateVaccinationCampaign(editing, payload);
+        await updateVaccinationCampaign(editing, { ...payload, id: editing });
         message.success("Cập nhật thành công!");
       } else {
         await createVaccinationCampaign(payload);

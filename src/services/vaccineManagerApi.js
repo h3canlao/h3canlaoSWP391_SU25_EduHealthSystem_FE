@@ -1,6 +1,9 @@
 import axios from "axios";
 const BASE_URL = "https://localhost:7096/api";
-
+const getAuthHeaders = () => {
+  const token = localStorage.getItem("accessToken");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
 // VaccineType
 export const getVaccineTypes = (params) => axios.get(`${BASE_URL}/VaccineType`, { params });
 
@@ -15,7 +18,8 @@ export const deleteVaccineTypes = (ids, isPermanent = false) =>
 
 export const getDeletedVaccineTypes = (params) => axios.get(`${BASE_URL}/VaccineType/deleted`, { params });
 
-export const restoreVaccineTypes = (ids) => axios.post(`${BASE_URL}/VaccineType/restore`, { ids });
+export const restoreVaccineTypes = (ids) =>
+  axios.post(`${BASE_URL}/VaccineType/restore`, { ids }, { headers: getAuthHeaders() });
 
 export const toggleVaccineTypeStatus = (id) => axios.patch(`${BASE_URL}/VaccineType/${id}/toggle-status`);
 // VaccineLot
@@ -30,7 +34,8 @@ export const updateVaccineLot = (id, data) => axios.put(`${BASE_URL}/VaccineLot/
 
 export const batchDeleteVaccineLot = (ids) => axios.post(`${BASE_URL}/VaccineLot/batch/delete`, { ids });
 
-export const batchRestoreVaccineLot = (ids) => axios.post(`${BASE_URL}/VaccineLot/batch/restore`, { ids });
+export const batchRestoreVaccineLot = (ids) =>
+  axios.post(`${BASE_URL}/VaccineLot/batch/restore`, { ids }, { headers: getAuthHeaders() });
 
 export const patchVaccineLotQuantity = (id, quantity) =>
   axios.patch(`${BASE_URL}/VaccineLot/${id}/quantity`, { quantity });

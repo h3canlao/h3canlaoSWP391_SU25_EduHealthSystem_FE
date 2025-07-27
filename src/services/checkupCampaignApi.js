@@ -1,7 +1,10 @@
 import axios from "axios";
 
 const BASE_URL = "https://localhost:7096/api"; // Giả định baseURL
-
+const getAuthHeaders = () => {
+  const token = localStorage.getItem("accessToken");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
 export const getCheckupCampaigns = async (params) => {
   return axios.get(`${BASE_URL}/CheckupCampaign`, { params });
 };
@@ -25,9 +28,13 @@ export const getCheckupCampaignDetail = (id) => {
 
 export const restoreCheckupCampaigns = async (ids) => {
   // PATCH: /api/CheckupCampaign/batch/restore
-  return axios.post(`${BASE_URL}/CheckupCampaign/batch/restore`, {
-    campaignIds: ids,
-  });
+  return axios.post(
+    `${BASE_URL}/CheckupCampaign/batch/restore`,
+    {
+      campaignIds: ids,
+    },
+    { headers: getAuthHeaders() }
+  );
 };
 
 export const updateStatusCheckupCampaigns = async (ids, status) => {

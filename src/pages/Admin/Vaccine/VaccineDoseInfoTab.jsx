@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { Table, Button, Modal, Form, InputNumber, Select, Popconfirm, message, Space } from "antd";
 import {
-  getVaccineDoseInfos, createVaccineDoseInfo, updateVaccineDoseInfo,
-  deleteVaccineDoseInfos
+  getVaccineDoseInfos,
+  createVaccineDoseInfo,
+  updateVaccineDoseInfo,
+  deleteVaccineDoseInfos,
 } from "@/services/vaccineManagerApi";
 
 const defaultDoseInfo = {
-  vaccineTypeId: "", doseNumber: null, recommendedAgeMonths: null, minIntervalDays: null, previousDoseId: "",
+  vaccineTypeId: "",
+  doseNumber: null,
+  recommendedAgeMonths: null,
+  minIntervalDays: null,
+  previousDoseId: "",
 };
 
 const VaccineDoseInfoTab = ({ vaccineTypes }) => {
@@ -15,10 +21,22 @@ const VaccineDoseInfoTab = ({ vaccineTypes }) => {
   const [doseEditing, setDoseEditing] = useState(null);
   const [doseForm] = Form.useForm();
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-
-  const fetchDoseInfos = async () => {
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 100,
+  });
+  const fetchDoseInfos = async (params = {}) => {
     try {
-      const res = await getVaccineDoseInfos();
+      const res = await getVaccineDoseInfos({
+        pageNumber: params.current || pagination.current,
+        pageSize: params.pageSize || pagination.pageSize,
+      });
+      setPagination((prev) => ({
+        ...prev,
+        current: params.current || prev.current,
+        pageSize: params.pageSize || prev.pageSize,
+      }));
       setDoseInfos(res.data.data || res.data || []);
     } catch {
       message.error("Không tải được liều tiêm");
@@ -28,6 +46,9 @@ const VaccineDoseInfoTab = ({ vaccineTypes }) => {
   useEffect(() => {
     fetchDoseInfos();
   }, []);
+  const handleTableChange = (newPagination) => {
+    fetchDoseInfos({ current: newPagination.current, pageSize: newPagination.pageSize });
+  };
 
   const handleDoseModal = (record) => {
     setDoseEditing(record || null);
@@ -64,15 +85,19 @@ const VaccineDoseInfoTab = ({ vaccineTypes }) => {
   };
 
   return (
-    <div style={{margin: '0 24px'}}>
+    <div style={{ margin: "0 24px" }}>
       <Space style={{ marginBottom: 8 }}>
-        <Button type="primary" onClick={() => handleDoseModal()}>Thêm liều tiêm</Button>
+        <Button type="primary" onClick={() => handleDoseModal()}>
+          Thêm liều tiêm
+        </Button>
         <Popconfirm
           title="Xoá các liều đã chọn?"
           disabled={!selectedRowKeys.length}
           onConfirm={() => handleDoseDelete(selectedRowKeys)}
         >
-          <Button danger disabled={!selectedRowKeys.length}>Xoá nhiều</Button>
+          <Button danger disabled={!selectedRowKeys.length}>
+            Xoá nhiều
+          </Button>
         </Popconfirm>
       </Space>
       <Table
@@ -81,12 +106,14 @@ const VaccineDoseInfoTab = ({ vaccineTypes }) => {
           selectedRowKeys,
           onChange: setSelectedRowKeys,
         }}
+        pagination={pagination}
+        onChange={handleTableChange}
         dataSource={doseInfos}
         columns={[
           {
             title: "Loại Vaccine",
             dataIndex: "vaccineTypeId",
-            render: (id) => vaccineTypes.find(t => t.id === id)?.name || id,
+            render: (id) => vaccineTypes.find((t) => t.id === id)?.name || id,
           },
           { title: "Số thứ tự", dataIndex: "doseNumber" },
           { title: "Tuổi khuyến nghị (tháng)", dataIndex: "recommendedAgeMonths" },
@@ -94,24 +121,35 @@ const VaccineDoseInfoTab = ({ vaccineTypes }) => {
           {
             title: "Liều trước đó",
             dataIndex: "previousDoseId",
-            render: (id) => doseInfos.find(d => d.id === id)?.doseNumber || "",
+            render: (id) => doseInfos.find((d) => d.id === id)?.doseNumber || "",
           },
           {
-            title: "Thao tác", render: (_, r) => (
+            title: "Thao tác",
+            render: (_, r) => (
               <Space>
-                <Button type="link" onClick={() => handleDoseModal(r)}>Sửa</Button>
+                <Button type="link" onClick={() => handleDoseModal(r)}>
+                  Sửa
+                </Button>
                 <Popconfirm title="Xoá liều này?" onConfirm={() => handleDoseDelete([r.id])}>
-                  <Button danger type="link">Xoá</Button>
+                  <Button danger type="link">
+                    Xoá
+                  </Button>
                 </Popconfirm>
               </Space>
-            )
-          }
+            ),
+          },
         ]}
       />
-      <Modal open={doseModal} onCancel={() => setDoseModal(false)} onOk={handleDoseOk} destroyOnClose title={doseEditing ? "Cập nhật" : "Thêm mới"}>
+      <Modal
+        open={doseModal}
+        onCancel={() => setDoseModal(false)}
+        onOk={handleDoseOk}
+        destroyOnClose
+        title={doseEditing ? "Cập nhật" : "Thêm mới"}
+      >
         <Form form={doseForm} layout="vertical" initialValues={defaultDoseInfo}>
           <Form.Item name="vaccineTypeId" label="Loại Vaccine" rules={[{ required: true }]}>
-            <Select options={vaccineTypes.map(v => ({ value: v.id, label: v.name }))} showSearch />
+            <Select options={vaccineTypes.map((v) => ({ value: v.id, label: v.name }))} showSearch />
           </Form.Item>
           <Form.Item name="doseNumber" label="Số thứ tự" rules={[{ required: true }]}>
             <InputNumber min={1} style={{ width: "100%" }} />
@@ -123,7 +161,7 @@ const VaccineDoseInfoTab = ({ vaccineTypes }) => {
             <InputNumber min={0} style={{ width: "100%" }} />
           </Form.Item>
           <Form.Item name="previousDoseId" label="Liều trước đó">
-            <Select options={doseInfos.map(d => ({ value: d.id, label: `${d.doseNumber}` }))} allowClear />
+            <Select options={doseInfos.map((d) => ({ value: d.id, label: `${d.doseNumber}` }))} allowClear />
           </Form.Item>
         </Form>
       </Modal>

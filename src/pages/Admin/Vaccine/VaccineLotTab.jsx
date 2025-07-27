@@ -2,11 +2,19 @@ import React, { useState, useEffect } from "react";
 import { Table, Button, Modal, Form, Input, InputNumber, DatePicker, Select, Popconfirm, message, Space } from "antd";
 import dayjs from "dayjs";
 import {
-  getVaccineLots, createVaccineLot, updateVaccineLot, batchDeleteVaccineLot, batchRestoreVaccineLot
+  getVaccineLots,
+  createVaccineLot,
+  updateVaccineLot,
+  batchDeleteVaccineLot,
+  batchRestoreVaccineLot,
 } from "@/services/vaccineManagerApi";
 
 const defaultVaccineLot = {
-  vaccineTypeId: "", lotNumber: "", expiryDate: null, quantity: null, storageLocation: "",
+  vaccineTypeId: "",
+  lotNumber: "",
+  expiryDate: null,
+  quantity: null,
+  storageLocation: "",
 };
 
 const VaccineLotTab = ({ vaccineTypes }) => {
@@ -16,10 +24,23 @@ const VaccineLotTab = ({ vaccineTypes }) => {
   const [lotForm] = Form.useForm();
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [showDeleted, setShowDeleted] = useState(false);
-
-  const fetchVaccineLots = async () => {
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 100,
+  });
+  const fetchVaccineLots = async (params = {}) => {
     try {
-      const res = await getVaccineLots({ deleted: showDeleted });
+      const res = await getVaccineLots({
+        isDeleted: showDeleted,
+        pageNumber: params.current || pagination.current,
+        pageSize: params.pageSize || pagination.pageSize,
+      });
+      setPagination((prev) => ({
+        ...prev,
+        current: params.current || prev.current,
+        pageSize: params.pageSize || prev.pageSize,
+      }));
       setVaccineLots(res.data.data || res.data || []);
     } catch {
       message.error("Không tải được lô vaccine");
@@ -33,9 +54,7 @@ const VaccineLotTab = ({ vaccineTypes }) => {
   const handleLotModal = (record) => {
     setLotEditing(record || null);
     lotForm.setFieldsValue(
-      record
-        ? { ...record, expiryDate: record.expiryDate ? dayjs(record.expiryDate) : null }
-        : { ...defaultVaccineLot }
+      record ? { ...record, expiryDate: record.expiryDate ? dayjs(record.expiryDate) : null } : { ...defaultVaccineLot }
     );
     setLotModal(true);
   };
@@ -83,15 +102,16 @@ const VaccineLotTab = ({ vaccineTypes }) => {
       message.error("Phục hồi thất bại!");
     }
   };
-
+  const handleTableChange = (newPagination) => {
+    fetchVaccineLots({ current: newPagination.current, pageSize: newPagination.pageSize });
+  };
   return (
-    <div style={{margin: '0 24px'}}>
+    <div style={{ margin: "0 24px" }}>
       <Space style={{ marginBottom: 8 }}>
-        <Button type="primary" onClick={() => handleLotModal()}>Thêm lô vaccine</Button>
-        <Button
-          onClick={() => setShowDeleted(v => !v)}
-          type={showDeleted ? "primary" : "default"}
-        >
+        <Button type="primary" onClick={() => handleLotModal()}>
+          Thêm lô vaccine
+        </Button>
+        <Button onClick={() => setShowDeleted((v) => !v)} type={showDeleted ? "primary" : "default"}>
           {showDeleted ? "Xem danh sách" : "Xem đã xoá"}
         </Button>
         {!showDeleted ? (
@@ -100,7 +120,9 @@ const VaccineLotTab = ({ vaccineTypes }) => {
             disabled={!selectedRowKeys.length}
             onConfirm={handleBatchDelete}
           >
-            <Button danger disabled={!selectedRowKeys.length}>Xoá nhiều</Button>
+            <Button danger disabled={!selectedRowKeys.length}>
+              Xoá nhiều
+            </Button>
           </Popconfirm>
         ) : (
           <Popconfirm
@@ -108,7 +130,9 @@ const VaccineLotTab = ({ vaccineTypes }) => {
             disabled={!selectedRowKeys.length}
             onConfirm={handleBatchRestore}
           >
-            <Button type="primary" disabled={!selectedRowKeys.length}>Phục hồi</Button>
+            <Button type="primary" disabled={!selectedRowKeys.length}>
+              Phục hồi
+            </Button>
           </Popconfirm>
         )}
       </Space>
@@ -119,34 +143,50 @@ const VaccineLotTab = ({ vaccineTypes }) => {
           onChange: setSelectedRowKeys,
         }}
         dataSource={vaccineLots}
+        pagination={pagination}
+        onChange={handleTableChange}
         columns={[
           { title: "Mã lô", dataIndex: "lotNumber" },
           {
             title: "Loại Vaccine",
             dataIndex: "vaccineTypeId",
-            render: (id) => vaccineTypes.find(t => t.id === id)?.name || id,
+            render: (id) => vaccineTypes.find((t) => t.id === id)?.name || id,
           },
-          { title: "Ngày hết hạn", dataIndex: "expiryDate", render: v => v ? dayjs(v).format("DD/MM/YYYY") : "" },
+          { title: "Ngày hết hạn", dataIndex: "expiryDate", render: (v) => (v ? dayjs(v).format("DD/MM/YYYY") : "") },
           { title: "Số lượng", dataIndex: "quantity" },
           { title: "Nơi lưu trữ", dataIndex: "storageLocation" },
           {
-            title: "Thao tác", render: (_, r) => (
+            title: "Thao tác",
+            render: (_, r) => (
               <Space>
-                <Button type="link" onClick={() => handleLotModal(r)}>Sửa</Button>
+                <Button type="link" onClick={() => handleLotModal(r)}>
+                  Sửa
+                </Button>
                 {!showDeleted && (
-                  <Popconfirm title="Xoá lô vaccine này?" onConfirm={() => batchDeleteVaccineLot([r.id]).then(fetchVaccineLots)}>
-                    <Button danger type="link">Xoá</Button>
+                  <Popconfirm
+                    title="Xoá lô vaccine này?"
+                    onConfirm={() => batchDeleteVaccineLot([r.id]).then(fetchVaccineLots)}
+                  >
+                    <Button danger type="link">
+                      Xoá
+                    </Button>
                   </Popconfirm>
                 )}
               </Space>
-            )
-          }
+            ),
+          },
         ]}
       />
-      <Modal open={lotModal} onCancel={() => setLotModal(false)} onOk={handleLotOk} destroyOnClose title={lotEditing ? "Cập nhật" : "Thêm mới"}>
+      <Modal
+        open={lotModal}
+        onCancel={() => setLotModal(false)}
+        onOk={handleLotOk}
+        destroyOnClose
+        title={lotEditing ? "Cập nhật" : "Thêm mới"}
+      >
         <Form form={lotForm} layout="vertical" initialValues={defaultVaccineLot}>
           <Form.Item name="vaccineTypeId" label="Loại Vaccine" rules={[{ required: true }]}>
-            <Select options={vaccineTypes.map(v => ({ value: v.id, label: v.name }))} showSearch />
+            <Select options={vaccineTypes.map((v) => ({ value: v.id, label: v.name }))} showSearch />
           </Form.Item>
           <Form.Item name="lotNumber" label="Mã lô" rules={[{ required: true }]}>
             <Input />

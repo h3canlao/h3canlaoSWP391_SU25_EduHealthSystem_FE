@@ -1,20 +1,15 @@
-import React, { useEffect, useState } from "react";
-import { Table, Button, Modal, Form, Input, DatePicker, Select, Popconfirm, message, Space, Tag } from "antd";
-import dayjs from "dayjs";
+import { getVaccinationCampaigns } from "@/services/vaccinationCampaignApi";
 import {
-  getVaccinationSchedules,
-  createVaccinationSchedule,
-  updateVaccinationSchedule,
   deleteVaccinationSchedules,
   getDeletedVaccinationSchedules,
+  getVaccinationSchedules,
   restoreVaccinationSchedules,
-  updateStatusVaccinationSchedules,
-  getVaccinationScheduleById,
 } from "@/services/vaccinationSchedule";
-import { getGrades, getStudents } from "@/services/vaccinationHelperApi";
-import { getVaccinationCampaigns } from "@/services/vaccinationCampaignApi";
+import { Button, DatePicker, Input, message, Popconfirm, Select, Space, Table, Tag } from "antd";
+import dayjs from "dayjs";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import VaccinationScheduleCreateModal from "./Modal";
+import VaccinationScheduleModal from "./Modal"; // Đảm bảo tên file Modal là chính xác
 
 const statusOptions = [
   { value: 0, label: "Chưa bắt đầu", color: "default" },
@@ -23,51 +18,44 @@ const statusOptions = [
   { value: 3, label: "Đã huỷ", color: "red" },
 ];
 
-const defaultForm = {
-  vaccinationTypeId: null,
-  scheduledAt: null,
-  studentIds: [],
-  notes: "",
-};
-
 const VaccinationScheduleAdmin = () => {
   const [data, setData] = useState([]);
   const [campaigns, setCampaigns] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [editing, setEditing] = useState(null);
-  const [form] = Form.useForm();
+  const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 });
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const navigate = useNavigate();
+
+  // State cho bộ lọc
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState(undefined);
   const [campaignFilter, setCampaignFilter] = useState(undefined);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
-  const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 });
-  const [filterType, setFilterType] = useState("all");
-  const [grades, setGrades] = useState([]);
-  const [students, setStudents] = useState([]);
-  const [selectedStudentIds, setSelectedStudentIds] = useState([]);
-  const [createModalOpen, setCreateModalOpen] = useState(false);
-  const navigate = useNavigate();
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [filterType, setFilterType] = useState("all"); // "all" hoặc "deleted"
 
-  // Lấy danh sách campaign cho filter
+  // State quản lý Modal (đã được tối ưu)
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingRecord, setEditingRecord] = useState(null);
+
+  // Lấy danh sách chiến dịch cho bộ lọc
   useEffect(() => {
     (async () => {
       try {
-        const res = await getVaccinationCampaigns({ pageNumber: 1, pageSize: 100 });
+        const res = await getVaccinationCampaigns({ pageNumber: 1, pageSize: 10 }); // Lấy nhiều để đủ cho Select
         setCampaigns(res.data?.data || []);
       } catch {
         setCampaigns([]);
+        message.error("Không tải được danh sách chiến dịch!");
       }
     })();
   }, []);
 
-  // Lấy danh sách schedule
+  // Lấy danh sách lịch tiêm
   const fetchData = async (params = {}) => {
     setLoading(true);
     try {
-      let query = {
+      const query = {
         pageNumber: params.current || pagination.current,
         pageSize: params.pageSize || pagination.pageSize,
         searchTerm: params.searchTerm !== undefined ? params.searchTerm : searchTerm,
@@ -76,104 +64,38 @@ const VaccinationScheduleAdmin = () => {
         startDate: startDate ? startDate.toISOString() : undefined,
         endDate: endDate ? endDate.toISOString() : undefined,
       };
-      let res;
-      if (filterType === "deleted") {
-        res = await getDeletedVaccinationSchedules(query);
-      } else {
-        res = await getVaccinationSchedules(query);
-      }
+      const res =
+        filterType === "deleted" ? await getDeletedVaccinationSchedules(query) : await getVaccinationSchedules(query);
+
       setData(res.data.data || []);
       setPagination((prev) => ({
         ...prev,
         current: params.current || pagination.current,
         pageSize: params.pageSize || pagination.pageSize,
-        total: res.data.totalRecords || 100,
+        total: res.data.totalRecords || 0,
       }));
     } catch (err) {
-      message.error(err?.response?.data?.message ?? "Không tải được dữ liệu!");
+      message.error(err?.response?.data?.message ?? "Không tải được dữ liệu lịch tiêm!");
     }
     setLoading(false);
   };
 
-  // Lấy grades, students cho modal
-  const loadGrades = async () => {
-    try {
-      const res = await getGrades();
-      setGrades(res.data.data || res.data || []);
-    } catch {
-      message.error("Không tải được danh sách khối");
-    }
-  };
-  const loadStudents = async () => {
-    try {
-      const res = await getStudents();
-      setStudents(res.data.data || res.data || []);
-    } catch {
-      message.error("Không tải được danh sách học sinh");
-    }
-  };
-
+  // Trigger fetchData khi bộ lọc thay đổi
   useEffect(() => {
-    fetchData({ current: 1, searchTerm, status: statusFilter });
-    setPagination((prev) => ({ ...prev, current: 1 }));
-    loadGrades();
-    loadStudents();
-    // eslint-disable-next-line
+    fetchData({ current: 1 });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterType, statusFilter, searchTerm, campaignFilter, startDate, endDate]);
 
-  // Sửa hoặc xem detail
-  const openModal = async (record = null) => {
-    setEditing(record ? record.id : null);
-    form.resetFields();
-    if (record) {
-      try {
-        const res = await getVaccinationScheduleById(record.id);
-        const detail = res.data;
-        form.setFieldsValue({
-          vaccinationTypeId: detail.vaccinationTypeId,
-          scheduledAt: detail.scheduledAt ? dayjs(detail.scheduledAt) : null,
-          notes: detail.notes,
-        });
-        setSelectedStudentIds(detail.studentIds || []);
-      } catch {
-        message.error("Không lấy được thông tin chi tiết!");
-        return;
-      }
-    } else {
-      form.setFieldsValue(defaultForm);
-      setSelectedStudentIds([]);
-    }
-    setModalVisible(true);
+  // Hàm mở modal (dùng chung cho cả thêm mới và sửa)
+  const openModal = (record = null) => {
+    setEditingRecord(record);
+    setIsModalOpen(true);
   };
 
-  // Tạo hoặc cập nhật
-  const handleOk = async () => {
-    try {
-      const values = await form.validateFields();
-      const payload = {
-        vaccinationTypeId: values.vaccinationTypeId,
-        scheduledAt: values.scheduledAt?.toISOString(),
-        studentIds: selectedStudentIds,
-        notes: values.notes,
-      };
-      if (editing) {
-        await updateVaccinationSchedule(editing, payload);
-        message.success("Cập nhật thành công!");
-      } else {
-        await createVaccinationSchedule(payload);
-        message.success("Tạo mới thành công!");
-      }
-      setModalVisible(false);
-      fetchData();
-    } catch (err) {
-      message.error(err?.response?.data?.message ?? "Có lỗi xảy ra!");
-    }
-  };
-
-  // Xóa batch (nhiều id)
+  // Hàm xóa lịch tiêm
   const handleDelete = async (ids) => {
     try {
-      await deleteVaccinationSchedules(ids, true);
+      await deleteVaccinationSchedules(ids); // API của bạn có thể cần tham số thứ hai là `true`
       message.success("Xóa thành công!");
       fetchData();
     } catch (err) {
@@ -181,11 +103,11 @@ const VaccinationScheduleAdmin = () => {
     }
   };
 
-  // Khôi phục đã xóa
-  const handleRestore = async (ids) => {
-    if (!ids.length) return message.warning("Chọn lịch để khôi phục");
+  // Hàm khôi phục lịch tiêm
+  const handleRestore = async () => {
+    if (!selectedRowKeys.length) return message.warning("Chọn lịch để khôi phục");
     try {
-      await restoreVaccinationSchedules(ids);
+      await restoreVaccinationSchedules(selectedRowKeys);
       message.success("Khôi phục thành công!");
       setSelectedRowKeys([]);
       fetchData();
@@ -194,14 +116,27 @@ const VaccinationScheduleAdmin = () => {
     }
   };
 
-  // Thay đổi trạng thái
-  const handleUpdateStatus = async (ids, status) => {
-    try {
-      await updateStatusVaccinationSchedules(ids, status);
-      message.success("Cập nhật trạng thái thành công!");
-      fetchData();
-    } catch (err) {
-      message.error(err?.response?.data?.message ?? "Cập nhật trạng thái thất bại!");
+  // Hàm xóa bộ lọc
+  const handleClearFilter = () => {
+    setSearchTerm("");
+    setStatusFilter(undefined);
+    setCampaignFilter(undefined);
+    setStartDate(null);
+    setEndDate(null);
+    // Nếu đang xem "đã xóa" thì cũng chuyển về "all"
+    if (filterType === "deleted") {
+      setFilterType("all");
+    }
+  };
+
+  // Hàm chuyển đổi chế độ xem (tất cả / đã xóa)
+  const handleSetFilterType = (type) => {
+    if (filterType !== type) {
+      setFilterType(type);
+      handleClearFilter(); // Xóa các bộ lọc khác khi chuyển tab
+      setFilterType(type); // Gán lại vì handleClearFilter đã reset
+    } else {
+      setFilterType("all"); // Nhấn lần nữa để quay về
     }
   };
 
@@ -211,7 +146,7 @@ const VaccinationScheduleAdmin = () => {
       title: "Thời gian dự kiến",
       dataIndex: "scheduledAt",
       key: "scheduledAt",
-      render: (v) => (v ? dayjs(v).format("DD/MM/YYYY HH:mm") : ""),
+      render: (v) => (v ? dayjs(v).format("DD/MM/YYYY HH:mm") : "N/A"),
     },
     {
       title: "Trạng thái",
@@ -219,11 +154,11 @@ const VaccinationScheduleAdmin = () => {
       key: "scheduleStatus",
       render: (status) => {
         const option = statusOptions.find((s) => s.value === status);
-        return <Tag color={option?.color}>{option?.label}</Tag>;
+        return <Tag color={option?.color}>{option?.label || "Không xác định"}</Tag>;
       },
     },
     { title: "Tổng HS", dataIndex: "totalStudents", key: "totalStudents" },
-    { title: "Hoàn thành", dataIndex: "completedRecords", key: "completedRecords" },
+    { title: "Đã tiêm", dataIndex: "completedRecords", key: "completedRecords" },
     {
       title: "Thao tác",
       key: "actions",
@@ -232,29 +167,32 @@ const VaccinationScheduleAdmin = () => {
           <Button type="link" onClick={() => navigate(`/admin/manage-vaccinationSchedule/${record.id}`)}>
             Chi tiết
           </Button>
-          <Button type="link" onClick={() => openModal(record)}>
-            Sửa
-          </Button>
-          <Popconfirm title="Xác nhận xóa lịch tiêm này?" onConfirm={() => handleDelete([record.id])}>
-            <Button type="link" danger>
-              Xóa
-            </Button>
-          </Popconfirm>
+          {filterType !== "deleted" && (
+            <>
+              <Button type="link" onClick={() => openModal(record)}>
+                Sửa
+              </Button>
+              <Popconfirm title="Xác nhận xóa lịch tiêm này?" onConfirm={() => handleDelete([record.id])}>
+                <Button type="link" danger>
+                  Xóa
+                </Button>
+              </Popconfirm>
+            </>
+          )}
         </Space>
       ),
     },
   ];
 
   const handleTableChange = (pag) => {
-    setPagination(pag);
-    fetchData({ current: pag.current, pageSize: pag.pageSize, searchTerm, status: statusFilter });
+    fetchData({ current: pag.current, pageSize: pag.pageSize });
   };
 
   return (
     <div style={{ margin: "0 24px" }}>
       <Space style={{ marginBottom: 16, flexWrap: "wrap" }}>
         <Input
-          placeholder="Tìm lịch tiêm"
+          placeholder="Tìm lịch tiêm..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           style={{ width: 180 }}
@@ -262,52 +200,41 @@ const VaccinationScheduleAdmin = () => {
         />
         <Select
           allowClear
-          placeholder="Chiến dịch"
-          style={{ width: 180 }}
+          placeholder="Lọc theo chiến dịch"
+          style={{ width: 220 }}
           value={campaignFilter}
           onChange={setCampaignFilter}
           options={campaigns.map((x) => ({ value: x.id, label: x.name }))}
           showSearch
+          filterOption={(input, option) => (option?.label ?? "").toLowerCase().includes(input.toLowerCase())}
         />
         <DatePicker allowClear placeholder="Từ ngày" style={{ width: 140 }} value={startDate} onChange={setStartDate} />
         <DatePicker allowClear placeholder="Đến ngày" style={{ width: 140 }} value={endDate} onChange={setEndDate} />
         <Select
           allowClear
-          placeholder="Trạng thái"
+          placeholder="Lọc trạng thái"
           style={{ width: 140 }}
           value={statusFilter}
           onChange={setStatusFilter}
           options={statusOptions}
         />
-        <Button
-          type="primary"
-          onClick={() => {
-            setSearchTerm("");
-            setStatusFilter(undefined);
-            setCampaignFilter(undefined);
-            setStartDate(null);
-            setEndDate(null);
-            setFilterType("all");
-            setPagination((prev) => ({ ...prev, current: 1 }));
-          }}
-        >
-          Xóa lọc
-        </Button>
-        <Button
-          type={filterType === "deleted" ? "primary" : "default"}
-          onClick={() => setFilterType((prev) => (prev === "deleted" ? "all" : "deleted"))}
-        >
-          Xem lịch đã xóa
-        </Button>
-        <Button type="primary" disabled={filterType === "deleted"} onClick={() => setCreateModalOpen(true)}>
+        <Button onClick={handleClearFilter}>Xóa lọc</Button>
+      </Space>
+
+      <Space style={{ marginBottom: 16, flexWrap: "wrap" }}>
+        <Button type="primary" disabled={filterType === "deleted"} onClick={() => openModal(null)}>
           Thêm mới lịch tiêm
         </Button>
+        <Button type={filterType === "deleted" ? "primary" : "default"} onClick={() => handleSetFilterType("deleted")}>
+          Xem lịch đã xóa
+        </Button>
         {filterType === "deleted" && (
-          <Button onClick={() => handleRestore(selectedRowKeys)} disabled={!selectedRowKeys.length} type="primary">
+          <Button onClick={handleRestore} disabled={!selectedRowKeys.length} type="primary">
             Khôi phục đã chọn
           </Button>
         )}
       </Space>
+
       <Table
         rowKey="id"
         loading={loading}
@@ -315,21 +242,17 @@ const VaccinationScheduleAdmin = () => {
         dataSource={data}
         pagination={pagination}
         onChange={handleTableChange}
-        rowSelection={
-          filterType === "deleted"
-            ? {
-                selectedRowKeys,
-                onChange: setSelectedRowKeys,
-              }
-            : undefined
-        }
+        rowSelection={filterType === "deleted" ? { selectedRowKeys, onChange: setSelectedRowKeys } : undefined}
       />
 
-      {/* Modal thêm/sửa lịch tiêm */}
-      <VaccinationScheduleCreateModal
-        visible={createModalOpen}
-        onClose={() => setCreateModalOpen(false)}
-        onCreated={fetchData}
+      <VaccinationScheduleModal
+        visible={isModalOpen}
+        editingRecord={editingRecord}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={() => {
+          setIsModalOpen(false);
+          fetchData();
+        }}
       />
     </div>
   );
