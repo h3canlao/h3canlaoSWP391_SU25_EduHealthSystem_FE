@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Card, Descriptions, Spin, Alert, Typography, Button, Space, Tag, Modal, Form, Input, message } from "antd";
 import { CheckCircleOutlined, CloseCircleOutlined, LoadingOutlined } from "@ant-design/icons";
 import axios from "axios";
@@ -59,6 +59,7 @@ const CheckupScheduleDetail = () => {
       setLoading(false);
     }
   };
+  const navigate = useNavigate();
 
   const handleUpdateStatus = (status) => {
     setNewStatus(status);
@@ -112,6 +113,7 @@ const CheckupScheduleDetail = () => {
       <Title level={2}>Chi tiết Lịch khám</Title>
       <Card
         title="Thông tin Lịch khám"
+        extra={<Button onClick={() => navigate(-1)}>Quay lại</Button>}
         bordered={false}
         // actions={[
         //   <Space>
