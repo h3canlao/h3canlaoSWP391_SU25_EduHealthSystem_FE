@@ -68,8 +68,9 @@ import CheckupScheduleAdmin from "./pages/Admin/CheckupSchedule/CheckupScheduleA
 import GeneralDashboard from "./pages/Admin/GeneralDashboard";
 import UserManagement from "./pages/Admin/Features/ManageUser";
 import CheckupScheduleDetail from "./pages/Admin/CheckupSchedule/CheckupScheduleDetail";
-
+import Blog from "./pages/Blog";
 import Homepage from "./pages/Homepage";
+
 
 const Router = () => {
   return (
@@ -81,6 +82,8 @@ const Router = () => {
         <Route path="/forget-password" element={<ForgetPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/confirm-email" element={<ConfirmEmail />} />
+        <Route path="/blog" element={<Blog />} />
+        {/* Default route to redirect to homepage */}
 
         {/* Parents Routes */}
         <Route

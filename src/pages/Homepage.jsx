@@ -32,6 +32,30 @@ const Header = () => {
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
         <img src={logoImg} alt="EduHealth Logo" style={{ height: 48, marginRight: 16 }} />
         <Typography variant="h5" sx={{ fontWeight: 700, color: '#1890ff' }}>EduHealth System</Typography>
+        <Button
+          variant="contained"
+          color="secondary"
+          sx={{
+            borderRadius: 25,
+            fontWeight: 700,
+            px: 4,
+            py: 1.2,
+            fontSize: 16,
+            boxShadow: '0 2px 8px rgba(0,188,212,0.10)',
+            background: 'linear-gradient(90deg,#1976d2 0%,#00bcd4 100%)',
+            color: '#fff',
+            textTransform: 'none',
+            ml: 3,
+            transition: '0.2s',
+            '&:hover': {
+              background: 'linear-gradient(90deg,#1565c0 0%,#0097a7 100%)',
+              color: '#fff',
+            },
+          }}
+          onClick={() => navigate("/blog")}
+        >
+          About Us
+        </Button>
       </Box>
       <Button
         variant="contained"
@@ -114,74 +138,99 @@ const Homepage = () => {
         <Box
           className="hero-section"
           sx={{
-            py: { xs: 6, md: 10 },
-            background: 'linear-gradient(90deg, #e0f7fa 0%, #fff 100%)',
-            display: 'block',
-            px: 2,
+            minHeight: { xs: 400, md: 600 },
+            width: '100%',
+            position: 'relative',
+            background: '#fff',
+            overflow: 'hidden',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-start',
           }}
         >
+          {/* Background image */}
+          <img
+            src={schoolHealthImg}
+            alt="Y tế học đường"
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: 'left center',
+              zIndex: 1,
+            }}
+          />
+          {/* Text content - align left, no box */}
           <Box
             sx={{
-              maxWidth: 1200,
-              width: '100%',
-              mx: 'auto',
-              display: { xs: 'block', md: 'flex' },
-              alignItems: 'center',
-              gap: 6,
+              position: 'relative',
+              zIndex: 2,
+              px: { xs: 2, md: 10 },
+              py: { xs: 6, md: 0 },
+              maxWidth: 700,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: { xs: 'center', md: 'flex-start' },
+              background: 'none',
+              boxShadow: 'none',
+              borderRadius: 0,
             }}
           >
-            <Box
+            <Typography
               sx={{
-                flex: '0 0 420px',
-                maxWidth: 480,
-                width: { xs: '100%', md: 420 },
-                mb: { xs: 4, md: 0 },
-                mr: { md: 6 },
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <img
-                src={schoolHealthImg}
-                alt="Y tế học đường"
-                style={{ width: '100%', borderRadius: 24, boxShadow: '0 8px 32px rgba(0,0,0,0.10)' }}
-              />
-            </Box>
-            <Box
-              sx={{
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: { xs: 'center', md: 'flex-start' },
+                fontFamily: '"Montserrat", "Arial", sans-serif',
+                fontWeight: 700,
+                color: '#1836a8',
+                mb: 2,
                 textAlign: { xs: 'center', md: 'left' },
+                fontSize: { xs: '2.5rem', md: '3.5rem' },
+                lineHeight: 1.1,
+                letterSpacing: '-2px',
               }}
             >
-              <Typography variant="h3" sx={{ fontWeight: 700, mb: 2, color: '#1890ff' }}>
-                EduHealth System
-              </Typography>
-              <Typography variant="h5" sx={{ mb: 3, color: '#333', lineHeight: 1.6 }}>
-                EduHealth System là nền tảng quản lý sức khỏe học đường thông minh, số hóa toàn bộ quy trình chăm sóc sức khỏe trong trường học. Kết nối phụ huynh, nhân viên y tế và nhà trường trên một hệ thống thống nhất, nâng cao hiệu quả quản lý, lưu trữ dữ liệu và đảm bảo an toàn sức khỏe học sinh.
-              </Typography>
-              <Box mt={3} sx={{ display: 'flex', gap: 2, justifyContent: { xs: 'center', md: 'flex-start' } }}>
-
-                {/* <StyledButton
-                  variant="outlined"
-                  color="primary"
-                  onClick={() => navigate("/signin")}
-                >
-                  Đăng nhập
-                </StyledButton> */}
-              </Box>
-            </Box>
+              EduHealth System
+            </Typography>
+            <Typography
+              sx={{
+                fontFamily: '"Montserrat", "Arial", sans-serif',
+                fontWeight: 400,
+                color: '#222',
+                textAlign: { xs: 'center', md: 'left' },
+                fontSize: { xs: '1.1rem', md: '1.25rem' },
+                maxWidth: 520,
+                mb: 3,
+              }}
+            >
+              EduHealth System là nền tảng quản lý sức khỏe học đường thông minh, số hóa toàn bộ quy trình chăm sóc sức khỏe trong trường học. Kết nối phụ huynh, nhân viên y tế và nhà trường trên một hệ thống thống nhất, nâng cao hiệu quả quản lý, lưu trữ dữ liệu và đảm bảo an toàn sức khỏe học sinh.
+            </Typography>
+            <StyledButton
+              variant="contained"
+              color="primary"
+              sx={{
+                mt: 2,
+                px: 4,
+                py: 1.5,
+                fontSize: 18,
+                borderRadius: 3,
+                fontFamily: '"Montserrat", "Arial", sans-serif',
+                fontWeight: 500,
+              }}
+              endIcon={<ArrowForwardIosIcon />}
+              onClick={() => navigate("/signin")}
+            >
+              Đăng nhập
+            </StyledButton>
           </Box>
         </Box>
 
         {/* Features Section */}
-        <Box className="features-section" sx={{ py: { xs: 6, md: 10 } }}>
-          <Container>
-            <Grid container spacing={6}>
+        <Box className="features-section" sx={{ py: { xs: 6, md: 10 }, display: 'flex', justifyContent: 'center' }}>
+          <Container sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Grid container spacing={6} justifyContent="center">
               <Grid item xs={12} md={4}>
                 <Box sx={{ textAlign: "center" }}>
                   <Typography variant="h3" sx={{ color: '#00bcd4', fontWeight: 700 }}>10,000+</Typography>
@@ -201,19 +250,23 @@ const Homepage = () => {
                 </Box>
               </Grid>
             </Grid>
-            <Grid container spacing={4} sx={{ mt: 4 }}>
+            <Grid container spacing={4} sx={{ mt: 4 }} justifyContent="center" alignItems="center">
               <Grid item xs={12} md={6}>
                 <Box sx={{ textAlign: "center" }}>
                   <img
                     src={chatDemoImg}
                     alt="Demo"
-                    style={{ maxWidth: 260, borderRadius: 16, boxShadow: '0 4px 16px rgba(0,0,0,0.06)' }}
+                    style={{
+                      maxWidth: 450,
+                      borderRadius: 16,
+                      boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
+                    }}
                   />
                 </Box>
               </Grid>
               <Grid item xs={12} md={6}>
                 <Box>
-                  <Typography variant="subtitle2" color="primary" sx={{ mb: 1, fontWeight: 700 }}>
+                  <Typography variant="subtitle2" color="primary" sx={{ mb: 1, fontWeight: 700, textAlign: 'center' }}>
                     Tính năng nổi bật
                   </Typography>
                   <ul style={{ listStyle: "none", padding: 0 }}>
@@ -241,20 +294,20 @@ const Homepage = () => {
         </Box>
 
         {/* Success Stats Section */}
-        <Box className="success-section" sx={{ py: { xs: 6, md: 10 }, background: 'linear-gradient(90deg, #fff 0%, #e0f7fa 100%)' }}>
-          <Container>
-            <Grid container spacing={4} alignItems="center">
+        <Box className="success-section" sx={{ py: { xs: 6, md: 10 }, background: 'linear-gradient(90deg, #fff 0%, #e0f7fa 100%)', display: 'flex', justifyContent: 'center' }}>
+          <Container sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Grid container spacing={4} alignItems="center" justifyContent="center">
               <Grid item xs={12} md={6}>
-                <Typography variant="subtitle1" sx={{ color: "#00bcd4", fontWeight: 700, mb: 1 }}>
+                <Typography variant="subtitle1" sx={{ color: "#00bcd4", fontWeight: 700, mb: 1, textAlign: 'center' }}>
                   Vì sao chọn EduHealth?
                 </Typography>
-                <Typography variant="h4" sx={{ fontWeight: 700, mb: 2 }}>
+                <Typography variant="h4" sx={{ fontWeight: 700, mb: 2, textAlign: 'center' }}>
                   Đảm bảo sức khỏe học đường toàn diện
                 </Typography>
-                <Typography variant="body1" sx={{ mb: 4 }}>
+                <Typography variant="body1" sx={{ mb: 4, textAlign: 'center' }}>
                   Hệ thống đã giúp hàng ngàn phụ huynh yên tâm hơn về sức khỏe của con em mình khi đến trường.
                 </Typography>
-                <Box sx={{ display: "flex", gap: 6, mb: 2 }}>
+                <Box sx={{ display: "flex", gap: 6, mb: 2, justifyContent: 'center' }}>
                   <Box sx={{ textAlign: "center" }}>
                     <Typography variant="h3" sx={{ color: "#00bcd4", fontWeight: 700 }}>4x ↑</Typography>
                     <Typography sx={{ fontWeight: 500 }}>Tăng khả năng phát hiện sớm vấn đề sức khỏe</Typography>
@@ -285,7 +338,7 @@ const Homepage = () => {
                 </IconButton>
               </Box>
             </Box>
-            <Box sx={{ display: "flex", flexDirection: "row", gap: 4, overflowX: "auto", pb: 2 }}>
+            <Box sx={{ display: "flex", flexDirection: "row", gap: 4, overflow: "auto", pb: 2 }}>
               {testimonials.map((testimonial, index) => (
                 <Card
                   key={index}
@@ -383,4 +436,4 @@ const Homepage = () => {
   );
 };
 
-export default Homepage; 
+export default Homepage;
