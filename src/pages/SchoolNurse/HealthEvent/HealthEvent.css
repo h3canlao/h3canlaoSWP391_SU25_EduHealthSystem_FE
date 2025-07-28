@@ -1,0 +1,235 @@
+.health-event {
+  padding: 24px;
+  background-color: #f5f7fa;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.health-event-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(79, 195, 247, 0.08);
+  padding: 32px;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.health-event-form-container {
+  max-width: 800px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(79, 195, 247, 0.08);
+  padding: 32px;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.health-event-title {
+  text-align: center;
+  color: #4FC3F7;
+  margin-bottom: 24px;
+}
+
+/* Tabs styling */
+.health-event .ant-tabs-tab {
+  font-weight: 500;
+  font-size: 16px;
+  padding: 12px 16px;
+}
+
+.health-event .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: #4FC3F7;
+  font-weight: 600;
+}
+
+.health-event .ant-tabs-ink-bar {
+  background: #4FC3F7;
+  height: 3px;
+  border-radius: 3px;
+}
+
+/* Card styling */
+.health-event-card {
+  transition: all 0.3s ease;
+  border: 1px solid #e8e8e8;
+  margin-bottom: 16px;
+  border-radius: 12px;
+}
+
+.health-event-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+  border-color: #4FC3F7;
+}
+
+/* Form styling */
+.health-event .ant-form-item-label > label {
+  font-weight: 500;
+  color: #333;
+}
+
+.health-event .ant-input,
+.health-event .ant-select-selector,
+.health-event .ant-picker {
+  border-radius: 8px;
+  border: 1px solid #e8e8e8;
+}
+
+.health-event .ant-input:hover,
+.health-event .ant-select-selector:hover,
+.health-event .ant-picker:hover {
+  border-color: #4FC3F7;
+}
+
+.health-event .ant-input:focus,
+.health-event .ant-select-selector:focus,
+.health-event .ant-picker-focused {
+  border-color: #4FC3F7;
+  box-shadow: 0 0 0 2px rgba(79, 195, 247, 0.2);
+}
+
+/* Button styling */
+.health-event .ant-btn {
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.health-event .ant-btn-primary {
+  background: linear-gradient(135deg, #4FC3F7 0%, #29B6F6 100%);
+  border: none;
+  box-shadow: 0 2px 4px rgba(79, 195, 247, 0.3);
+}
+
+.health-event .ant-btn-primary:hover {
+  background: linear-gradient(135deg, #29B6F6 0%, #039BE5 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(79, 195, 247, 0.4);
+}
+
+.health-event .ant-btn-dashed {
+  border-color: #4FC3F7;
+  color: #4FC3F7;
+}
+
+.health-event .ant-btn-dashed:hover {
+  border-color: #29B6F6;
+  color: #29B6F6;
+}
+
+/* Tags styling */
+.health-event .ant-tag {
+  border-radius: 6px;
+  font-weight: 500;
+  padding: 4px 8px;
+}
+
+/* Steps styling */
+.health-event .ant-steps-item-process .ant-steps-item-icon {
+  background: #4FC3F7;
+  border-color: #4FC3F7;
+}
+
+.health-event .ant-steps-item-finish .ant-steps-item-icon {
+  border-color: #4FC3F7;
+}
+
+.health-event .ant-steps-item-finish .ant-steps-icon {
+  color: #4FC3F7;
+}
+
+.health-event .ant-steps-item-finish .ant-steps-item-tail::after {
+  background-color: #4FC3F7;
+}
+
+/* Table styling */
+.health-event .ant-table {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.health-event .ant-table-thead > tr > th {
+  background: #f0f9ff;
+  color: #333;
+  font-weight: 600;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .health-event {
+    padding: 16px;
+  }
+  
+  .health-event-container,
+  .health-event-form-container {
+    padding: 20px;
+  }
+  
+  .health-event-title {
+    margin-bottom: 16px;
+  }
+}
+
+@media (max-width: 576px) {
+  .health-event {
+    padding: 12px;
+  }
+  
+  .health-event-container,
+  .health-event-form-container {
+    padding: 16px;
+  }
+}
+
+/* Remove button styling */
+.health-event .remove-btn {
+  color: #ff4d4f;
+  background: #fff;
+  border-color: #ff4d4f;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+}
+
+.health-event .remove-btn:hover {
+  color: #fff;
+  background: #ff4d4f;
+  border-color: #ff4d4f;
+}
+
+/* Custom scrollbar */
+.health-event::-webkit-scrollbar {
+  width: 6px;
+}
+
+.health-event::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.health-event::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.health-event::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+} 

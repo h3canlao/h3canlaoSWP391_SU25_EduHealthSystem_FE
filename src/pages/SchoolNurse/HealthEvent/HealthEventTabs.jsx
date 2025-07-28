@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Tabs, Table, Typography, Tag, Spin, message, Input } from "antd";
 import { getHealthEvents } from "@/services/apiServices";
 import HealthEventForm from "./HealthEventForm";
+import "./HealthEvent.css";
 
 const { Title } = Typography;
 
@@ -82,37 +83,41 @@ export default function HealthEventTabs() {
   ];
 
   return (
-    <div style={{ maxWidth: 1200, width:1200, margin: "0 auto", background: "#fff", borderRadius: 16, boxShadow: "0 2px 12px rgba(79,195,247,0.08)", padding: 32 }}>
-      <Title level={3} style={{ color: "#4FC3F7", marginBottom: 24 }}>Quản lý sự kiện y tế</Title>
-      <Tabs defaultActiveKey="1" items={[
-        {
-          key: "1",
-          label: "Danh sách sự kiện",
-          children: loading ? <Spin /> : (
-            <>
-              <Input
-                placeholder="Tìm kiếm tên học sinh..."
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-                style={{ marginBottom: 20, maxWidth: 350 }}
-                allowClear
-              />
-              <Table
-                columns={columns}
-                dataSource={filteredEvents}
-                rowKey="id"
-                pagination={{ pageSize: 8 }}
-                bordered
-              />
-            </>
-          )
-        },
-        {
-          key: "2",
-          label: "Tạo sự kiện mới",
-          children: <HealthEventForm />
-        }
-      ]} />
+    <div className="health-event">
+      <div className="health-event-container">
+        <Title level={3} className="health-event-title">Quản lý sự kiện y tế</Title>
+        <Tabs defaultActiveKey="1" items={[
+          {
+            key: "1",
+            label: "Danh sách sự kiện",
+            children: loading ? <Spin /> : (
+              <>
+                <Input
+                  placeholder="Tìm kiếm tên học sinh..."
+                  value={searchTerm}
+                  onChange={e => setSearchTerm(e.target.value)}
+                  style={{ marginBottom: 20, maxWidth: 350 }}
+                  allowClear
+                />
+                <Table
+                  columns={columns}
+                  dataSource={filteredEvents}
+                  rowKey="id"
+                  pagination={{ pageSize: 8 }}
+                  bordered
+                  className="health-event-table"
+                  rowClassName="health-event-row"
+                />
+              </>
+            )
+          },
+          {
+            key: "2",
+            label: "Tạo sự kiện mới",
+            children: <HealthEventForm />
+          }
+        ]} />
+      </div>
     </div>
   );
 } 

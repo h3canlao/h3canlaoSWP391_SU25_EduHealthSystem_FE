@@ -105,7 +105,7 @@ const CounselingAppointments = () => {
                       <FaUser className="info-icon" />
                       <div className="info-content">
                         <span className="label">Học sinh:</span>
-                        <span className="value">{app.studentId}</span>
+                        <span className="value">{app.studentName}</span>
                       </div>
                     </div>
                   </div>

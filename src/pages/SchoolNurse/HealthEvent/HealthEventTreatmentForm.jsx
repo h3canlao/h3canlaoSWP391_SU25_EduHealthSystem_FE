@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Button, Select, InputNumber, Typography, message, Spin, Space } from "antd";
+import { Form, Input, Button, Select, InputNumber, Typography, message, Spin, Row, Col } from "antd";
+import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import { getMedicalSupplyLots, updateHealthEventTreatment } from "@/services/apiServices";
+import "./HealthEvent.css";
 
 const { Title } = Typography;
 
@@ -29,80 +31,114 @@ export default function HealthEventTreatmentForm({ healthEventId, onFinish }) {
           notes: item.notes || ""
         }))
       };
-      await updateHealthEventTreatment(payload);
-      message.success("Cập nhật điều trị thành công!");
+      const response = await updateHealthEventTreatment(payload);
       if (onFinish) onFinish();
     } catch (e) {
-      message.error("Cập nhật điều trị thất bại!");
+      const errorMessage = e.response?.data?.message || "Cập nhật điều trị thất bại!";
+      message.error(errorMessage);
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <div style={{ maxWidth: 800, margin: "0 auto", background: "#fff", borderRadius: 16, boxShadow: "0 2px 12px rgba(79,195,247,0.08)", padding: 32 }}>
-      <Title level={4} style={{ textAlign: "center", color: "#4FC3F7" }}>Khai báo vật tư y tế sử dụng</Title>
-      {loading ? <Spin /> : (
-        <Form form={form} layout="vertical" onFinish={handleFinish} initialValues={{ supplyUsages: [{}] }}>
+    <div className="health-event">
+      <Title level={4} className="health-event-title">Khai báo vật tư y tế sử dụng</Title>
+      {loading ? <Spin size="large" className="health-event-loading" /> : (
+        <Form 
+          form={form} 
+          layout="vertical" 
+          onFinish={handleFinish} 
+          initialValues={{ supplyUsages: [{}] }}
+          className="health-event-form"
+        >
           <Form.List name="supplyUsages">
             {(fields, { add, remove }) => (
               <>
                 {fields.map((field, idx) => (
-                  <Space key={field.key} align="baseline" style={{ display: "flex", marginBottom: 8, width: '100%', gap: 8 }}>
-                    <Form.Item
-                      {...field}
-                      name={[field.name, "medicalSupplyLotId"]}
-                      fieldKey={[field.fieldKey, "medicalSupplyLotId"]}
-                      rules={[{ required: true, message: "Chọn vật tư" }]}
-                      style={{ flex: 2, minWidth: 220, marginBottom: 0 }}
-                    >
-                      <Select
-                        placeholder="Chọn vật tư y tế"
-                        showSearch
-                        filterOption={(input, option) =>
-                          (option?.children || "").toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').includes(
-                            input.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '')
-                          )
-                        }
-                      >
-                        {lots.map(lot => (
-                          <Select.Option key={lot.id} value={lot.id}>
-                            {lot.medicalSupplyName} ({lot.lotNumber})
-                          </Select.Option>
-                        ))}
-                      </Select>
-                    </Form.Item>
-                    <Form.Item
-                      {...field}
-                      name={[field.name, "quantityUsed"]}
-                      fieldKey={[field.fieldKey, "quantityUsed"]}
-                      rules={[{ required: true, message: "Nhập số lượng" }]}
-                      style={{ flex: 1, minWidth: 100, marginBottom: 0 }}
-                    >
-                      <InputNumber min={1} placeholder="Số lượng" style={{ width: "100%" }} />
-                    </Form.Item>
-                    <Form.Item
-                      {...field}
-                      name={[field.name, "notes"]}
-                      fieldKey={[field.fieldKey, "notes"]}
-                      style={{ flex: 2, minWidth: 180, marginBottom: 0 }}
-                    >
-                      <Input placeholder="Ghi chú" />
-                    </Form.Item>
-                    {/* Ẩn nút xóa ở dòng cuối cùng (dòng đang nhập mới) */}
-                    {fields.length > 1 && idx !== fields.length - 1 && (
-                      <Button danger onClick={() => remove(field.name)}>-</Button>
-                    )}
-                  </Space>
+                  <div className="health-event-card" key={field.key}>
+                    <Row gutter={16} align="middle">
+                      <Col xs={24} sm={24} md={10} lg={10}>
+                        <Form.Item
+                          {...field}
+                          name={[field.name, "medicalSupplyLotId"]}
+                          fieldKey={[field.fieldKey, "medicalSupplyLotId"]}
+                          rules={[{ required: true, message: "Chọn vật tư" }]}
+                          label="Vật tư y tế"
+                        >
+                          <Select
+                            placeholder="Chọn vật tư y tế"
+                            showSearch
+                            filterOption={(input, option) =>
+                              (option?.children || "").toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').includes(
+                                input.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '')
+                              )
+                            }
+                          >
+                            {lots.map(lot => (
+                              <Select.Option key={lot.id} value={lot.id}>
+                                {lot.medicalSupplyName} ({lot.lotNumber})
+                              </Select.Option>
+                            ))}
+                          </Select>
+                        </Form.Item>
+                      </Col>
+                      <Col xs={12} sm={8} md={4} lg={4}>
+                        <Form.Item
+                          {...field}
+                          name={[field.name, "quantityUsed"]}
+                          fieldKey={[field.fieldKey, "quantityUsed"]}
+                          rules={[{ required: true, message: "Nhập số lượng" }]}
+                          label="Số lượng"
+                        >
+                          <InputNumber min={1} placeholder="Số lượng" style={{ width: "100%" }} />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={12} sm={16} md={8} lg={8}>
+                        <Form.Item
+                          {...field}
+                          name={[field.name, "notes"]}
+                          fieldKey={[field.fieldKey, "notes"]}
+                          label="Ghi chú"
+                        >
+                          <Input placeholder="Ghi chú" />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} sm={24} md={2} lg={2} style={{ textAlign: "center", marginTop: idx === 0 ? 29 : 0 }}>
+                        {idx > 0 && (
+                          <Button 
+                            type="text"
+                            danger
+                            icon={<MinusCircleOutlined />} 
+                            onClick={() => remove(field.name)}
+                            className="remove-btn"
+                          />
+                        )}
+                      </Col>
+                    </Row>
+                  </div>
                 ))}
                 <Form.Item>
-                  <Button type="dashed" onClick={() => add()} block>+ Thêm vật tư</Button>
+                  <Button 
+                    type="dashed" 
+                    onClick={() => add()} 
+                    block 
+                    icon={<PlusOutlined />}
+                  >
+                    Thêm vật tư
+                  </Button>
                 </Form.Item>
               </>
             )}
           </Form.List>
           <Form.Item>
-            <Button type="primary" htmlType="submit" loading={submitting} block>
+            <Button 
+              type="primary" 
+              htmlType="submit" 
+              loading={submitting} 
+              block
+              size="large"
+            >
               Lưu điều trị
             </Button>
           </Form.Item>

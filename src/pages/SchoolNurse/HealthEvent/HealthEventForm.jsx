@@ -3,6 +3,7 @@ import { Form, Input, Button, Select, DatePicker, Typography, message, Spin, Ste
 import { PlusCircleOutlined } from "@ant-design/icons";
 import { getAllStudents, createHealthEvent } from "@/services/apiServices";
 import HealthEventTreatmentForm from "./HealthEventTreatmentForm";
+import "./HealthEvent.css";
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -71,18 +72,18 @@ export default function HealthEventForm() {
   };
 
   return (
-    <div style={{ maxWidth: 800, width:800, margin: "0 auto", background: "#fff", borderRadius: 16, boxShadow: "0 2px 12px rgba(79,195,247,0.08)", padding: 32 }}>
-      <Steps current={step} style={{ marginBottom: 32 }}>
+    <div className="health-event-form-container">
+      <Steps current={step} className="health-event-steps" style={{ marginBottom: 32 }}>
         <Steps.Step title="Khai báo sự kiện" />
         <Steps.Step title="Vật tư y tế sử dụng" />
       </Steps>
       {step === 0 && (
         <>
-          <Title level={3} style={{ textAlign: "center", color: "#4FC3F7" }}>
+          <Title level={3} className="health-event-title">
             <PlusCircleOutlined /> Khai báo sự kiện y tế
           </Title>
           {loading ? <Spin /> : (
-            <Form layout="vertical" onFinish={onFinish}>
+            <Form layout="vertical" onFinish={onFinish} className="health-event-form">
               <Form.Item label="Học sinh" name="studentId" rules={[{ required: true, message: "Chọn học sinh" }]}> 
                 <Select
                   placeholder="Chọn học sinh"
