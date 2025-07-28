@@ -113,6 +113,7 @@ const Router = () => {
             </ProtectedRoute>
           }
         >
+          <Route index element={<GeneralDashboard />} />
           <Route path="dashboard" element={<GeneralDashboard />} />
           <Route path="manage-users" element={<ManageUser />} />
           <Route path="manage-medication" element={<MedicationManager />} />

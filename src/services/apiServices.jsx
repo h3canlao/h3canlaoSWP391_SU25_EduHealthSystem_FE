@@ -9,8 +9,8 @@ const getAuthHeaders = () => {
 };
 
 // Đăng nhập
-const postSignin = async (email, password) => {
-  return axios.post(`${BASE_URL}/Auth/login`, { email, password });
+const postSignin = async (login, password) => {
+  return axios.post(`${BASE_URL}/Auth/login`, { login, password });
 };
 
 // Đăng ký phụ huynh
@@ -154,7 +154,7 @@ const updateMedicationDeliveryStatus = async (parentMedicationDeliveryId, status
 
 // Lấy danh sách lịch khám sức khỏe
 const getCheckupSchedules = async () => {
-  return axios.get(`${BASE_URL}/CheckupSchedule`, {
+  return axios.get(`${BASE_URL}/CheckupSchedule?pageNumber=1&pageSize=50`, {
     headers: getAuthHeaders()
   });
 };
@@ -264,7 +264,7 @@ export const getVaccinationSchedulesMyChildren = () =>
 
 // Lấy danh sách lô vật tư y tế
 const getMedicalSupplyLots = async () => {
-  return axios.get(`${BASE_URL}/MedicalSupplyLot`, { headers: getAuthHeaders() });
+  return axios.get(`${BASE_URL}/MedicalSupplyLot?pageNumber=1&pageSize=50&includeDeleted=false`, { headers: getAuthHeaders() });
 };
 
 // Cập nhật điều trị cho sự kiện y tế
