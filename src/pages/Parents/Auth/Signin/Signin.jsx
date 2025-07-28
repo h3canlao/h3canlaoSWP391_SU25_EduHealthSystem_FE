@@ -54,7 +54,8 @@ export default function Signin() {
         else navigate("/");
       }
     } catch (error) {
-      toast.error(error.res?.data?.message || 'An error occurred during registration!');
+      const errorMessage = error?.response?.data?.message || 'An error occurred during registration!';
+      toast.error(errorMessage);
     }
   };
 
@@ -98,12 +99,6 @@ export default function Signin() {
               />
             </Form.Item>
 
-            {/* Forgot Password Link */}
-            <div className="signin-forgot">
-              <Link onClick={() => navigate("/forget-password")}>
-                Forgot password?
-              </Link>
-            </div>
 
             {/* Submit Button */}
             <Form.Item>
@@ -122,14 +117,14 @@ export default function Signin() {
           {/* Sign Up Link */}
           <div className="signin-header">
             <Text type="secondary" className="signin-header-text">
-              Don't have an account?
+              Forget Password?
             </Text>
             <Button
               type="link"
               className="signin-signup-btn"
-              onClick={() => navigate("/register")}
+              onClick={() => navigate("/forget-password")}
             >
-              Sign up
+              Change Password
             </Button>
           </div>
 

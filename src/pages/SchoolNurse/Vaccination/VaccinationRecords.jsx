@@ -65,8 +65,8 @@ export default function VaccinationRecords() {
                   <th>Ngày tiêm</th>
                   <th>Người tiêm</th>
                   <th>Trạng thái</th>
-                  <th>Phản ứng 24h</th>
-                  <th>Phản ứng 72h</th>
+                  <th>Theo dõi 24h</th>
+                  <th>Theo dõi 72h</th>
                 </tr>
               </thead>
               <tbody>

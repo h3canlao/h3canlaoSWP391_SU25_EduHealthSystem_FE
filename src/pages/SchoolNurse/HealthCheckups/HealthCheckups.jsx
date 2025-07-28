@@ -1,26 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { getCheckupSchedules } from '../../../services/apiServices';
 import { toast } from 'react-toastify';
-import { FaCalendar, FaUser, FaClock, FaStethoscope, FaEye, FaCheck } from 'react-icons/fa';
+import { FaCalendar, FaUser, FaClock, FaStethoscope, FaEye, FaSearch } from 'react-icons/fa';
 import CheckupRecordModal from './CheckupRecordModal';
 import './HealthCheckups.css';
 
 const HealthCheckups = () => {
   const [checkupSchedules, setCheckupSchedules] = useState([]);
+  const [filteredSchedules, setFilteredSchedules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedSchedule, setSelectedSchedule] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchType, setSearchType] = useState('student'); // 'student' or 'campaign'
 
   useEffect(() => {
     fetchCheckupSchedules();
   }, []);
 
+  useEffect(() => {
+    filterSchedules();
+  }, [checkupSchedules, searchQuery, searchType]);
+
   const fetchCheckupSchedules = async () => {
     try {
       setLoading(true);
       const response = await getCheckupSchedules();
-      if (response.data.isdaccess) {
+      if (response.data.isSuccess) {
         setCheckupSchedules(response.data.data);
+        setFilteredSchedules(response.data.data);
       } else {
         toast.error('Không thể tải danh sách lịch khám');
       }
@@ -30,6 +38,36 @@ const HealthCheckups = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const filterSchedules = () => {
+    if (!searchQuery.trim()) {
+      setFilteredSchedules(checkupSchedules);
+      return;
+    }
+
+    const query = searchQuery.toLowerCase().trim();
+    const filtered = checkupSchedules.filter((schedule) => {
+      if (searchType === 'student') {
+        return schedule.studentName.toLowerCase().includes(query);
+      } else {
+        return schedule.campaignName.toLowerCase().includes(query);
+      }
+    });
+
+    setFilteredSchedules(filtered);
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleSearchTypeChange = (type) => {
+    setSearchType(type);
+  };
+
+  const handleClearSearch = () => {
+    setSearchQuery('');
   };
 
   const handleScheduleClick = (schedule) => {
@@ -72,10 +110,6 @@ const HealthCheckups = () => {
     );
   };
 
-  // Chia danh sách thành đã khám và chưa khám
-  const pendingSchedules = checkupSchedules.filter(schedule => !schedule.hasRecord);
-  const completedSchedules = checkupSchedules.filter(schedule => schedule.hasRecord);
-
   if (loading) {
     return (
       <div className="health-checkups-container">
@@ -99,21 +133,51 @@ const HealthCheckups = () => {
         </div>
       </div>
 
+      <div className="search-container">
+        <div className="search-input-wrapper">
+          <FaSearch className="search-icon" />
+          <input
+            type="text"
+            placeholder={searchType === 'student' ? "Tìm kiếm theo tên học sinh..." : "Tìm kiếm theo tên chiến dịch..."}
+            value={searchQuery}
+            onChange={handleSearchChange}
+            className="search-input"
+          />
+          {searchQuery && (
+            <button className="clear-search-btn" onClick={handleClearSearch}>
+              ×
+            </button>
+          )}
+        </div>
+        <div className="search-type-toggle">
+          <button
+            className={`toggle-btn ${searchType === 'student' ? 'active' : ''}`}
+            onClick={() => handleSearchTypeChange('student')}
+          >
+            Tên học sinh
+          </button>
+          <button
+            className={`toggle-btn ${searchType === 'campaign' ? 'active' : ''}`}
+            onClick={() => handleSearchTypeChange('campaign')}
+          >
+            Tên chiến dịch
+          </button>
+        </div>
+      </div>
+
       <div className="health-checkups-content">
-        {/* Pending Records */}
-        <h2 className="section-title">Danh sách chưa khám</h2>
-        {pendingSchedules.length === 0 ? (
+        {filteredSchedules.length === 0 ? (
           <div className="empty-state">
             <FaStethoscope className="empty-icon" />
-            <h3>Chưa có lịch khám nào</h3>
-            <p>Hiện tại chưa có lịch khám sức khỏe nào được tạo.</p>
+            <h3>Không tìm thấy lịch khám nào</h3>
+            <p>Không có lịch khám nào phù hợp với tiêu chí tìm kiếm của bạn.</p>
           </div>
         ) : (
           <div className="schedules-grid">
-            {pendingSchedules.map((schedule) => (
+            {filteredSchedules.map((schedule) => (
               <div
                 key={schedule.id}
-                className="schedule-card pending"
+                className={`schedule-card ${schedule.hasRecord ? 'completed' : 'pending'}`}
                 onClick={() => handleScheduleClick(schedule)}
               >
                 <div className="card-header">
@@ -177,7 +241,7 @@ const HealthCheckups = () => {
                 <div className="card-footer">
                   <button className="view-details-btn">
                     <FaEye />
-                    Tạo hồ sơ khám
+                    {schedule.hasRecord ? 'Xem chi tiết' : 'Tạo hồ sơ khám'}
                   </button>
                 </div>
               </div>

@@ -7,6 +7,16 @@
   padding: 0;
 }
 
+:where(.css-dev-only-do-not-override-pjilya).ant-input-affix-wrapper >input.ant-input, :where(.css-dev-only-do-not-override-pjilya).ant-input-affix-wrapper >textarea.ant-input {
+  font-size: inherit;
+  border: none !important;
+  border-radius: 0;
+  outline: none;
+  background: transparent;
+  color: inherit;
+}
+
+
 .app-container .header-container .navbar-nav .nav-link.active {
   color: #00bfff;
 }
