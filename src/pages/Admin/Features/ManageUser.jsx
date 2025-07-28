@@ -275,11 +275,11 @@ const UserManagement = () => {
       </Row>
 
       <Card
-        extra={
-          <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
-            Thêm mới
-          </Button>
-        }
+      // extra={
+      //   <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
+      //     Thêm mới
+      //   </Button>
+      // }
       >
         <Space style={{ marginBottom: 16, flexWrap: "wrap" }}>
           <Input.Search
@@ -296,7 +296,7 @@ const UserManagement = () => {
               </Option>
             ))}
           </Select>
-          <Popconfirm
+          {/* <Popconfirm
             title={`Bạn có chắc chắn muốn xóa ${selectedRowKeys.length} người dùng đã chọn?`}
             onConfirm={handleBulkDelete}
             okText="Xóa"
@@ -305,7 +305,7 @@ const UserManagement = () => {
             <Button type="primary" danger disabled={selectedRowKeys.length === 0} icon={<DeleteOutlined />}>
               Xóa đã chọn
             </Button>
-          </Popconfirm>
+          </Popconfirm> */}
         </Space>
         <Table
           rowKey="id"
