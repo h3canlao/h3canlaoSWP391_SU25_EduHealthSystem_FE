@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Card, Row, Col, Typography, Tag, Button, Spin, Empty } from "antd";
-import { ScheduleOutlined, UserOutlined, CheckCircleOutlined, ClockCircleOutlined } from "@ant-design/icons";
+import { Card, Row, Col, Typography, Tag, Button, Spin, Empty, Input } from "antd";
+import { ScheduleOutlined, UserOutlined, CheckCircleOutlined, ClockCircleOutlined, SearchOutlined } from "@ant-design/icons";
 import { getVaccinationSchedules } from "@/services/apiServices";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
@@ -15,26 +15,72 @@ const statusColor = {
 
 export default function VaccinationSchedules() {
   const [schedules, setSchedules] = useState([]);
+  const [filteredSchedules, setFilteredSchedules] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     setLoading(true);
     getVaccinationSchedules()
-      .then(res => setSchedules(res.data?.data || []))
-      .catch(() => setSchedules([]))
+      .then(res => {
+        const data = res.data?.data || [];
+        setSchedules(data);
+        setFilteredSchedules(data);
+      })
+      .catch(() => {
+        setSchedules([]);
+        setFilteredSchedules([]);
+      })
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    filterSchedules();
+  }, [searchQuery, schedules]);
+
+  const filterSchedules = () => {
+    if (!searchQuery.trim()) {
+      setFilteredSchedules(schedules);
+      return;
+    }
+
+    const query = searchQuery.toLowerCase().trim();
+    const filtered = schedules.filter((schedule) => {
+      return schedule.vaccinationTypeName.toLowerCase().includes(query);
+    });
+
+    setFilteredSchedules(filtered);
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
 
   return (
     <div style={{ maxWidth: 1200, margin: "0 auto" }}>
       <Title level={3} style={{ color: "#4FC3F7", marginBottom: 24 }}>
         <ScheduleOutlined /> Lịch tiêm chủng
       </Title>
+      
+      <div style={{ marginBottom: 24 }}>
+        <Input
+          placeholder="Tìm kiếm theo tên chiến dịch tiêm chủng..."
+          prefix={<SearchOutlined />}
+          value={searchQuery}
+          onChange={handleSearchChange}
+          allowClear
+          style={{ borderRadius: 8 }}
+          size="large"
+        />
+      </div>
+
       {loading ? <Spin /> : (
-        schedules.length === 0 ? <Empty description="Không có lịch tiêm nào" /> : (
+        filteredSchedules.length === 0 ? (
+          <Empty description={searchQuery ? "Không tìm thấy lịch tiêm nào phù hợp" : "Không có lịch tiêm nào"} />
+        ) : (
           <Row gutter={[24, 24]}>
-            {schedules.map(sch => (
+            {filteredSchedules.map(sch => (
               <Col xs={24} sm={12} md={8} key={sch.id}>
                 <Card
                   hoverable
