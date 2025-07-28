@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Form, Input, Button, Typography } from 'antd';
 import { toast } from 'react-toastify';
 import { resetPassword } from '../../../../../services/apiServices';
-import './ResetPassword.css';
+import './resetPassword.css';
 
 const { Title, Text, Link } = Typography;
 

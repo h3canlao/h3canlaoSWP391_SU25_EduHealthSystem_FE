@@ -6,83 +6,7 @@ import "./ModalStudent.css";
 import { toast } from "react-toastify";
 import Select from "react-select";
 
-const VaccineDeclarationForm = ({ studentId, onSuccess }) => {
-  const [vaccineTypes, setVaccineTypes] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [vaccineTypeId, setVaccineTypeId] = useState("");
-  const [doseNumber, setDoseNumber] = useState(1);
 
-  const vaccineOptions = vaccineTypes.map(v => ({ value: v.id, label: v.name }));
-
-  useEffect(() => {
-    const fetchVaccineTypes = async () => {
-      setLoading(true);
-      try {
-        const res = await getVaccineTypes();
-        setVaccineTypes(res.data?.data || []);
-      } catch {
-        setVaccineTypes([]);
-        toast.error("Không thể tải danh sách vắc xin!");
-      }
-      setLoading(false);
-    };
-    fetchVaccineTypes();
-  }, []);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!vaccineTypeId || !doseNumber) {
-      toast.warning("Vui lòng chọn loại vắc xin và nhập số mũi đã tiêm!");
-      return;
-    }
-    setSubmitting(true);
-    try {
-      await declareVaccination([{ 
-        studentId, 
-        vaccineTypeId, 
-        doseNumber: Number(doseNumber), 
-        administeredAt: new Date().toISOString() 
-      }]);
-      toast.success("Khai báo vắc xin thành công!");
-      setVaccineTypeId("");
-      setDoseNumber(1);
-      onSuccess?.();
-    } catch {
-      toast.error("Khai báo vắc xin thất bại!");
-    }
-    setSubmitting(false);
-  };
-
-  return (
-    <form onSubmit={handleSubmit} style={{ maxWidth: 400, margin: "0 auto", padding: 16 }}>
-      <div className="mb-3">
-        <label className="form-label">Loại vắc xin</label>
-        <Select
-          options={vaccineOptions}
-          isLoading={loading}
-          placeholder="Tìm kiếm hoặc chọn loại vắc xin..."
-          value={vaccineOptions.find(opt => opt.value === vaccineTypeId) || null}
-          onChange={opt => setVaccineTypeId(opt ? opt.value : "")}
-          isClearable
-        />
-      </div>
-      <div className="mb-3">
-        <label className="form-label">Số mũi đã tiêm</label>
-        <input
-          type="number"
-          className="form-control form-control-sm"
-          min={1}
-          value={doseNumber}
-          onChange={e => setDoseNumber(e.target.value)}
-        />
-      </div>
-      <button type="submit" className="btn btn-primary" disabled={submitting || loading} style={{ width: "100%" }}>
-        {submitting ? "Đang gửi..." : "Khai báo"}
-      </button>
-    </form>
-  );
-};
 
 const initialFormData = {
   allergies: "",
@@ -257,5 +181,83 @@ const HealthProfileForm = ({ formData, handleChange }) => (
     </div>
   </div>
 );
+
+const VaccineDeclarationForm = ({ studentId, onSuccess }) => {
+  const [vaccineTypes, setVaccineTypes] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [vaccineTypeId, setVaccineTypeId] = useState("");
+  const [doseNumber, setDoseNumber] = useState(1);
+
+  const vaccineOptions = vaccineTypes.map(v => ({ value: v.id, label: v.name }));
+
+  useEffect(() => {
+    const fetchVaccineTypes = async () => {
+      setLoading(true);
+      try {
+        const res = await getVaccineTypes();
+        setVaccineTypes(res.data?.data || []);
+      } catch {
+        setVaccineTypes([]);
+        toast.error("Không thể tải danh sách vắc xin!");
+      }
+      setLoading(false);
+    };
+    fetchVaccineTypes();
+  }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!vaccineTypeId || !doseNumber) {
+      toast.warning("Vui lòng chọn loại vắc xin và nhập số mũi đã tiêm!");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      await declareVaccination([{ 
+        studentId, 
+        vaccineTypeId, 
+        doseNumber: Number(doseNumber), 
+        administeredAt: new Date().toISOString() 
+      }]);
+      toast.success("Khai báo vắc xin thành công!");
+      setVaccineTypeId("");
+      setDoseNumber(1);
+      onSuccess?.();
+    } catch {
+      toast.error("Khai báo vắc xin thất bại!");
+    }
+    setSubmitting(false);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} style={{ maxWidth: 400, margin: "0 auto", padding: 16 }}>
+      <div className="mb-3">
+        <label className="form-label">Loại vắc xin</label>
+        <Select
+          options={vaccineOptions}
+          isLoading={loading}
+          placeholder="Tìm kiếm hoặc chọn loại vắc xin..."
+          value={vaccineOptions.find(opt => opt.value === vaccineTypeId) || null}
+          onChange={opt => setVaccineTypeId(opt ? opt.value : "")}
+          isClearable
+        />
+      </div>
+      <div className="mb-3">
+        <label className="form-label">Số mũi đã tiêm</label>
+        <input
+          type="number"
+          className="form-control form-control-sm"
+          min={1}
+          value={doseNumber}
+          onChange={e => setDoseNumber(e.target.value)}
+        />
+      </div>
+      <button type="submit" className="btn btn-primary" disabled={submitting || loading} style={{ width: "100%" }}>
+        {submitting ? "Đang gửi..." : "Khai báo"}
+      </button>
+    </form>
+  );
+};
 
 export default ModalStudent;
