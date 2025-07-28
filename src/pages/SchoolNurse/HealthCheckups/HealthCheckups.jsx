@@ -19,7 +19,7 @@ const HealthCheckups = () => {
     try {
       setLoading(true);
       const response = await getCheckupSchedules();
-      if (response.data.isSuccess) {
+      if (response.data.isdaccess) {
         setCheckupSchedules(response.data.data);
       } else {
         toast.error('Không thể tải danh sách lịch khám');
