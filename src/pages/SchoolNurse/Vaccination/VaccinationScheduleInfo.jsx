@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Card, Typography, Table, Tag, Button, Spin, Modal, message } from "antd";
-import { UserOutlined, CheckCircleOutlined, ClockCircleOutlined, FormOutlined, MedicineBoxOutlined, ArrowLeftOutlined } from "@ant-design/icons";
-import { getVaccinationScheduleDetail, createVaccinationRecord } from "@/services/apiServices";
+import { UserOutlined, CheckCircleOutlined, ClockCircleOutlined, FormOutlined, MedicineBoxOutlined, ArrowLeftOutlined, EditOutlined } from "@ant-design/icons";
+import { getVaccinationScheduleDetail, createVaccinationRecord, updateVaccinationRecord, getVaccinationRecordsByScheduleId } from "@/services/apiServices";
 import { useParams, useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 
@@ -20,22 +20,113 @@ export default function VaccinationScheduleInfo() {
   const [detail, setDetail] = useState(null);
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [updateModalOpen, setUpdateModalOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [recordSubmitting, setRecordSubmitting] = useState(false);
+  const [updateSubmitting, setUpdateSubmitting] = useState(false);
   const [form, setForm] = useState({ administeredDate: null, reactionFollowup24h: false, reactionFollowup72h: false, reactionSeverity: 0 });
+  const [updateForm, setUpdateForm] = useState({ 
+    administeredDate: null, 
+    reactionFollowup24h: false, 
+    reactionFollowup72h: false, 
+    reactionSeverity: 0 
+  });
+  const [vaccinationRecords, setVaccinationRecords] = useState([]);
+  const [recordsLoading, setRecordsLoading] = useState(false);
 
-  useEffect(() => {
+  const loadData = () => {
     setLoading(true);
+    setRecordsLoading(true);
+    
+    // Fetch schedule details
     getVaccinationScheduleDetail(id)
-      .then(res => setDetail(res.data?.data || null))
+      .then(res => {
+        console.log("Schedule detail:", res.data?.data);
+        setDetail(res.data?.data || null);
+      })
       .catch(() => setDetail(null))
       .finally(() => setLoading(false));
+      
+    // Fetch vaccination records
+    getVaccinationRecordsByScheduleId(id)
+      .then(res => {
+        console.log("Vaccination records:", res.data?.data);
+        setVaccinationRecords(res.data?.data || []);
+      })
+      .catch(() => setVaccinationRecords([]))
+      .finally(() => setRecordsLoading(false));
+  };
+
+  useEffect(() => {
+    loadData();
   }, [id]);
 
   const openRecordModal = (student) => {
     setSelectedStudent(student);
     setForm({ administeredDate: dayjs(), reactionFollowup24h: false, reactionFollowup72h: false, reactionSeverity: 0 });
     setModalOpen(true);
+  };
+
+  const openUpdateModal = (record) => {
+    // Now using direct record data from the API
+    console.log("Opening update modal for record:", record);
+    setSelectedStudent(record);
+    
+    // Parse boolean values correctly from strings
+    const reactionFollowup24h = record.reactionFollowup24h === "True";
+    const reactionFollowup72h = record.reactionFollowup72h === "True";
+    
+    setUpdateForm({
+      administeredDate: dayjs(record.administeredDate),
+      reactionFollowup24h: reactionFollowup24h,
+      reactionFollowup72h: reactionFollowup72h,
+      reactionSeverity: 0 // Assuming default if not available
+    });
+    setUpdateModalOpen(true);
+  };
+
+  // Handler for 24h reaction checkbox in create form
+  const handleReaction24hChange = (e) => {
+    const checked = e.target.checked;
+    setForm(f => ({ 
+      ...f, 
+      reactionFollowup24h: checked,
+      // If 24h is checked, automatically uncheck 72h
+      reactionFollowup72h: checked ? false : f.reactionFollowup72h
+    }));
+  };
+
+  // Handler for 72h reaction checkbox in create form
+  const handleReaction72hChange = (e) => {
+    const checked = e.target.checked;
+    setForm(f => ({ 
+      ...f, 
+      reactionFollowup72h: checked,
+      // If 72h is checked, automatically uncheck 24h
+      reactionFollowup24h: checked ? false : f.reactionFollowup24h
+    }));
+  };
+
+  // Handler for 24h reaction checkbox in update form
+  const handleUpdateReaction24hChange = (e) => {
+    const checked = e.target.checked;
+    setUpdateForm(f => ({ 
+      ...f, 
+      reactionFollowup24h: checked,
+      // If 24h is checked, automatically uncheck 72h
+      reactionFollowup72h: checked ? false : f.reactionFollowup72h
+    }));
+  };
+
+  // Handler for 72h reaction checkbox in update form
+  const handleUpdateReaction72hChange = (e) => {
+    const checked = e.target.checked;
+    setUpdateForm(f => ({ 
+      ...f, 
+      reactionFollowup72h: checked,
+      // If 72h is checked, automatically uncheck 24h
+      reactionFollowup24h: checked ? false : f.reactionFollowup24h
+    }));
   };
 
   const handleRecord = async () => {
@@ -55,11 +146,9 @@ export default function VaccinationScheduleInfo() {
       });
       message.success("Ghi nhận tiêm chủng thành công!");
       setModalOpen(false);
-      // reload lại detail
-      setLoading(true);
-      getVaccinationScheduleDetail(id)
-        .then(res => setDetail(res.data?.data || null))
-        .finally(() => setLoading(false));
+      
+      // reload lại data
+      loadData();
     } catch {
       message.error("Ghi nhận thất bại!");
     } finally {
@@ -67,30 +156,73 @@ export default function VaccinationScheduleInfo() {
     }
   };
 
-  // Chia danh sách học sinh thành 2 nhóm
-  const studentsChuaTiem = detail?.sessionStudents?.filter(s => s.statusName === 'Registered') || [];
-  const studentsDaTiem = detail?.sessionStudents?.filter(s => s.statusName !== 'Registered') || [];
+  const handleUpdate = async () => {
+    setUpdateSubmitting(true);
+    try {
+      // Using the ID directly from the record
+      const recordId = selectedStudent.id;
+      
+      console.log("Updating vaccination record with ID:", recordId);
+      
+      if (!recordId) {
+        message.error("Không tìm thấy ID bản ghi tiêm chủng!");
+        setUpdateSubmitting(false);
+        return;
+      }
+      
+      await updateVaccinationRecord(
+        recordId, 
+        {
+          vaccinatedAt: updateForm.administeredDate.toDate().toISOString(),
+          reactionFollowup24h: updateForm.reactionFollowup24h,
+          reactionFollowup72h: updateForm.reactionFollowup72h,
+          reactionSeverity: updateForm.reactionSeverity,
+        }
+      );
+      
+      message.success("Cập nhật tiêm chủng thành công!");
+      setUpdateModalOpen(false);
+      
+      // reload lại data
+      loadData();
+    } catch (error) {
+      console.error("Error updating vaccination record:", error);
+      message.error("Cập nhật thất bại: " + (error.response?.data?.message || error.message));
+    } finally {
+      setUpdateSubmitting(false);
+    }
+  };
 
-  // Cột cho bảng chưa tiêm (có nút ghi nhận)
+  const studentsChuaTiem = detail?.sessionStudents?.filter(s => s.statusName === 'Registered') || [];
+  
+  // Use the records from the new API endpoint
+  const studentsDaTiem = vaccinationRecords;
+
   const columnsChuaTiem = [
     { title: "Học sinh", dataIndex: "studentName", key: "studentName", render: (text) => <><UserOutlined /> {text}</> },
     { title: "Mã HS", dataIndex: "studentCode", key: "studentCode" },
     { title: "Trạng thái", dataIndex: "statusName", key: "statusName", render: (text) => <Tag color={text === "Registered" ? "orange" : "green"}>{text}</Tag> },
     { title: "Ghi nhận", key: "action", render: (_, record) => (
       <Button type="primary" icon={<FormOutlined />} onClick={() => openRecordModal(record)}>
-        Ghi nhận tiêm chủng
+        Ghi nhận
       </Button>
     ) },
   ];
-  // Cột cho bảng đã tiêm (không có nút ghi nhận)
+  
+  // Updated columns for the new data structure
   const columnsDaTiem = [
     { title: "Học sinh", dataIndex: "studentName", key: "studentName", render: (text) => <><UserOutlined /> {text}</> },
     { title: "Mã HS", dataIndex: "studentCode", key: "studentCode" },
-    { title: "Trạng thái", dataIndex: "statusName", key: "statusName", render: (text) => <Tag color={"green"}>{text}</Tag> },
+    { title: "Trạng thái", dataIndex: "sessionStatus", key: "sessionStatus", render: (text) => <Tag color={"green"}>{text}</Tag> },
+    { title: "Cập nhật", key: "update", render: (_, record) => (
+      <Button type="primary" icon={<EditOutlined />} onClick={() => openUpdateModal(record)}>
+        Cập nhật
+      </Button>
+    ) },
   ];
 
   return (
-    <div style={{ maxWidth: 900, margin: "0 auto" }}>
+    <div style={{ maxWidth: 1300, margin: "0 auto" }}>
       {/* Nút Back */}
       <Button type="link" icon={<ArrowLeftOutlined />} onClick={() => navigate(-1)} style={{ marginBottom: 16, paddingLeft: 0 }}>
         Quay lại
@@ -104,14 +236,64 @@ export default function VaccinationScheduleInfo() {
             <div><b>Trạng thái:</b> <Tag color={detail.scheduleStatusName === "Pending" ? "orange" : "green"}>{detail.scheduleStatusName}</Tag></div>
             <div><UserOutlined /> Tổng học sinh: <b>{detail.totalStudents}</b> &nbsp; <CheckCircleOutlined style={{ color: "#52c41a" }} /> Đã tiêm: <b>{detail.completedRecords}</b></div>
           </Card>
-          <Card style={{ borderRadius: 16 }}>
+          <Card style={{ borderRadius: 16, overflow: 'hidden', height: '600px' }}>
             <Title level={5} style={{ marginBottom: 16 }}><UserOutlined /> Danh sách học sinh</Title>
-            <Table
-              dataSource={studentsChuaTiem}
-              columns={columnsChuaTiem}
-              rowKey="id"
-              pagination={false}
-            />
+            
+            {/* Two-column layout for tables */}
+            <div style={{ display: 'flex', flexDirection: 'row', gap: '32px', overflow: 'hidden', height: '580px', width: '100%' }}>
+              {/* Left column - Students pending vaccination */}
+              <div style={{ 
+                flex: '1 1 48%', 
+                minWidth: '420px', 
+                maxHeight: '520px', 
+                height: '520px',
+                overflow: 'hidden',
+                padding: '10px',
+                border: '1px solid #f0f0f0',
+                borderRadius: '8px'
+              }}>
+                <Title level={5} style={{ marginBottom: 16, position: 'sticky', top: 0, background: 'white', padding: '10px 0', zIndex: 1 }}>
+                  <ClockCircleOutlined style={{ color: "#faad14" }} /> Chưa tiêm
+                </Title>
+                <div style={{ height: '400px', overflow: 'hidden' }}>
+                  <Table
+                    dataSource={studentsChuaTiem}
+                    columns={columnsChuaTiem}
+                    rowKey="id"
+                    pagination={false}
+                    locale={{ emptyText: "Không có học sinh nào chưa tiêm" }}
+                    scroll={{ y: 420 }}
+                  />
+                </div>
+              </div>
+              
+              {/* Right column - Vaccinated students */}
+              <div style={{ 
+                flex: '1 1 48%', 
+                minWidth: '400px', 
+                maxHeight: '520px', 
+                height: '520px',
+                overflow: 'hidden',
+                padding: '10px',
+                border: '1px solid #f0f0f0',
+                borderRadius: '8px'
+              }}>
+                <Title level={5} style={{ marginBottom: 16, position: 'sticky', top: 0, background: 'white', padding: '10px 0', zIndex: 1 }}>
+                  <CheckCircleOutlined style={{ color: "#52c41a" }} /> Đã tiêm
+                </Title>
+                <div style={{ height: '400px', overflow: 'auto' }}>
+                  <Table
+                    dataSource={studentsDaTiem}
+                    columns={columnsDaTiem}
+                    rowKey="id"
+                    pagination={false}
+                    loading={recordsLoading}
+                    locale={{ emptyText: "Chưa có học sinh nào được tiêm" }}
+                    scroll={{ y: 420 }}
+                  />
+                </div>
+              </div>
+            </div>
           </Card>
           <Modal
             open={modalOpen}
@@ -128,15 +310,69 @@ export default function VaccinationScheduleInfo() {
             </div>
             <div style={{ marginBottom: 12 }}>
               <b>Phản ứng sau 24h:</b>
-              <input type="checkbox" checked={form.reactionFollowup24h} onChange={e => setForm(f => ({ ...f, reactionFollowup24h: e.target.checked }))} style={{ marginLeft: 8 }} />
+              <input 
+                type="checkbox" 
+                checked={form.reactionFollowup24h} 
+                onChange={handleReaction24hChange} 
+                disabled={form.reactionFollowup72h} 
+                style={{ marginLeft: 8 }} 
+              />
             </div>
             <div style={{ marginBottom: 12 }}>
               <b>Phản ứng sau 72h:</b>
-              <input type="checkbox" checked={form.reactionFollowup72h} onChange={e => setForm(f => ({ ...f, reactionFollowup72h: e.target.checked }))} style={{ marginLeft: 8 }} />
+              <input 
+                type="checkbox" 
+                checked={form.reactionFollowup72h} 
+                onChange={handleReaction72hChange} 
+                disabled={form.reactionFollowup24h} 
+                style={{ marginLeft: 8 }} 
+              />
             </div>
             <div style={{ marginBottom: 12 }}>
               <b>Mức độ phản ứng:</b>
               <select value={form.reactionSeverity} onChange={e => setForm(f => ({ ...f, reactionSeverity: Number(e.target.value) }))} style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid #B0BEC5" }}>
+                {REACTION_SEVERITY.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+              </select>
+            </div>
+          </Modal>
+          
+          {/* Modal cập nhật tiêm chủng */}
+          <Modal
+            open={updateModalOpen}
+            title={<><EditOutlined /> Cập nhật tiêm chủng cho {selectedStudent?.studentName}</>}
+            onCancel={() => setUpdateModalOpen(false)}
+            onOk={handleUpdate}
+            confirmLoading={updateSubmitting}
+            okText="Cập nhật"
+            cancelText="Hủy"
+          >
+            <div style={{ marginBottom: 12 }}>
+              <b>Ngày giờ tiêm:</b><br />
+              <input type="datetime-local" value={updateForm.administeredDate && dayjs(updateForm.administeredDate).format("YYYY-MM-DDTHH:mm")} onChange={e => setUpdateForm(f => ({ ...f, administeredDate: dayjs(e.target.value) }))} style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid #B0BEC5" }} />
+            </div>
+            <div style={{ marginBottom: 12 }}>
+              <b>Phản ứng sau 24h:</b>
+              <input 
+                type="checkbox" 
+                checked={updateForm.reactionFollowup24h} 
+                onChange={handleUpdateReaction24hChange} 
+                disabled={updateForm.reactionFollowup72h} 
+                style={{ marginLeft: 8 }} 
+              />
+            </div>
+            <div style={{ marginBottom: 12 }}>
+              <b>Phản ứng sau 72h:</b>
+              <input 
+                type="checkbox" 
+                checked={updateForm.reactionFollowup72h} 
+                onChange={handleUpdateReaction72hChange} 
+                disabled={updateForm.reactionFollowup24h} 
+                style={{ marginLeft: 8 }} 
+              />
+            </div>
+            <div style={{ marginBottom: 12 }}>
+              <b>Mức độ phản ứng:</b>
+              <select value={updateForm.reactionSeverity} onChange={e => setUpdateForm(f => ({ ...f, reactionSeverity: Number(e.target.value) }))} style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid #B0BEC5" }}>
                 {REACTION_SEVERITY.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
               </select>
             </div>

@@ -286,3 +286,88 @@
     padding-right: 0.7rem;
   }
 } 
+
+/* Toggle section styles */
+.toggle-section {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.toggle-button {
+  background-color: #f0f0f0;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.toggle-button:hover {
+  background-color: #e0e0e0;
+}
+
+.toggle-button.active {
+  background-color: #1976d2;
+  color: white;
+}
+
+.toggle-button svg {
+  font-size: 16px;
+}
+
+/* Section title styles */
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Style for completed button */
+.view-details-btn.completed {
+  background-color: #52c41a;
+}
+
+.view-details-btn.completed:hover {
+  background-color: #49ad18;
+} 
+
+/* Two-column layout styles */
+.two-column-layout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.column {
+  flex: 1 1 400px;
+  min-width: 400px;
+}
+
+/* Make sure the grid in each column doesn't overflow */
+.column .schedules-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+  .two-column-layout {
+    flex-direction: column;
+  }
+  
+  .column {
+    width: 100%;
+    min-width: 100%;
+  }
+} 

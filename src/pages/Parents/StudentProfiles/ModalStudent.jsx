@@ -1,72 +1,10 @@
 import React, { useState, useEffect } from "react";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
-import { updateHealthProfile } from "../../../services/apiServices";
+import { updateHealthProfile, getVaccineTypes, declareVaccination } from "../../../services/apiServices";
 import "./ModalStudent.css";
 import { toast } from "react-toastify";
 import Select from "react-select";
-
-
-const StudentStaticProfile = ({ studentInfo }) => (
-  <div className="text-center">
-    <div className="student-profile-image-container">
-      <img
-        src={studentInfo?.image || "https://static.vecteezy.com/system/resources/previews/000/497/579/original/male-student-icon-design-vector.jpg"}
-        alt="avatar"
-        className="student-profile-image"
-      />
-    </div>
-    <h4 className="font-weight-bold">{studentInfo?.firstName} {studentInfo?.lastName}</h4>
-    <p className="text-muted">Mã học sinh: {studentInfo?.studentCode}</p>
-    <div className="row text-left mt-4">
-      <div className="col-6"><strong>Ngày sinh:</strong> {studentInfo?.dateOfBirth?.slice(0, 10) ?? ""}</div>
-      <div className="col-6"><strong>Giới tính:</strong> {studentInfo?.gender === 0 ? "Nam" : studentInfo?.gender === 1 ? "Nữ" : "Khác"}</div>
-      <div className="col-6"><strong>Lớp:</strong> {studentInfo?.grade ?? ""}</div>
-      <div className="col-6"><strong>Khối:</strong> {studentInfo?.section ?? ""}</div>
-    </div>
-  </div>
-);
-
-const HealthProfileForm = ({ formData, handleChange }) => (
-  <>
-    <div className="row">
-      <div className="col-12 mb-3">
-        <label className="form-label">Dị ứng</label>
-        <textarea className="form-control form-control-sm" rows={2} name="allergies" value={formData.allergies} onChange={handleChange} placeholder="Nhập dị ứng nếu có" />
-      </div>
-      <div className="col-12 mb-3">
-        <label className="form-label">Bệnh mãn tính</label>
-        <textarea className="form-control form-control-sm" rows={2} name="chronicConditions" value={formData.chronicConditions} onChange={handleChange} placeholder="Nhập bệnh mãn tính nếu có" />
-      </div>
-      <div className="col-12 mb-3">
-        <label className="form-label">Lịch sử điều trị</label>
-        <textarea className="form-control form-control-sm" rows={2} name="treatmentHistory" value={formData.treatmentHistory} onChange={handleChange} placeholder="Nhập lịch sử điều trị nếu có" />
-      </div>
-      <div className="col-md-6 mb-3">
-        <label className="form-label">Thị lực</label>
-        <select className="form-control form-control-sm" name="vision" value={formData.vision} onChange={handleChange}>
-          <option value="0">Bình thường</option>
-          <option value="1">Nhẹ</option>
-          <option value="2">Trung bình</option>
-          <option value="3">Nặng</option>
-        </select>
-      </div>
-      <div className="col-md-6 mb-3">
-        <label className="form-label">Thính lực</label>
-        <select className="form-control form-control-sm" name="hearing" value={formData.hearing} onChange={handleChange}>
-          <option value="0">Bình thường</option>
-          <option value="1">Nhẹ</option>
-          <option value="2">Trung bình</option>
-          <option value="3">Nặng</option>
-        </select>
-      </div>
-      <div className="col-12 mb-3">
-        <label className="form-label">Tóm tắt tiêm chủng</label>
-        <textarea className="form-control form-control-sm" rows={3} name="vaccinationSummary" value={formData.vaccinationSummary} onChange={handleChange} placeholder="Nhập tóm tắt tiêm chủng nếu có" />
-      </div>
-    </div>
-  </>
-);
 
 const VaccineDeclarationForm = ({ studentId, onSuccess }) => {
   const [vaccineTypes, setVaccineTypes] = useState([]);
@@ -75,14 +13,13 @@ const VaccineDeclarationForm = ({ studentId, onSuccess }) => {
   const [vaccineTypeId, setVaccineTypeId] = useState("");
   const [doseNumber, setDoseNumber] = useState(1);
 
-  // Tạo options cho react-select
   const vaccineOptions = vaccineTypes.map(v => ({ value: v.id, label: v.name }));
 
   useEffect(() => {
     const fetchVaccineTypes = async () => {
       setLoading(true);
       try {
-        const res = await import("../../../services/apiServices").then(m => m.getVaccineTypes());
+        const res = await getVaccineTypes();
         setVaccineTypes(res.data?.data || []);
       } catch {
         setVaccineTypes([]);
@@ -101,9 +38,12 @@ const VaccineDeclarationForm = ({ studentId, onSuccess }) => {
     }
     setSubmitting(true);
     try {
-      const administeredAt = new Date().toISOString();
-      const payload = [{ studentId, vaccineTypeId, doseNumber: Number(doseNumber), administeredAt }];
-      await import("../../../services/apiServices").then(m => m.declareVaccination(payload));
+      await declareVaccination([{ 
+        studentId, 
+        vaccineTypeId, 
+        doseNumber: Number(doseNumber), 
+        administeredAt: new Date().toISOString() 
+      }]);
       toast.success("Khai báo vắc xin thành công!");
       setVaccineTypeId("");
       setDoseNumber(1);
@@ -148,29 +88,27 @@ const initialFormData = {
   allergies: "",
   chronicConditions: "",
   treatmentHistory: "",
-  vision: "0",
-  hearing: "0",
+  vision: "1",
+  hearing: "1",
   vaccinationSummary: "",
 };
 
-const ModalStudent = ({ show, setShow, healthProfile, resetData, loading, onUpdated }) => {
+const ModalStudent = ({ show, setShow, healthProfile, resetData, onUpdated }) => {
   const [studentInfo, setStudentInfo] = useState({});
   const [formData, setFormData] = useState(initialFormData);
   const [updating, setUpdating] = useState(false);
   const [activeTab, setActiveTab] = useState("profile");
 
   useEffect(() => {
-    if (show) {
-      setActiveTab("profile");
-    }
+    if (show) setActiveTab("profile");
     if (healthProfile) {
       setStudentInfo(healthProfile.studentInformation || {});
       setFormData({
         allergies: healthProfile.allergies || "",
         chronicConditions: healthProfile.chronicConditions || "",
         treatmentHistory: healthProfile.treatmentHistory || "",
-        vision: String(healthProfile.vision ?? "0"),
-        hearing: String(healthProfile.hearing ?? "0"),
+        vision: String(healthProfile.vision ?? "1"),
+        hearing: String(healthProfile.hearing ?? "1"),
         vaccinationSummary: healthProfile.vaccinationSummary || "",
       });
     } else {
@@ -185,19 +123,19 @@ const ModalStudent = ({ show, setShow, healthProfile, resetData, loading, onUpda
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleUpdate = async () => {
     setUpdating(true);
-    const updatedHealthProfile = {
-      version: healthProfile?.version ?? 0,
-      profileDate: new Date().toISOString(),
-      ...formData,
-      vision: Number(formData.vision),
-      hearing: Number(formData.hearing),
-    };
     try {
+      const updatedHealthProfile = {
+        version: healthProfile?.version ?? 0,
+        profileDate: new Date().toISOString(),
+        ...formData,
+        vision: Number(formData.vision),
+        hearing: Number(formData.hearing),
+      };
       const response = await updateHealthProfile(studentInfo.studentCode, updatedHealthProfile);
       if (response?.data?.isSuccess || response?.status === 200) {
         onUpdated?.();
@@ -212,9 +150,7 @@ const ModalStudent = ({ show, setShow, healthProfile, resetData, loading, onUpda
     }
   };
 
-  if (!healthProfile) {
-    return null;
-  }
+  if (!healthProfile) return null;
 
   return (
     <Modal show={show} onHide={handleClose} size="lg" centered className="modal-user-detail">
@@ -240,15 +176,86 @@ const ModalStudent = ({ show, setShow, healthProfile, resetData, loading, onUpda
         </div>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
-          Đóng
-        </Button>
-        <Button variant="primary" onClick={handleUpdate} disabled={loading || updating}>
+        <Button variant="secondary" onClick={handleClose}>Đóng</Button>
+        <Button variant="primary" onClick={handleUpdate} disabled={updating}>
           {updating ? "Đang lưu..." : "Lưu thay đổi"}
         </Button>
       </Modal.Footer>
     </Modal>
   );
 };
+
+const StudentStaticProfile = ({ studentInfo }) => (
+  <div className="text-center">
+    <div className="student-profile-image-container">
+      <img
+        src={studentInfo?.image || "https://images.icon-icons.com/3310/PNG/512/student_man_avatar_user_toga_school_university_icon_209264.png"}
+        alt="avatar"
+        className="student-profile-image"
+      />
+    </div>
+    <h4 className="font-weight-bold">{studentInfo?.firstName} {studentInfo?.lastName}</h4>
+    <p className="text-muted">Mã học sinh: {studentInfo?.studentCode}</p>
+    <div className="row text-left mt-4">
+      <div className="col-6"><strong>Ngày sinh:</strong> {studentInfo?.dateOfBirth?.slice(0, 10) ?? ""}</div>
+      <div className="col-6"><strong>Giới tính:</strong> {studentInfo?.gender === 0 ? "Nam" : studentInfo?.gender === 1 ? "Nữ" : "Khác"}</div>
+      <div className="col-6"><strong>Lớp:</strong> {studentInfo?.grade ?? ""}</div>
+      <div className="col-6"><strong>Khối:</strong> {studentInfo?.section ?? ""}</div>
+    </div>
+  </div>
+);
+
+const HealthProfileForm = ({ formData, handleChange }) => (
+  <div className="row">
+    <div className="col-12 mb-3">
+      <label className="form-label">Dị ứng</label>
+      <textarea className="form-control form-control-sm" rows={2} name="allergies" value={formData.allergies} onChange={handleChange} placeholder="Nhập dị ứng nếu có" />
+    </div>
+    <div className="col-12 mb-3">
+      <label className="form-label">Bệnh mãn tính</label>
+      <textarea className="form-control form-control-sm" rows={2} name="chronicConditions" value={formData.chronicConditions} onChange={handleChange} placeholder="Nhập bệnh mãn tính nếu có" />
+    </div>
+    <div className="col-12 mb-3">
+      <label className="form-label">Lịch sử điều trị</label>
+      <textarea className="form-control form-control-sm" rows={2} name="treatmentHistory" value={formData.treatmentHistory} onChange={handleChange} placeholder="Nhập lịch sử điều trị nếu có" />
+    </div>
+    <div className="col-md-6 mb-3">
+      <label className="form-label">Thị lực (/10)</label>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <input
+          type="number"
+          className="form-control form-control-sm"
+          name="vision"
+          value={formData.vision}
+          onChange={handleChange}
+          min="1"
+          max="10"
+          style={{ width: '80px' }}
+        />
+        <span style={{ color: '#666' }}>/ 10</span>
+      </div>
+    </div>
+    <div className="col-md-6 mb-3">
+      <label className="form-label">Thính lực (/10)</label>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <input
+          type="number"
+          className="form-control form-control-sm"
+          name="hearing"
+          value={formData.hearing}
+          onChange={handleChange}
+          min="1"
+          max="10"
+          style={{ width: '80px' }}
+        />
+        <span style={{ color: '#666' }}>/ 10</span>
+      </div>
+    </div>
+    <div className="col-12 mb-3">
+      <label className="form-label">Tóm tắt tiêm chủng</label>
+      <textarea className="form-control form-control-sm" rows={3} name="vaccinationSummary" value={formData.vaccinationSummary} onChange={handleChange} placeholder="Nhập tóm tắt tiêm chủng nếu có" />
+    </div>
+  </div>
+);
 
 export default ModalStudent;

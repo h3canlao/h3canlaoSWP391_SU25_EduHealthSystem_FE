@@ -1,18 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { Button, Typography, Modal } from "antd";
-import { useNavigate } from "react-router-dom";
+import { Modal } from "antd";
 import { toast } from "react-toastify";
-import { FaBars } from "react-icons/fa";
 import ModalStudent from "./ModalStudent";
 import { getStudentsByParentId, getNewestHealthProfile, createHealthProfile } from "../../../services/apiServices";
 import { getUserInfo } from "@/services/handleStorageApi";
 import "./StudentProfiles.css";
 
-const { Text } = Typography;
 const { confirm } = Modal;
 
 const StudentCard = ({ student, onClick }) => {
-  const imageUrl = student.image || "https://static.vecteezy.com/system/resources/previews/000/497/579/original/male-student-icon-design-vector.jpg";
+  const imageUrl = student.image || "https://images.icon-icons.com/3310/PNG/512/student_man_avatar_user_toga_school_university_icon_209264.png";
   return (
     <div onClick={() => onClick(student)} className="student-card">
       <img
@@ -33,9 +30,6 @@ const StudentProfiles = () => {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [healthProfile, setHealthProfile] = useState(null);
-  const [healthProfileLoading, setHealthProfileLoading] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState(null);
-  const navigate = useNavigate();
   const userInfo = getUserInfo();
   const userId = JSON.parse(atob(userInfo.accessToken.split('.')[1]))?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
   useEffect(() => {
@@ -59,13 +53,7 @@ const StudentProfiles = () => {
     fetchStudents();
   }, [userId]);
 
-  const handleAddStudent = () => {
-    navigate("/add-student");
-  };
-
   const handleCardClick = async (student) => {
-    setSelectedStudent(student);
-    setHealthProfileLoading(true);
     try {
       const res = await getNewestHealthProfile(student.studentCode);
       setHealthProfile(res?.data?.data || null);
@@ -81,18 +69,16 @@ const StudentProfiles = () => {
             try {
               const newProfile = { studentCode: student.studentCode };
               await createHealthProfile(newProfile);
-              toast.success("Profile created! Loading details...");
+              toast.success("Tạo hồ sơ sức khỏe thành công!");
               const res = await getNewestHealthProfile(student.studentCode);
               setHealthProfile(res?.data?.data || null);
               setShowModal(true);
             } catch (createError) {
-              toast.error("Failed to create health profile.");
+              toast.error("Thất bại khi tạo hồ sơ sức khỏe.");
               setHealthProfile(null);
             }
           },
-          onCancel: () => {
-            setSelectedStudent(null);
-          },
+          onCancel: () => {},
         });
       } else {
         toast.error("Failed to get health profile.");
@@ -103,15 +89,8 @@ const StudentProfiles = () => {
     }
   };
 
-  const resetModalData = () => {
-    setHealthProfile(null);
-    setSelectedStudent(null);
-  };
-
-  const handleProfileUpdate = () => {
-    toast.success("Health profile updated successfully!");
-    // Optional: refetch students if the update could change student list data
-  };
+  const resetModalData = () => setHealthProfile(null);
+  const handleProfileUpdate = () => toast.success("Cập nhập thành công!");
 
   return (
     <div className="student-outer-container">
@@ -134,7 +113,6 @@ const StudentProfiles = () => {
           show={showModal}
           setShow={setShowModal}
           healthProfile={healthProfile}
-          loading={healthProfileLoading}
           resetData={resetModalData}
           onUpdated={handleProfileUpdate}
         />

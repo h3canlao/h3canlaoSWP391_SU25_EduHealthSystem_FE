@@ -9,7 +9,6 @@ const ModalMedication = ({ show, setShow, onClose, students, parentId }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
-  // Xác định studentId mặc định nếu chỉ có 1 học sinh
   const defaultStudentId = students && students.length === 1 ? (students[0].id || students[0].studentId || students[0].studentCode) : undefined;
 
   const handleCancel = () => {
