@@ -86,37 +86,37 @@ export default function HealthEventTabs() {
     <div className="health-event">
       <div className="health-event-container">
         <Title level={3} className="health-event-title">Quản lý sự kiện y tế</Title>
-        <Tabs defaultActiveKey="1" items={[
-          {
-            key: "1",
-            label: "Danh sách sự kiện",
-            children: loading ? <Spin /> : (
-              <>
-                <Input
-                  placeholder="Tìm kiếm tên học sinh..."
-                  value={searchTerm}
-                  onChange={e => setSearchTerm(e.target.value)}
-                  style={{ marginBottom: 20, maxWidth: 350 }}
-                  allowClear
-                />
-                <Table
-                  columns={columns}
-                  dataSource={filteredEvents}
-                  rowKey="id"
-                  pagination={{ pageSize: 8 }}
-                  bordered
+      <Tabs defaultActiveKey="1" items={[
+        {
+          key: "1",
+          label: "Danh sách sự kiện",
+          children: loading ? <Spin /> : (
+            <>
+              <Input
+                placeholder="Tìm kiếm tên học sinh..."
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                style={{ marginBottom: 20, maxWidth: 350 }}
+                allowClear
+              />
+              <Table
+                columns={columns}
+                dataSource={filteredEvents}
+                rowKey="id"
+                pagination={{ pageSize: 8 }}
+                bordered
                   className="health-event-table"
                   rowClassName="health-event-row"
-                />
-              </>
-            )
-          },
-          {
-            key: "2",
-            label: "Tạo sự kiện mới",
-            children: <HealthEventForm />
-          }
-        ]} />
+              />
+            </>
+          )
+        },
+        {
+          key: "2",
+          label: "Tạo sự kiện mới",
+          children: <HealthEventForm />
+        }
+      ]} />
       </div>
     </div>
   );

@@ -124,7 +124,7 @@ const ParentCheckupSchedules = () => {
               <div className="card-flex">
                 <Avatar 
                   size={64} 
-                  src="https://static.vecteezy.com/system/resources/previews/012/941/843/non_2x/illustration-of-boy-avatar-student-s-character-face-vector.jpg"
+                  src="https://images.icon-icons.com/3310/PNG/512/student_man_avatar_user_toga_school_university_icon_209264.png"
                   className="student-avatar"
                 />
                 <div className="card-info">

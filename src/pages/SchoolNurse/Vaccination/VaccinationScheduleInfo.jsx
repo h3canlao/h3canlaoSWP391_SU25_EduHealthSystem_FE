@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Card, Typography, Table, Tag, Button, Spin, Modal, message } from "antd";
-import { UserOutlined, CheckCircleOutlined, ClockCircleOutlined, FormOutlined, MedicineBoxOutlined, ArrowLeftOutlined, EditOutlined } from "@ant-design/icons";
+import { Card, Typography, Table, Tag, Button, Spin, Modal, message, Input } from "antd";
+import { UserOutlined, CheckCircleOutlined, ClockCircleOutlined, FormOutlined, MedicineBoxOutlined, ArrowLeftOutlined, EditOutlined, SearchOutlined } from "@ant-design/icons";
 import { 
   getVaccinationScheduleDetail, 
   createVaccinationRecord, 
@@ -40,6 +40,8 @@ export default function VaccinationScheduleInfo() {
   });
   const [vaccinationRecords, setVaccinationRecords] = useState([]);
   const [recordsLoading, setRecordsLoading] = useState(false);
+  const [searchPending, setSearchPending] = useState("");
+  const [searchVaccinated, setSearchVaccinated] = useState("");
 
   const loadData = () => {
     setLoading(true);
@@ -161,23 +163,23 @@ export default function VaccinationScheduleInfo() {
         });
         
         // Step 3: Create vaccination record
-        await createVaccinationRecord({
-          studentId: selectedStudent.studentId,
-          scheduleId: id,
-          administeredDate: form.administeredDate.toDate().toISOString(),
-          vaccinatedById: nurseId,
-          vaccinatedAt: form.administeredDate.toDate().toISOString(),
-          reactionFollowup24h: form.reactionFollowup24h,
-          reactionFollowup72h: form.reactionFollowup72h,
-          reactionSeverity: form.reactionSeverity,
-        });
+      await createVaccinationRecord({
+        studentId: selectedStudent.studentId,
+        scheduleId: id,
+        administeredDate: form.administeredDate.toDate().toISOString(),
+        vaccinatedById: nurseId,
+        vaccinatedAt: form.administeredDate.toDate().toISOString(),
+        reactionFollowup24h: form.reactionFollowup24h,
+        reactionFollowup72h: form.reactionFollowup72h,
+        reactionSeverity: form.reactionSeverity,
+      });
         
         message.success("Ghi nhận tiêm chủng và check-in thành công!");
         
-        setModalOpen(false);
-        
-        // reload lại data
-        loadData();
+      setModalOpen(false);
+      
+      // reload lại data
+      loadData();
       } else {
         message.error("Không tìm thấy thông tin phiên cho học sinh này, không thể ghi nhận tiêm chủng!");
       }
@@ -254,6 +256,24 @@ export default function VaccinationScheduleInfo() {
     ) },
   ];
 
+  // Filter students who haven't been vaccinated based on search term
+  const filteredStudentsChuaTiem = detail?.sessionStudents
+    ?.filter(s => s.statusName === 'Registered')
+    .filter(s => 
+      s.studentName?.toLowerCase()
+        .normalize('NFD')
+        .replace(/\p{Diacritic}/gu, '')
+        .includes(searchPending.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, ''))
+    ) || [];
+  
+  // Filter vaccinated students based on search term
+  const filteredStudentsDaTiem = vaccinationRecords.filter(s => 
+    s.studentName?.toLowerCase()
+      .normalize('NFD')
+      .replace(/\p{Diacritic}/gu, '')
+      .includes(searchVaccinated.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, ''))
+  );
+
   return (
     <div style={{ maxWidth: 1300, margin: "0 auto" }}>
       {/* Nút Back */}
@@ -288,14 +308,25 @@ export default function VaccinationScheduleInfo() {
                 <Title level={5} style={{ marginBottom: 16, position: 'sticky', top: 0, background: 'white', padding: '10px 0', zIndex: 1 }}>
                   <ClockCircleOutlined style={{ color: "#faad14" }} /> Chưa tiêm
                 </Title>
-                <div style={{ height: '400px', overflow: 'hidden' }}>
+                
+                {/* Search input for pending students */}
+                <Input 
+                  placeholder="Tìm kiếm học sinh..." 
+                  prefix={<SearchOutlined />} 
+                  value={searchPending}
+                  onChange={e => setSearchPending(e.target.value)}
+                  style={{ marginBottom: 16 }}
+                  allowClear
+                />
+                
+                <div style={{ height: '370px', overflow: 'hidden' }}>
                   <Table
-                    dataSource={studentsChuaTiem}
+                    dataSource={filteredStudentsChuaTiem}
                     columns={columnsChuaTiem}
                     rowKey="id"
                     pagination={false}
                     locale={{ emptyText: "Không có học sinh nào chưa tiêm" }}
-                    scroll={{ y: 420 }}
+                    scroll={{ y: 370 }}
                   />
                 </div>
               </div>
@@ -314,15 +345,26 @@ export default function VaccinationScheduleInfo() {
                 <Title level={5} style={{ marginBottom: 16, position: 'sticky', top: 0, background: 'white', padding: '10px 0', zIndex: 1 }}>
                   <CheckCircleOutlined style={{ color: "#52c41a" }} /> Đã tiêm
                 </Title>
-                <div style={{ height: '400px', overflow: 'auto' }}>
+                
+                {/* Search input for vaccinated students */}
+                <Input 
+                  placeholder="Tìm kiếm học sinh..." 
+                  prefix={<SearchOutlined />} 
+                  value={searchVaccinated}
+                  onChange={e => setSearchVaccinated(e.target.value)}
+                  style={{ marginBottom: 16 }}
+                  allowClear
+                />
+                
+                <div style={{ height: '370px', overflow: 'auto' }}>
                   <Table
-                    dataSource={studentsDaTiem}
+                    dataSource={filteredStudentsDaTiem}
                     columns={columnsDaTiem}
                     rowKey="id"
                     pagination={false}
                     loading={recordsLoading}
                     locale={{ emptyText: "Chưa có học sinh nào được tiêm" }}
-                    scroll={{ y: 420 }}
+                    scroll={{ y: 370 }}
                   />
                 </div>
               </div>
