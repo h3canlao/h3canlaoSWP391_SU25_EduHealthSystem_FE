@@ -107,7 +107,6 @@ const CheckupRecordModal = ({ schedule, onClose, onRecordCreated }) => {
         toast.error('Không thể tải danh sách y tá');
       }
     } catch (error) {
-      console.error('Error fetching nurses:', error);
       toast.error('Không thể tải danh sách y tá');
     }
   };
@@ -187,11 +186,12 @@ const CheckupRecordModal = ({ schedule, onClose, onRecordCreated }) => {
         // Chỉ gọi onRecordCreated() để xử lý cập nhật dữ liệu và đóng modal
         onRecordCreated();
       } else {
-        toast.error(response.data.message || 'Phụ huynh cần phải đồng ý để tạo hồ sơ');
+        const errorMessage = response?.data?.message;
+        toast.error(errorMessage);
       }
     } catch (error) {
-      console.error('Error creating checkup record:', error);
-      toast.error('Phụ huynh cần phải đồng ý để tạo hồ sơ');
+      const errorMessage = error?.response?.data?.message;
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

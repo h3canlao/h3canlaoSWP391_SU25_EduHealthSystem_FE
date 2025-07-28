@@ -319,6 +319,25 @@ export const getNurses = async () => {
   return axios.get(`${BASE_URL}/NurseProfile/all`, { headers: getAuthHeaders() });
 };
 
+// Get session students by studentId and/or vaccinationScheduleId
+export const getSessionStudents = async (studentId, vaccinationScheduleId) => {
+  const params = {};
+  if (studentId) params.studentId = studentId;
+  if (vaccinationScheduleId) params.vaccinationScheduleId = vaccinationScheduleId;
+  
+  return axios.get(`${BASE_URL}/session-students`, { 
+    params,
+    headers: getAuthHeaders() 
+  });
+};
+
+// Update session student check-in time
+export const updateSessionStudentCheckInTime = async (data) => {
+  return axios.put(`${BASE_URL}/session-students/check-in-time`, data, {
+    headers: getAuthHeaders()
+  });
+};
+
 export {
   postSignin,
   postRegister,
@@ -355,5 +374,6 @@ export {
   updateHealthEventTreatment,
   getHealthEvents,
   getHealthEventsMyChild,
+
 };
 

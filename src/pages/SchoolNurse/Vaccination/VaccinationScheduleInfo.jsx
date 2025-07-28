@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Card, Typography, Table, Tag, Button, Spin, Modal, message } from "antd";
 import { UserOutlined, CheckCircleOutlined, ClockCircleOutlined, FormOutlined, MedicineBoxOutlined, ArrowLeftOutlined, EditOutlined } from "@ant-design/icons";
-import { getVaccinationScheduleDetail, createVaccinationRecord, updateVaccinationRecord, getVaccinationRecordsByScheduleId } from "@/services/apiServices";
+import { 
+  getVaccinationScheduleDetail, 
+  createVaccinationRecord, 
+  updateVaccinationRecord, 
+  getVaccinationRecordsByScheduleId,
+  getSessionStudents,
+  updateSessionStudentCheckInTime
+} from "@/services/apiServices";
 import { useParams, useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 
@@ -134,23 +141,49 @@ export default function VaccinationScheduleInfo() {
     try {
       // nurseId từ token (giả lập)
       const nurseId = JSON.parse(atob(localStorage.getItem("accessToken")?.split(".")[1] || ""))?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
-      await createVaccinationRecord({
-        studentId: selectedStudent.studentId,
-        scheduleId: id,
-        administeredDate: form.administeredDate.toDate().toISOString(),
-        vaccinatedById: nurseId,
-        vaccinatedAt: form.administeredDate.toDate().toISOString(),
-        reactionFollowup24h: form.reactionFollowup24h,
-        reactionFollowup72h: form.reactionFollowup72h,
-        reactionSeverity: form.reactionSeverity,
-      });
-      message.success("Ghi nhận tiêm chủng thành công!");
-      setModalOpen(false);
       
-      // reload lại data
-      loadData();
-    } catch {
-      message.error("Ghi nhận thất bại!");
+      // Step 1: Get session student information with both parameters
+      const sessionStudentResponse = await getSessionStudents(
+        selectedStudent.studentId,
+        id
+      );
+      
+      const sessionStudents = sessionStudentResponse.data?.data || [];
+      
+      // Since we're filtering by both studentId and vaccinationScheduleId, we should get exactly what we need
+      if (sessionStudents.length > 0) {
+        const currentSessionStudent = sessionStudents[0];
+        
+        // Step 2: Update check-in time for the session student
+        await updateSessionStudentCheckInTime({
+          sessionStudentId: [currentSessionStudent.sessionStudentId],
+          note: `Đã tiêm chủng vào lúc ${form.administeredDate.format("DD/MM/YYYY HH:mm")}`
+        });
+        
+        // Step 3: Create vaccination record
+        await createVaccinationRecord({
+          studentId: selectedStudent.studentId,
+          scheduleId: id,
+          administeredDate: form.administeredDate.toDate().toISOString(),
+          vaccinatedById: nurseId,
+          vaccinatedAt: form.administeredDate.toDate().toISOString(),
+          reactionFollowup24h: form.reactionFollowup24h,
+          reactionFollowup72h: form.reactionFollowup72h,
+          reactionSeverity: form.reactionSeverity,
+        });
+        
+        message.success("Ghi nhận tiêm chủng và check-in thành công!");
+        
+        setModalOpen(false);
+        
+        // reload lại data
+        loadData();
+      } else {
+        message.error("Không tìm thấy thông tin phiên cho học sinh này, không thể ghi nhận tiêm chủng!");
+      }
+    } catch (error) {
+      console.error("Error recording vaccination:", error);
+      message.error("Ghi nhận thất bại: " + (error.response?.data?.message || error.message));
     } finally {
       setRecordSubmitting(false);
     }

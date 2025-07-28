@@ -91,7 +91,7 @@ const PendingMedications = () => {
         key={med.parentMedicationDeliveryId}
         className="medication-card"
         style={{ marginBottom: 16, borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
-        bodyStyle={{ padding: 20 }}
+        bodyStyle={{ padding: 20, background: "#fff" }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div style={{ flex: 1 }}>
@@ -138,30 +138,30 @@ const PendingMedications = () => {
 
   return (
     <div className="pending-medications">
-      <div className="page-header">
-        <Title level={3}>Quản Lý Đơn Thuốc Đang Chờ</Title>
-        <Text type="secondary">Theo dõi và cập nhật trạng thái các đơn thuốc từ phụ huynh</Text>
-      </div>
-      <Input
-        placeholder="Tìm kiếm tên thuốc..."
-        value={searchTerm}
-        onChange={e => setSearchTerm(e.target.value)}
-        style={{ marginBottom: 20, maxWidth: 350 }}
-        allowClear
-      />
-      {loading ? (
-        <div style={{ textAlign: 'center', padding: '40px' }}>
-          <Spin size="large" />
+      <Card className="pending-medications-container">
+        <div className="page-header">
+          <Title level={3}>Quản Lý Đơn Thuốc Đang Chờ</Title>
+          <Text type="secondary">Theo dõi và cập nhật trạng thái các đơn thuốc từ phụ huynh</Text>
         </div>
-      ) : filteredMedications.length === 0 ? (
-        <Card>
+        <Input
+          placeholder="Tìm kiếm tên thuốc..."
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+          style={{ marginBottom: 20, maxWidth: 350 }}
+          allowClear
+        />
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '40px' }}>
+            <Spin size="large" />
+          </div>
+        ) : filteredMedications.length === 0 ? (
           <Empty description="Không có đơn thuốc nào đang chờ xử lý." />
-        </Card>
-      ) : (
-        <div className="medications-container">
-          {filteredMedications.map(renderMedicationCard)}
-        </div>
-      )}
+        ) : (
+          <div className="medications-container">
+            {filteredMedications.map(renderMedicationCard)}
+          </div>
+        )}
+      </Card>
 
       {/* Modal cập nhật trạng thái */}
       <Modal
