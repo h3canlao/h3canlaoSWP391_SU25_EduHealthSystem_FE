@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Form, Input, Button, Typography } from 'antd';
 import { toast } from 'react-toastify';
 import { forgetPassword } from '../../../../../services/apiServices';
-import './ForgetPassword.css';
+import './forgetPassword.css';
 
 const { Title, Text, Link } = Typography;
 
