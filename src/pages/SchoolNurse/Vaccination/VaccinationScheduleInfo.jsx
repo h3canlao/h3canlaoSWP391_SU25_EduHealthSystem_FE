@@ -94,14 +94,15 @@ export default function VaccinationScheduleInfo() {
     setUpdateModalOpen(true);
   };
 
+  // Modify the checkbox handlers to allow both options to be selected simultaneously
+
   // Handler for 24h reaction checkbox in create form
   const handleReaction24hChange = (e) => {
     const checked = e.target.checked;
     setForm(f => ({ 
       ...f, 
-      reactionFollowup24h: checked,
-      // If 24h is checked, automatically uncheck 72h
-      reactionFollowup72h: checked ? false : f.reactionFollowup72h
+      reactionFollowup24h: checked
+      // Remove the code that automatically unsets reactionFollowup72h
     }));
   };
 
@@ -110,9 +111,8 @@ export default function VaccinationScheduleInfo() {
     const checked = e.target.checked;
     setForm(f => ({ 
       ...f, 
-      reactionFollowup72h: checked,
-      // If 72h is checked, automatically uncheck 24h
-      reactionFollowup24h: checked ? false : f.reactionFollowup24h
+      reactionFollowup72h: checked
+      // Remove the code that automatically unsets reactionFollowup24h
     }));
   };
 
@@ -121,9 +121,8 @@ export default function VaccinationScheduleInfo() {
     const checked = e.target.checked;
     setUpdateForm(f => ({ 
       ...f, 
-      reactionFollowup24h: checked,
-      // If 24h is checked, automatically uncheck 72h
-      reactionFollowup72h: checked ? false : f.reactionFollowup72h
+      reactionFollowup24h: checked
+      // Remove the code that automatically unsets reactionFollowup72h
     }));
   };
 
@@ -132,9 +131,8 @@ export default function VaccinationScheduleInfo() {
     const checked = e.target.checked;
     setUpdateForm(f => ({ 
       ...f, 
-      reactionFollowup72h: checked,
-      // If 72h is checked, automatically uncheck 24h
-      reactionFollowup24h: checked ? false : f.reactionFollowup24h
+      reactionFollowup72h: checked
+      // Remove the code that automatically unsets reactionFollowup24h
     }));
   };
 
@@ -389,7 +387,6 @@ export default function VaccinationScheduleInfo() {
                 type="checkbox" 
                 checked={form.reactionFollowup24h} 
                 onChange={handleReaction24hChange} 
-                disabled={form.reactionFollowup72h} 
                 style={{ marginLeft: 8 }} 
               />
             </div>
@@ -399,7 +396,6 @@ export default function VaccinationScheduleInfo() {
                 type="checkbox" 
                 checked={form.reactionFollowup72h} 
                 onChange={handleReaction72hChange} 
-                disabled={form.reactionFollowup24h} 
                 style={{ marginLeft: 8 }} 
               />
             </div>
@@ -431,7 +427,6 @@ export default function VaccinationScheduleInfo() {
                 type="checkbox" 
                 checked={updateForm.reactionFollowup24h} 
                 onChange={handleUpdateReaction24hChange} 
-                disabled={updateForm.reactionFollowup72h} 
                 style={{ marginLeft: 8 }} 
               />
             </div>
@@ -441,7 +436,6 @@ export default function VaccinationScheduleInfo() {
                 type="checkbox" 
                 checked={updateForm.reactionFollowup72h} 
                 onChange={handleUpdateReaction72hChange} 
-                disabled={updateForm.reactionFollowup24h} 
                 style={{ marginLeft: 8 }} 
               />
             </div>
