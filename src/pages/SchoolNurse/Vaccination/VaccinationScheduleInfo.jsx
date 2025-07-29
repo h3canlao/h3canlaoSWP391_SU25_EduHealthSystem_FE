@@ -21,6 +21,14 @@ const REACTION_SEVERITY = [
   { label: "Nặng", value: 3 },
 ];
 
+// Thêm bảng ánh xạ trạng thái từ tiếng Anh sang tiếng Việt
+const statusMap = {
+  Registered: { color: 'orange', text: 'Đã đăng kí' },
+  Completed: { color: 'green', text: 'Hoàn thành' },
+  Pending: { color: 'orange', text: 'Chờ tiêm' },
+  Cancelled: { color: 'red', text: 'Đã huỷ' },
+};
+
 export default function VaccinationScheduleInfo() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -226,7 +234,7 @@ export default function VaccinationScheduleInfo() {
     }
   };
 
-  const studentsChuaTiem = detail?.sessionStudents?.filter(s => s.statusName === 'Registered') || [];
+  const studentsChuaTiem = detail?.sessionStudents?.filter(s => s.statusName === 'Đã đăng kí') || [];
   
   // Use the records from the new API endpoint
   const studentsDaTiem = vaccinationRecords;
@@ -234,7 +242,7 @@ export default function VaccinationScheduleInfo() {
   const columnsChuaTiem = [
     { title: "Học sinh", dataIndex: "studentName", key: "studentName", render: (text) => <><UserOutlined /> {text}</> },
     { title: "Mã HS", dataIndex: "studentCode", key: "studentCode" },
-    { title: "Trạng thái", dataIndex: "statusName", key: "statusName", render: (text) => <Tag color={text === "Registered" ? "orange" : "green"}>{text}</Tag> },
+    { title: "Trạng thái", dataIndex: "statusName", key: "statusName", render: (text) => <Tag color={statusMap[text]?.color || "default"}>{statusMap[text]?.text || text}</Tag> },
     { title: "Ghi nhận", key: "action", render: (_, record) => (
       <Button type="primary" icon={<FormOutlined />} onClick={() => openRecordModal(record)}>
         Ghi nhận
@@ -246,7 +254,7 @@ export default function VaccinationScheduleInfo() {
   const columnsDaTiem = [
     { title: "Học sinh", dataIndex: "studentName", key: "studentName", render: (text) => <><UserOutlined /> {text}</> },
     { title: "Mã HS", dataIndex: "studentCode", key: "studentCode" },
-    { title: "Trạng thái", dataIndex: "sessionStatus", key: "sessionStatus", render: (text) => <Tag color={"green"}>{text}</Tag> },
+    { title: "Trạng thái", dataIndex: "sessionStatus", key: "sessionStatus", render: (text) => <Tag color={statusMap[text]?.color || "green"}>{statusMap[text]?.text || text}</Tag> },
     { title: "Cập nhật", key: "update", render: (_, record) => (
       <Button type="primary" icon={<EditOutlined />} onClick={() => openUpdateModal(record)}>
         Cập nhật

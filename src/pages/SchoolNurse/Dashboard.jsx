@@ -107,12 +107,12 @@ const Dashboard = () => {
             <table className="dashboard-table" style={{width:'100%',borderCollapse:'collapse',fontSize:'1rem'}}>
               <thead>
                 <tr style={{background:'#1976d2',color:'#fff'}}>
-                  <th style={{padding:'10px 8px'}}>Student ID</th>
-                  <th>Height (cm)</th>
-                  <th>Weight (kg)</th>
+                  <th style={{padding:'10px 8px'}}>Mã học sinh</th>
+                  <th>Chiều cao (cm)</th>
+                  <th>Cân nặng (kg)</th>
                   <th>BMI</th>
-                  <th>Vision L/R</th>
-                  <th>Blood Pressure</th>
+                  <th>Thị lực T/P</th>
+                  <th>Huyết áp</th>
                   <th>Trạng thái</th>
                   <th>Kết quả gửi</th>
                   <th>Tư vấn</th>
