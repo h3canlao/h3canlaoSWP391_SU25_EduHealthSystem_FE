@@ -268,7 +268,7 @@ const UserManagement = () => {
           <Popconfirm
             title={`Xác nhận ${record.isLockedOut ? "mở khóa" : "khóa"} tài khoản này?`}
             onConfirm={() => (record.isLockedOut ? handleUnlockUser(record.id) : handleLockUser(record.id))}
-            okText={record.isLocked ? "Mở khóa" : "Khóa"}
+            okText={record.isLockedOut ? "Mở khóa" : "Khóa"}
             cancelText="Hủy"
           >
             <Button
