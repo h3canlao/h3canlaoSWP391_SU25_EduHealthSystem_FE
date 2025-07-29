@@ -140,15 +140,15 @@ const CheckupRecordModal = ({ schedule, onClose, onRecordCreated }) => {
       return;
     }
 
-    const getHour = (dtStr) => Number(dtStr?.split('T')[1]?.split(':')[0]);
-    if (getHour(formData.examinedAt) < 8 || getHour(formData.examinedAt) > 18) {
-      toast.error('Chỉ được chọn giờ khám từ 08:00 đến 18:00');
-      return;
-    }
-    if (formData.status === 2 && (getHour(followUpData.appointmentDate) < 8 || getHour(followUpData.appointmentDate) > 18)) {
-      toast.error('Chỉ được chọn giờ hẹn tái khám từ 08:00 đến 18:00');
-      return;
-    }
+    // const getHour = (dtStr) => Number(dtStr?.split('T')[1]?.split(':')[0]);
+    // if (getHour(formData.examinedAt) < 8 || getHour(formData.examinedAt) > 18) {
+    //   toast.error('Chỉ được chọn giờ khám từ 08:00 đến 18:00');
+    //   return;
+    // }
+    // if (formData.status === 2 && (getHour(followUpData.appointmentDate) < 8 || getHour(followUpData.appointmentDate) > 18)) {
+    //   toast.error('Chỉ được chọn giờ hẹn tái khám từ 08:00 đến 18:00');
+    //   return;
+    // }
 
     try {
       setLoading(true);
