@@ -1,6 +1,9 @@
 import axios from "axios";
 const BASE_URL = "https://localhost:7096/api";
-
+const getAuthHeaders = () => {
+  const token = localStorage.getItem("accessToken");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
 // Danh sách
 export const getCheckupSchedules = (params) => axios.get(`${BASE_URL}/CheckupSchedule`, { params });
 
@@ -17,10 +20,11 @@ export const updateCheckupSchedule = (id, data) => axios.put(`${BASE_URL}/Checku
 export const getCheckupScheduleById = (id) => axios.get(`${BASE_URL}/CheckupSchedule/${id}/detail`); // Lưu ý: API có endpoint riêng cho detail
 
 // Xóa nhiều (batch, dùng body là mảng ids)
-export const deleteCheckupSchedules = (ids) => axios.post(`${BASE_URL}/CheckupSchedule/batch/delete`, ids); // Lưu ý: API dùng POST cho batch delete
+export const deleteCheckupSchedules = (ids) => axios.post(`${BASE_URL}/CheckupSchedule/batch/delete`, { ids }); // Lưu ý: API dùng POST cho batch delete
 
 // Phục hồi nhiều
-export const restoreCheckupSchedules = (ids) => axios.post(`${BASE_URL}/CheckupSchedule/batch/restore`, ids); // Lưu ý: API dùng POST cho batch restore
+export const restoreCheckupSchedules = (ids) =>
+  axios.post(`${BASE_URL}/CheckupSchedule/batch/restore`, { ids }, { headers: getAuthHeaders() }); // Lưu ý: API dùng POST cho batch restore
 
 // Đổi trạng thái nhiều
 export const updateStatusCheckupSchedules = (scheduleIds, newStatus, notes) =>

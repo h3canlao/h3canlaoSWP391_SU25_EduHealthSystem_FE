@@ -96,7 +96,11 @@ const ModalStudent = ({ show, setShow, healthProfile, resetData, onUpdated }) =>
         <div className="tab-content">
           {activeTab === 'profile' && <StudentStaticProfile studentInfo={studentInfo} />}
           {activeTab === 'health' && <HealthProfileForm formData={formData} handleChange={handleChange} />}
-          {activeTab === 'vaccine' && <VaccineDeclarationForm studentId={studentInfo.id} onSuccess={() => {}} />}
+          {activeTab === 'vaccine' && <VaccineDeclarationForm 
+            studentId={studentInfo.id} 
+            formData={formData}
+            setFormData={setFormData}
+          />}
         </div>
       </Modal.Body>
       <Modal.Footer>
@@ -182,7 +186,7 @@ const HealthProfileForm = ({ formData, handleChange }) => (
   </div>
 );
 
-const VaccineDeclarationForm = ({ studentId, onSuccess }) => {
+const VaccineDeclarationForm = ({ studentId, formData, setFormData }) => {
   const [vaccineTypes, setVaccineTypes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -220,10 +224,23 @@ const VaccineDeclarationForm = ({ studentId, onSuccess }) => {
         doseNumber: Number(doseNumber), 
         administeredAt: new Date().toISOString() 
       }]);
+      
+      // Get the selected vaccine name
+      const selectedVaccine = vaccineTypes.find(v => v.id === vaccineTypeId);
+      const vaccineName = selectedVaccine ? selectedVaccine.name : "Vắc xin không xác định";
+      
+      // Update the vaccination summary
+      const newEntry = `- ${vaccineName} - ${doseNumber} mũi`;
+      const updatedSummary = formData.vaccinationSummary 
+        ? `${formData.vaccinationSummary}\n${newEntry}` 
+        : newEntry;
+        
+      // Update the form data with the new summary
+      setFormData(prev => ({ ...prev, vaccinationSummary: updatedSummary }));
+      
       toast.success("Khai báo vắc xin thành công!");
       setVaccineTypeId("");
       setDoseNumber(1);
-      onSuccess?.();
     } catch {
       toast.error("Khai báo vắc xin thất bại!");
     }
@@ -231,32 +248,55 @@ const VaccineDeclarationForm = ({ studentId, onSuccess }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ maxWidth: 400, margin: "0 auto", padding: 16 }}>
-      <div className="mb-3">
-        <label className="form-label">Loại vắc xin</label>
-        <Select
-          options={vaccineOptions}
-          isLoading={loading}
-          placeholder="Tìm kiếm hoặc chọn loại vắc xin..."
-          value={vaccineOptions.find(opt => opt.value === vaccineTypeId) || null}
-          onChange={opt => setVaccineTypeId(opt ? opt.value : "")}
-          isClearable
-        />
+    <div className="row">
+      <div className="col-md-6">
+        <form onSubmit={handleSubmit} className="p-3 border rounded">
+          <h5 className="text-center mb-3">Khai báo vắc xin đã tiêm</h5>
+          <div className="mb-3">
+            <label className="form-label">Loại vắc xin</label>
+            <Select
+              options={vaccineOptions}
+              isLoading={loading}
+              placeholder="Tìm kiếm hoặc chọn loại vắc xin..."
+              value={vaccineOptions.find(opt => opt.value === vaccineTypeId) || null}
+              onChange={opt => setVaccineTypeId(opt ? opt.value : "")}
+              isClearable
+            />
+          </div>
+          <div className="mb-3">
+            <label className="form-label">Số mũi đã tiêm</label>
+            <input
+              type="number"
+              className="form-control form-control-sm"
+              min={1}
+              value={doseNumber}
+              onChange={e => setDoseNumber(e.target.value)}
+            />
+          </div>
+          <button type="submit" className="btn btn-primary" disabled={submitting || loading} style={{ width: "100%" }}>
+            {submitting ? "Đang gửi..." : "Khai báo"}
+          </button>
+        </form>
       </div>
-      <div className="mb-3">
-        <label className="form-label">Số mũi đã tiêm</label>
-        <input
-          type="number"
-          className="form-control form-control-sm"
-          min={1}
-          value={doseNumber}
-          onChange={e => setDoseNumber(e.target.value)}
-        />
+      
+      <div className="col-md-6">
+        <div className="border rounded p-3 h-100">
+          <h5 className="text-center mb-3">Tóm tắt tiêm chủng</h5>
+          <div className="bg-light rounded p-3" style={{ minHeight: '150px', maxHeight: '240px', overflowY: 'auto' }}>
+            {formData.vaccinationSummary ? (
+              <pre style={{ whiteSpace: 'pre-wrap', margin: 0, fontFamily: 'inherit' }}>
+                {formData.vaccinationSummary}
+              </pre>
+            ) : (
+              <p className="text-center text-muted my-4">Chưa có thông tin tiêm chủng</p>
+            )}
+          </div>
+          <div className="mt-2 text-center">
+            <small className="text-muted">Các khai báo mới sẽ được tự động thêm vào tóm tắt này</small>
+          </div>
+        </div>
       </div>
-      <button type="submit" className="btn btn-primary" disabled={submitting || loading} style={{ width: "100%" }}>
-        {submitting ? "Đang gửi..." : "Khai báo"}
-      </button>
-    </form>
+    </div>
   );
 };
 

@@ -31,7 +31,7 @@ export const restoreCheckupCampaigns = async (ids) => {
   return axios.post(
     `${BASE_URL}/CheckupCampaign/batch/restore`,
     {
-      campaignIds: ids,
+      ids,
     },
     { headers: getAuthHeaders() }
   );
@@ -57,5 +57,5 @@ export const cancelCheckupCampaign = async (id) => {
 // Hàm lấy danh sách đã xóa, có thể dùng chung getCheckupCampaigns với param includeDeleted
 // nhưng tôi sẽ tạo hàm riêng để giữ cấu trúc tương tự code mẫu của bạn
 export const getDeletedCheckupCampaigns = async (params) => {
-  return axios.get(`${BASE_URL}/CheckupCampaign`, { params: { ...params, includeDeleted: true } });
+  return axios.get(`${BASE_URL}/CheckupCampaign/deleted`, { params: { ...params } });
 };

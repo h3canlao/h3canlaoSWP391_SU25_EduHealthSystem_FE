@@ -33,7 +33,7 @@ const { Option } = Select;
 
 const BASE_URL = "https://localhost:7096/api";
 
-// Các service functions sử dụng API thực tế dựa trên các hình ảnh đã được cung cấp
+// Cập nhật service functions để bao gồm API đăng ký cho Parent và Nurse
 const userServices = {
   getUsers: async (params) => {
     return axios.get(`${BASE_URL}/User`, { params });
@@ -50,15 +50,19 @@ const userServices = {
   unlockUser: async (id) => {
     return axios.put(`${BASE_URL}/User/unlock`, null, { params: { id } });
   },
-  createUser: async (data) => {
-    // Giả định API POST /api/User để tạo người dùng
-    return axios.post(`${BASE_URL}/User`, data);
+  // API đăng ký cho Parent
+  registerParent: async (data) => {
+    return axios.post(`${BASE_URL}/parents/register`, data);
+  },
+  // API đăng ký cho Nurse
+  registerNurse: async (data) => {
+    return axios.post(`${BASE_URL}/NurseProfile/register-nurse`, data);
   },
 };
 
 const UserManagement = () => {
   const [data, setData] = useState([]);
-  const [roles, setRoles] = useState([]);
+  const [roles, setRoles] = useState(["Student", "Parent", "SchoolNurse", "Admin"]);
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
@@ -76,14 +80,17 @@ const UserManagement = () => {
         pageNumber: params.current || pagination.current,
         pageSize: params.pageSize || pagination.pageSize,
         searchTerm: searchTerm,
-        roleId: roleFilter,
+        role: roleFilter,
       });
 
       const userList = usersRes.data.data || [];
       setData(userList);
 
       const uniqueRoles = [...new Set(userList.flatMap((user) => user.roles))];
-      setRoles(uniqueRoles);
+      // Thêm các vai trò có thể tạo mới vào danh sách nếu chưa có
+      if (!uniqueRoles.includes("Parent")) uniqueRoles.push("Parent");
+      if (!uniqueRoles.includes("SchoolNurse")) uniqueRoles.push("SchoolNurse");
+      // setRoles(uniqueRoles);
 
       const counts = {};
       userList.forEach((user) => {
@@ -97,7 +104,7 @@ const UserManagement = () => {
         ...prev,
         current: params.current || pagination.current,
         pageSize: params.pageSize || pagination.pageSize,
-        total: 100,
+        total: usersRes.data.totalCount || 100, // Sử dụng totalCount từ API nếu có
       }));
     } catch (err) {
       message.error(err?.response?.data?.message || "Không tải được dữ liệu!");
@@ -127,7 +134,7 @@ const UserManagement = () => {
       firstName: record.firstName,
       lastName: record.lastName,
       email: record.email,
-      gender: record.gender,
+      gender: record.gender, // Giả sử API GET trả về gender là string
       phoneNumbers: record.phoneNumbers,
       roles: record.roles,
     });
@@ -169,7 +176,7 @@ const UserManagement = () => {
     try {
       const values = await form.validateFields();
       if (editingUser) {
-        // Chỉ gửi các trường được hỗ trợ bởi API PATCH
+        // Cập nhật người dùng (logic giữ nguyên)
         const updatePayload = {
           firstName: values.firstName,
           lastName: values.lastName,
@@ -181,8 +188,37 @@ const UserManagement = () => {
         await userServices.updateUser(editingUser.id, updatePayload);
         message.success("Cập nhật người dùng thành công!");
       } else {
-        await userServices.createUser(values);
-        message.success("Tạo người dùng thành công!");
+        console.log("values", values);
+        // ⭐ LOGIC TẠO NGƯỜI DÙNG MỚI
+        if (!values.roles) {
+          message.error("Vui lòng chọn chính xác một vai trò khi tạo người dùng mới.");
+          return;
+        }
+
+        const role = values.roles;
+        const genderMap = { Male: 0, Female: 1, Other: 2 }; // Ánh xạ gender từ string sang number
+
+        // Chuẩn bị payload theo yêu cầu của API đăng ký
+        const registrationPayload = {
+          email: values.email,
+          password: values.password,
+          firstName: values.firstName,
+          lastName: values.lastName,
+          gender: genderMap[values.gender], // Sử dụng giá trị đã ánh xạ
+        };
+
+        if (role === "Parent") {
+          await userServices.registerParent(registrationPayload);
+          message.success("Tạo tài khoản Phụ huynh thành công!");
+        } else if (role === "SchoolNurse") {
+          await userServices.registerNurse(registrationPayload);
+          message.success("Tạo tài khoản Y tá thành công!");
+        } else {
+          message.error(
+            `Không thể tạo tài khoản với vai trò '${role}'. Vui lòng chỉ chọn 'Parent' hoặc 'SchoolNurse'.`
+          );
+          return; // Dừng lại nếu vai trò không hợp lệ
+        }
       }
       setModalVisible(false);
       fetchData();
@@ -200,7 +236,7 @@ const UserManagement = () => {
       key: "roles",
       render: (roles) => (
         <Space>
-          {roles.map((role) => {
+          {(roles || []).map((role) => {
             let color = "";
             if (role === "Admin") color = "geekblue";
             if (role === "Parent") color = "green";
@@ -216,8 +252,8 @@ const UserManagement = () => {
     },
     {
       title: "Trạng thái",
-      dataIndex: "isLocked",
-      key: "isLocked",
+      dataIndex: "isLockedOut",
+      key: "isLockedOut",
       render: (isLocked) => <Tag color={isLocked ? "red" : "green"}>{isLocked ? "Đã khóa" : "Hoạt động"}</Tag>,
     },
     {
@@ -225,21 +261,22 @@ const UserManagement = () => {
       key: "actions",
       render: (_, record) => (
         <Space size="middle">
+          {/* Nút sửa vẫn có thể giữ lại nếu cần */}
           {/* <Button type="primary" icon={<EditOutlined />} onClick={() => handleEdit(record)}>
             Sửa
           </Button> */}
           <Popconfirm
-            title={`Xác nhận ${record.isLocked ? "mở khóa" : "khóa"} tài khoản này?`}
-            onConfirm={() => (record.isLocked ? handleUnlockUser(record.id) : handleLockUser(record.id))}
+            title={`Xác nhận ${record.isLockedOut ? "mở khóa" : "khóa"} tài khoản này?`}
+            onConfirm={() => (record.isLockedOut ? handleUnlockUser(record.id) : handleLockUser(record.id))}
             okText={record.isLocked ? "Mở khóa" : "Khóa"}
             cancelText="Hủy"
           >
             <Button
               type="primary"
-              danger={!record.isLocked}
-              icon={record.isLocked ? <UnlockOutlined /> : <LockOutlined />}
+              danger={!record.isLockedOut}
+              icon={record.isLockedOut ? <UnlockOutlined /> : <LockOutlined />}
             >
-              {record.isLocked ? "Mở khóa" : "Khóa"}
+              {record.isLockedOut ? "Mở khóa" : "Khóa"}
             </Button>
           </Popconfirm>
         </Space>
@@ -276,6 +313,7 @@ const UserManagement = () => {
 
       <Card
         extra={
+          // ⭐ KÍCH HOẠT LẠI NÚT THÊM MỚI
           <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
             Thêm mới
           </Button>
@@ -296,16 +334,12 @@ const UserManagement = () => {
               </Option>
             ))}
           </Select>
-          <Popconfirm
-            title={`Bạn có chắc chắn muốn xóa ${selectedRowKeys.length} người dùng đã chọn?`}
-            onConfirm={handleBulkDelete}
-            okText="Xóa"
-            cancelText="Hủy"
-          >
+          {/* Popconfirm xóa hàng loạt vẫn được giữ lại, có thể bỏ comment nếu cần */}
+          {/* <Popconfirm title={`Bạn có chắc chắn muốn xóa ${selectedRowKeys.length} người dùng đã chọn?`} onConfirm={handleBulkDelete} okText="Xóa" cancelText="Hủy">
             <Button type="primary" danger disabled={selectedRowKeys.length === 0} icon={<DeleteOutlined />}>
               Xóa đã chọn
             </Button>
-          </Popconfirm>
+          </Popconfirm> */}
         </Space>
         <Table
           rowKey="id"
@@ -314,7 +348,7 @@ const UserManagement = () => {
           dataSource={data}
           pagination={pagination}
           onChange={handleTableChange}
-          rowSelection={rowSelection}
+          // rowSelection={rowSelection} // Có thể bật lại nếu cần chức năng xóa hàng loạt
         />
       </Card>
 
@@ -342,7 +376,6 @@ const UserManagement = () => {
           >
             <Input />
           </Form.Item>
-          {/* Trường password chỉ hiển thị khi thêm mới */}
           {!editingUser && (
             <Form.Item
               name="password"
@@ -359,12 +392,18 @@ const UserManagement = () => {
               <Option value="Other">Khác</Option>
             </Select>
           </Form.Item>
-          <Form.Item name="phoneNumbers" label="Số điện thoại">
-            <Input />
-          </Form.Item>
+          {editingUser && (
+            <Form.Item name="phoneNumbers" label="Số điện thoại">
+              <Input />
+            </Form.Item>
+          )}
           <Form.Item name="roles" label="Vai trò" rules={[{ required: true, message: "Vui lòng chọn vai trò!" }]}>
-            <Select mode="multiple" placeholder="Chọn vai trò">
-              {roles.map((role) => (
+            <Select mode={editingUser ? "multiple" : undefined} placeholder="Chọn vai trò">
+              {/* ⭐ LOGIC THAY ĐỔI TẠI ĐÂY
+                - Nếu là chỉnh sửa (editingUser tồn tại), hiển thị tất cả vai trò.
+                - Nếu là tạo mới (!editingUser), chỉ hiển thị 'Parent' và 'SchoolNurse'.
+              */}
+              {(editingUser ? roles : ["Parent", "SchoolNurse"]).map((role) => (
                 <Option key={role} value={role}>
                   {role}
                 </Option>
