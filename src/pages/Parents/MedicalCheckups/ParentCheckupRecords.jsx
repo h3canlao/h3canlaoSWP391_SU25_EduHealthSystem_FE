@@ -111,13 +111,10 @@ const ParentCheckupRecords = () => {
                         <div className="detail-row"><FaWeight className="detail-icon" /><span className="label">Cân nặng:</span><span className="value">{record.weightKg} kg</span></div>
                         <div className="detail-row">
                           <FaEye className="detail-icon" />
-                          <span className="label">Thị lực trái:</span>
-                          <span className="value">{visionLevelMap[record.visionLeft] ?? record.visionLeft}</span>
-                        </div>
-                        <div className="detail-row">
-                          <FaEye className="detail-icon" />
-                          <span className="label">Thị lực phải:</span>
-                          <span className="value">{visionLevelMap[record.visionRight] ?? record.visionRight}</span>
+                          <span className="label">Thị lực:</span>
+                          <span className="value">
+                            {visionLevelMap[record.visionLeft] ?? record.visionLeft}/{visionLevelMap[record.visionRight] ?? record.visionRight}
+                          </span>
                         </div>
                         <div className="detail-row">
                           <FaVolumeUp className="detail-icon" />

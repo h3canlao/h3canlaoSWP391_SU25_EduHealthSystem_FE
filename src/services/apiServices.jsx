@@ -154,7 +154,7 @@ const updateMedicationDeliveryStatus = async (parentMedicationDeliveryId, status
 
 // Lấy danh sách lịch khám sức khỏe
 const getCheckupSchedules = async () => {
-  return axios.get(`${BASE_URL}/CheckupSchedule?pageNumber=1&pageSize=50`, {
+  return axios.get(`${BASE_URL}/CheckupSchedule/with-parent-acpt?pageNumber=1&pageSize=50`, {
     headers: getAuthHeaders()
   });
 };
@@ -269,7 +269,7 @@ const getMedicalSupplyLots = async () => {
 
 // Cập nhật điều trị cho sự kiện y tế
 const updateHealthEventTreatment = async (data) => {
-  // data: { healthEventId, supplyUsages: [{ medicalSupplyLotId, quantityUsed, notes }] }
+  // data: { healthEventId, supplyUsages: [{ medicalSupplyLotId, quantityUsed, notes }] } 
   return axios.put(`${BASE_URL}/HealthEvent/treatment`, data, { headers: getAuthHeaders() });
 };
 
