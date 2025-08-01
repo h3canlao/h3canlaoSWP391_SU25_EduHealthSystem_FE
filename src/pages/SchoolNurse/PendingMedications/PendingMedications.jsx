@@ -1,12 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Typography, Spin, Empty, Card, Tag, Modal, Select, message, Input } from 'antd';
-import { ClockCircleOutlined, CheckCircleOutlined, CarOutlined, HomeOutlined, EditOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { Button, Typography, Spin, Empty, Card, Tag, Modal, Select, message, Input, Collapse, Tabs } from 'antd';
+import { 
+  ClockCircleOutlined, 
+  CheckCircleOutlined, 
+  CarOutlined, 
+  HomeOutlined, 
+  EditOutlined, 
+  MedicineBoxOutlined
+} from '@ant-design/icons';
 import { getPendingMedicationDeliveries, updateMedicationDeliveryStatus } from '../../../services/apiServices';
 import { getAccessToken } from '../../../services/handleStorageApi';
 import './PendingMedications.css';
+import TodayMedications from './TodayMedications';
+import { formatDateTime } from '../../../utils';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
+const { Panel } = Collapse;
+const { TabPane } = Tabs;
 
 const PendingMedications = () => {
   const [medications, setMedications] = useState([]);
@@ -15,80 +26,73 @@ const PendingMedications = () => {
   const [selectedStatus, setSelectedStatus] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const token = getAccessToken();
-
-  // Lấy danh sách đơn thuốc pending
-  const fetchPendingMedications = async () => {
-    if (!token) return;
-    setLoading(true);
-    try {
-      const res = await getPendingMedicationDeliveries();
-      setMedications(Array.isArray(res.data?.data) ? res.data.data : []);
-    } catch (error) {
-      message.error('Không thể tải danh sách đơn thuốc');
-      setMedications([]);
-    } finally {
-      setLoading(false);
-    }
+  // Status mapping
+  const statusMap = {
+    0: { color: '#fa8c16', icon: <ClockCircleOutlined />, text: 'Đang chờ' },
+    1: { color: '#52c41a', icon: <CheckCircleOutlined />, text: 'Đã xác nhận' },
+    2: { color: '#f5222d', icon: <CarOutlined />, text: 'Từ chối' },
+    3: { color: '#722ed1', icon: <HomeOutlined />, text: 'Đã giao' }
   };
 
+  // Fetch data
   useEffect(() => {
-    fetchPendingMedications();
-  }, [token]);
+    const fetchData = async () => {
+      const token = getAccessToken();
+      if (!token) return;
+      
+      setLoading(true);
+      try {
+        const res = await getPendingMedicationDeliveries();
+        setMedications(Array.isArray(res.data?.data) ? res.data.data : []);
+      } catch (error) {
+        message.error('Không thể tải danh sách đơn thuốc');
+        setMedications([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, []);
 
-  // Lọc danh sách đơn thuốc theo searchTerm
+  // Filter medications based on search term
   const filteredMedications = medications.filter(med =>
-    med.medicationName?.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '')
+    med.studentName?.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '')
       .includes(searchTerm.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, ''))
   );
 
-  // Xử lý cập nhật trạng thái
+  // Modal handlers
   const handleUpdateStatus = async () => {
     if (!updateModal.medication) return;
     
     setUpdateModal(prev => ({ ...prev, loading: true }));
     try {
       await updateMedicationDeliveryStatus(
-        updateModal.medication.parentMedicationDeliveryId,
+        updateModal.medication.id,
         selectedStatus
       );
       message.success('Cập nhật trạng thái thành công!');
+      
+      // Refresh data and close modal
       setUpdateModal({ visible: false, medication: null, loading: false });
-      fetchPendingMedications(); // Reload danh sách
+      const token = getAccessToken();
+      if (token) {
+        const res = await getPendingMedicationDeliveries();
+        setMedications(Array.isArray(res.data?.data) ? res.data.data : []);
+      }
     } catch (error) {
       message.error('Cập nhật trạng thái thất bại');
-    } finally {
       setUpdateModal(prev => ({ ...prev, loading: false }));
     }
   };
 
-  // Mở modal cập nhật
-  const openUpdateModal = (medication) => {
-    setUpdateModal({ visible: true, medication, loading: false });
-    setSelectedStatus(0);
-  };
-
-  // Đóng modal
-  const closeUpdateModal = () => {
-    setUpdateModal({ visible: false, medication: null, loading: false });
-    setSelectedStatus(0);
-  };
-
-  // Map trạng thái
-  const statusMap = {
-    Pending: { color: '#fa8c16', icon: <ClockCircleOutlined />, text: 'Pending' },
-    Confirmed: { color: '#52c41a', icon: <CheckCircleOutlined />, text: 'Confirmed' },
-    Rejected: { color: '#f5222d', icon: <CloseCircleOutlined />, text: 'Rejected' },
-    Delivered: { color: '#722ed1', icon: <HomeOutlined />, text: 'Delivered' }
-  };
-
-  // Render card đơn thuốc
-  const renderMedicationCard = (med) => {
-    const currentStatus = statusMap[med.status] || statusMap['Pending'];
+  // Render medication card
+  const renderMedicationCard = ({ id, studentName, notes, deliveredAt, status, medications: meds }) => {
+    const currentStatus = statusMap[status] || statusMap[0];
     
     return (
       <Card
-        key={med.parentMedicationDeliveryId}
+        key={id}
         className="medication-card"
         style={{ marginBottom: 16, borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
         bodyStyle={{ padding: 20, background: "#fff" }}
@@ -96,20 +100,11 @@ const PendingMedications = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 8, color: '#2c3e50' }}>
-              {med.medicationName}
+              {studentName}
             </div>
-            <div style={{ color: '#666', marginBottom: 4 }}>
-              <strong>Mã đơn:</strong> {med.parentMedicationDeliveryId.slice(0, 8)}...
-            </div>
-            <div style={{ color: '#666', marginBottom: 4 }}>
-              <strong>Số lượng:</strong> {med.quantityDelivered}
-            </div>
-            <div style={{ color: '#666', marginBottom: 4 }}>
-              <strong>Thời gian giao:</strong> {new Date(med.deliveredAt).toLocaleString()}
-            </div>
-            <div style={{ color: '#666', marginBottom: 8 }}>
-              <strong>Ghi chú:</strong> {med.notes || 'Không có'}
-            </div>
+            <div style={{ color: '#666', marginBottom: 4 }}><strong>Mã đơn:</strong> {id.slice(0, 8)}...</div>
+            <div style={{ color: '#666', marginBottom: 4 }}><strong>Thời gian giao:</strong> {formatDateTime(deliveredAt)}</div>
+            <div style={{ color: '#666', marginBottom: 8 }}><strong>Ghi chú:</strong> {notes || 'Không có'}</div>
           </div>
           
           <div style={{ textAlign: 'right', marginLeft: 16 }}>
@@ -125,13 +120,52 @@ const PendingMedications = () => {
               type="primary"
               icon={<EditOutlined />}
               size="small"
-              onClick={() => openUpdateModal(med)}
+              onClick={() => setUpdateModal({ visible: true, medication: { id, studentName, status }, loading: false })}
               style={{ borderRadius: 6, background: '#722ed1', borderColor: '#722ed1' }}
             >
               Cập nhật
             </Button>
           </div>
         </div>
+
+        {meds && meds.length > 0 ? (
+          <div className="medications-container" style={{ marginTop: 16 }}>
+            <Collapse bordered={false} className="medications-collapse" expandIconPosition="end">
+              {meds.map((med, idx) => (
+                <Panel 
+                  key={med.id || `med-${idx}`}
+                  header={<div className="medication-panel-header">
+                    <MedicineBoxOutlined /> <span className="medication-name">{med.medicationName}</span>
+                  </div>}
+                >
+                  <div className="medication-details">
+                    <div><Text strong>Số lượng tổng:</Text> {med.totalQuantity}</div>
+                    <div><Text strong>Đã sử dụng:</Text> {med.quantityUsed}</div>
+                    <div><Text strong>Còn lại:</Text> {med.quantityRemaining}</div>
+                    <div><Text strong>Hướng dẫn sử dụng:</Text> {med.dosageInstruction || '-'}</div>
+                    
+                    {med.dailySchedule?.length > 0 && (
+                      <div className="daily-schedules">
+                        <div className="schedule-divider">Lịch uống thuốc</div>
+                        {med.dailySchedule.map((schedule, idx) => (
+                          <div key={schedule.id || idx} className="schedule-display-item">
+                            <strong>Thời gian:</strong> {schedule.time} | 
+                            <strong> Liều lượng:</strong> {schedule.dosage} | 
+                            <strong> Ghi chú:</strong> {schedule.note || '-'}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </Panel>
+              ))}
+            </Collapse>
+          </div>
+        ) : (
+          <div style={{ marginTop: 16, color: '#999', fontStyle: 'italic' }}>
+            Không có thông tin thuốc
+          </div>
+        )}
       </Card>
     );
   };
@@ -140,35 +174,43 @@ const PendingMedications = () => {
     <div className="pending-medications">
       <Card className="pending-medications-container">
         <div className="page-header">
-          <Title level={3}>Quản Lý Đơn Thuốc Đang Chờ</Title>
+          <Title level={3}>Quản Lý Đơn Thuốc</Title>
           <Text type="secondary">Theo dõi và cập nhật trạng thái các đơn thuốc từ phụ huynh</Text>
         </div>
-        <Input
-          placeholder="Tìm kiếm tên thuốc..."
-          value={searchTerm}
-          onChange={e => setSearchTerm(e.target.value)}
-          style={{ marginBottom: 20, maxWidth: 350 }}
-          allowClear
-        />
-        {loading ? (
-          <div style={{ textAlign: 'center', padding: '40px' }}>
-            <Spin size="large" />
-          </div>
-        ) : filteredMedications.length === 0 ? (
-          <Empty description="Không có đơn thuốc nào đang chờ xử lý." />
-        ) : (
-          <div className="medications-container">
-            {filteredMedications.map(renderMedicationCard)}
-          </div>
-        )}
+        
+        <Tabs defaultActiveKey="all" className="medications-tabs">
+          <TabPane tab="Tất cả đơn thuốc" key="all">
+            <Input
+              placeholder="Tìm kiếm tên học sinh..."
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              style={{ marginBottom: 20, maxWidth: 350 }}
+              allowClear
+            />
+            
+            {loading ? (
+              <div style={{ textAlign: 'center', padding: '40px' }}><Spin size="large" /></div>
+            ) : filteredMedications.length === 0 ? (
+              <Empty description="Không có đơn thuốc nào." />
+            ) : (
+              <div className="medications-container">
+                {filteredMedications.map(renderMedicationCard)}
+              </div>
+            )}
+          </TabPane>
+          
+          <TabPane tab="Thuốc cần dùng hôm nay" key="today">
+            <TodayMedications />
+          </TabPane>
+        </Tabs>
       </Card>
 
-      {/* Modal cập nhật trạng thái */}
+      {/* Modal cập nhật trạng thái đơn thuốc */}
       <Modal
         title="Cập nhật trạng thái đơn thuốc"
         open={updateModal.visible}
         onOk={handleUpdateStatus}
-        onCancel={closeUpdateModal}
+        onCancel={() => setUpdateModal({ visible: false, medication: null, loading: false })}
         confirmLoading={updateModal.loading}
         okText="Cập nhật"
         cancelText="Hủy"
@@ -177,7 +219,7 @@ const PendingMedications = () => {
         {updateModal.medication && (
           <div>
             <div style={{ marginBottom: 16 }}>
-              <strong>Tên thuốc:</strong> {updateModal.medication.medicationName}
+              <strong>Học sinh:</strong> {updateModal.medication.studentName}
             </div>
             <div style={{ marginBottom: 16 }}>
               <strong>Trạng thái hiện tại:</strong>
@@ -197,10 +239,10 @@ const PendingMedications = () => {
                 style={{ width: '100%', marginTop: 8 }}
                 placeholder="Chọn trạng thái mới"
               >
-                <Option value={0}>Pending</Option>
-                <Option value={1}>Confirmed</Option>
-                <Option value={2}>Rejected</Option>
-                <Option value={3}>Delivered</Option>
+                <Option value={0}>Đang chờ</Option>
+                <Option value={1}>Đã xác nhận</Option>
+                <Option value={2}>Từ chối</Option>
+                <Option value={3}>Đã giao</Option>
               </Select>
             </div>
           </div>

@@ -7,15 +7,26 @@ import Col from "react-bootstrap/Col";
 import { createParentMedicationDelivery } from '../../../services/apiServices';
 import "./ModalMedication.css";
 import { toast } from "react-toastify";
+import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 
 // Initial form data
 const initialFormData = {
-  medicationName: "",
   studentId: "",
-  quantityDelivered: 1,
-  deliveredDate: new Date().toISOString().split('T')[0], // Default to today's date
-  deliveredTime: new Date().toTimeString().slice(0, 5), // Default to current time (HH:MM format)
-  notes: ""
+  notes: "",
+  medications: [
+    {
+      medicationName: "",
+      quantityDelivered: 1,
+      dosageInstruction: "",
+      dailySchedule: [
+        {
+          time: "",
+          dosage: 1,
+          note: ""
+        }
+      ]
+    }
+  ]
 };
 
 const ModalMedication = ({ show, setShow, onClose, students = [], parentId }) => {
@@ -40,23 +51,118 @@ const ModalMedication = ({ show, setShow, onClose, students = [], parentId }) =>
         ? students[0]?.id || students[0]?.studentId || students[0]?.studentCode 
         : "";
       
-      const now = new Date();
-      const currentTime = now.toTimeString().slice(0, 5); // HH:MM format
-      const currentDate = now.toISOString().split('T')[0]; // YYYY-MM-DD format
-      
       setFormData({
         ...initialFormData,
-        studentId: defaultStudentId,
-        deliveredDate: currentDate,
-        deliveredTime: currentTime
+        studentId: defaultStudentId
       });
     }
   }, [show, students]);
 
-  // Handle input changes
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+  // Handle student selection change
+  const handleStudentChange = (e) => {
+    setFormData(prev => ({ ...prev, studentId: e.target.value }));
+  };
+
+  // Handle notes change
+  const handleNotesChange = (e) => {
+    setFormData(prev => ({ ...prev, notes: e.target.value }));
+  };
+
+  // Handle medication fields change
+  const handleMedicationChange = (index, field, value) => {
+    setFormData(prev => {
+      const updatedMedications = [...prev.medications];
+      updatedMedications[index] = { 
+        ...updatedMedications[index], 
+        [field]: value 
+      };
+      return { ...prev, medications: updatedMedications };
+    });
+  };
+
+  // Handle daily schedule change
+  const handleScheduleChange = (medIndex, scheduleIndex, field, value) => {
+    setFormData(prev => {
+      const updatedMedications = [...prev.medications];
+      const updatedSchedule = [...updatedMedications[medIndex].dailySchedule];
+      updatedSchedule[scheduleIndex] = { 
+        ...updatedSchedule[scheduleIndex], 
+        [field]: value 
+      };
+      updatedMedications[medIndex] = {
+        ...updatedMedications[medIndex],
+        dailySchedule: updatedSchedule
+      };
+      return { ...prev, medications: updatedMedications };
+    });
+  };
+
+  // Add a new medication
+  const addMedication = () => {
+    setFormData(prev => ({
+      ...prev,
+      medications: [
+        ...prev.medications,
+        {
+          medicationName: "",
+          quantityDelivered: 1,
+          dosageInstruction: "",
+          dailySchedule: [
+            {
+              time: "",
+              dosage: 1,
+              note: ""
+            }
+          ]
+        }
+      ]
+    }));
+  };
+
+  // Remove a medication
+  const removeMedication = (index) => {
+    if (formData.medications.length <= 1) return;
+    
+    setFormData(prev => {
+      const updatedMedications = [...prev.medications];
+      updatedMedications.splice(index, 1);
+      return { ...prev, medications: updatedMedications };
+    });
+  };
+
+  // Add a new schedule item
+  const addScheduleItem = (medicationIndex) => {
+    setFormData(prev => {
+      const updatedMedications = [...prev.medications];
+      updatedMedications[medicationIndex] = {
+        ...updatedMedications[medicationIndex],
+        dailySchedule: [
+          ...updatedMedications[medicationIndex].dailySchedule,
+          {
+            time: "08:00:00",
+            dosage: 1,
+            note: ""
+          }
+        ]
+      };
+      return { ...prev, medications: updatedMedications };
+    });
+  };
+
+  // Remove a schedule item
+  const removeScheduleItem = (medicationIndex, scheduleIndex) => {
+    if (formData.medications[medicationIndex].dailySchedule.length <= 1) return;
+    
+    setFormData(prev => {
+      const updatedMedications = [...prev.medications];
+      const updatedSchedule = [...updatedMedications[medicationIndex].dailySchedule];
+      updatedSchedule.splice(scheduleIndex, 1);
+      updatedMedications[medicationIndex] = {
+        ...updatedMedications[medicationIndex],
+        dailySchedule: updatedSchedule
+      };
+      return { ...prev, medications: updatedMedications };
+    });
   };
 
   // Close modal
@@ -72,20 +178,20 @@ const ModalMedication = ({ show, setShow, onClose, students = [], parentId }) =>
     setLoading(true);
     
     try {
-      // Create a formatted ISO datetime string that preserves Vietnam timezone (UTC+7)
-      const { deliveredDate, deliveredTime } = formData;
-      
-      // Create datetime string in Vietnam timezone (UTC+7)
-      const deliveredAt = `${deliveredDate}T${deliveredTime}:00+07:00`;
-      
       // Submit data
       await createParentMedicationDelivery({
-        medicationName: formData.medicationName,
         studentId: formData.studentId,
-        parentId,
-        quantityDelivered: Number(formData.quantityDelivered),
-        deliveredAt,
-        notes: formData.notes || ''
+        notes: formData.notes || '',
+        medications: formData.medications.map(med => ({
+          medicationName: med.medicationName,
+          quantityDelivered: Number(med.quantityDelivered),
+          dosageInstruction: med.dosageInstruction || '',
+          dailySchedule: med.dailySchedule.map(schedule => ({
+            time: schedule.time,
+            dosage: Number(schedule.dosage),
+            note: schedule.note || ''
+          }))
+        }))
       });
       
       toast.success('Gửi đơn thuốc thành công!');
@@ -100,33 +206,20 @@ const ModalMedication = ({ show, setShow, onClose, students = [], parentId }) =>
   };
 
   return (
-    <Modal show={show} onHide={handleClose} centered>
+    <Modal show={show} onHide={handleClose} centered size="lg">
       <Modal.Header closeButton>
         <Modal.Title>Gửi đơn thuốc mới</Modal.Title>
       </Modal.Header>
       
       <Modal.Body>
         <Form onSubmit={handleSubmit} className="modal-medication-form">
-          {/* Medication Name */}
-          <Form.Group className="mb-3">
-            <Form.Label>Tên thuốc <span className="text-danger">*</span></Form.Label>
-            <Form.Control
-              type="text"
-              name="medicationName"
-              value={formData.medicationName}
-              onChange={handleChange}
-              placeholder="Nhập tên thuốc"
-              required
-            />
-          </Form.Group>
-          
           {/* Student Selection */}
           <Form.Group className="mb-3">
             <Form.Label>Chọn học sinh <span className="text-danger">*</span></Form.Label>
             <Form.Select
               name="studentId"
               value={formData.studentId}
-              onChange={handleChange}
+              onChange={handleStudentChange}
               disabled={students.length === 1}
               required
             >
@@ -142,56 +235,163 @@ const ModalMedication = ({ show, setShow, onClose, students = [], parentId }) =>
             </Form.Select>
           </Form.Group>
           
-          {/* Quantity */}
-          <Form.Group className="mb-3">
-            <Form.Label>Số lượng thuốc giao <span className="text-danger">*</span></Form.Label>
-            <Form.Control
-              type="number"
-              name="quantityDelivered"
-              value={formData.quantityDelivered}
-              onChange={handleChange}
-              min="1"
-              required
-            />
-          </Form.Group>
-          
-          {/* Delivery Date and Time */}
-          <Form.Group className="mb-3">
-            <Form.Label>Thời gian giao <span className="text-danger">*</span></Form.Label>
-            <Row>
-              <Col>
-                <Form.Control
-                  type="date"
-                  name="deliveredDate"
-                  value={formData.deliveredDate}
-                  onChange={handleChange}
-                  required
-                />
-              </Col>
-              <Col>
-                <Form.Control
-                  type="time"
-                  name="deliveredTime"
-                  value={formData.deliveredTime}
-                  onChange={handleChange}
-                  required
-                />
-              </Col>
-            </Row>
-          </Form.Group>
-          
           {/* Notes */}
           <Form.Group className="mb-3">
-            <Form.Label>Ghi chú</Form.Label>
+            <Form.Label>Ghi chú chung</Form.Label>
             <Form.Control
               as="textarea"
               name="notes"
               value={formData.notes}
-              onChange={handleChange}
-              rows={3}
-              placeholder="Nhập ghi chú (nếu có)"
+              onChange={handleNotesChange}
+              rows={2}
+              placeholder="Nhập ghi chú chung (nếu có)"
             />
           </Form.Group>
+          
+          <hr className="my-4" />
+          
+          {/* Medications */}
+          {formData.medications.map((medication, medIndex) => (
+            <div key={medIndex} className="medication-item mb-4">
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <h5 className="m-0">Thuốc #{medIndex + 1}</h5>
+                {formData.medications.length > 1 && (
+                  <Button 
+                    variant="outline-danger" 
+                    size="sm"
+                    onClick={() => removeMedication(medIndex)}
+                  >
+                    <DeleteOutlined /> Xóa thuốc
+                  </Button>
+                )}
+              </div>
+              
+              {/* Medication Name */}
+              <Form.Group className="mb-3">
+                <Form.Label>Tên thuốc <span className="text-danger">*</span></Form.Label>
+                <Form.Control
+                  type="text"
+                  value={medication.medicationName}
+                  onChange={(e) => handleMedicationChange(medIndex, 'medicationName', e.target.value)}
+                  placeholder="Nhập tên thuốc"
+                  required
+                />
+              </Form.Group>
+              
+              {/* Quantity */}
+              <Row className="mb-3">
+                <Col>
+                  <Form.Group>
+                    <Form.Label>Số lượng thuốc giao <span className="text-danger">*</span></Form.Label>
+                    <Form.Control
+                      type="number"
+                      value={medication.quantityDelivered}
+                      onChange={(e) => handleMedicationChange(medIndex, 'quantityDelivered', e.target.value)}
+                      min="1"
+                      required
+                    />
+                  </Form.Group>
+                </Col>
+                
+                <Col>
+                  <Form.Group>
+                    <Form.Label>Hướng dẫn sử dụng</Form.Label>
+                    <Form.Control
+                      type="text"
+                      value={medication.dosageInstruction}
+                      onChange={(e) => handleMedicationChange(medIndex, 'dosageInstruction', e.target.value)}
+                      placeholder="VD: Uống sau khi ăn"
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+              
+              {/* Daily Schedule */}
+              <div className="daily-schedule mb-3">
+                <div className="d-flex justify-content-between align-items-center mb-2">
+                  <Form.Label className="mb-0">Lịch uống thuốc hàng ngày</Form.Label>
+                  <Button 
+                    variant="outline-primary" 
+                    size="sm"
+                    onClick={() => addScheduleItem(medIndex)}
+                  >
+                    <PlusOutlined /> Thêm lịch
+                  </Button>
+                </div>
+                
+                {medication.dailySchedule.map((schedule, scheduleIndex) => (
+                  <div key={scheduleIndex} className="schedule-item border rounded p-3 mb-2">
+                    <div className="d-flex justify-content-between align-items-center mb-2">
+                      <small>Lịch #{scheduleIndex + 1}</small>
+                      {medication.dailySchedule.length > 1 && (
+                        <Button 
+                          variant="outline-danger" 
+                          size="sm"
+                          onClick={() => removeScheduleItem(medIndex, scheduleIndex)}
+                        >
+                          <DeleteOutlined />
+                        </Button>
+                      )}
+                    </div>
+                    
+                    <Row>
+                      <Col md={4}>
+                        <Form.Group className="mb-2">
+                          <Form.Label>Thời gian <span className="text-danger">*</span></Form.Label>
+                          <Form.Control
+                            type="time"
+                            value={schedule.time}
+                            onChange={(e) => handleScheduleChange(medIndex, scheduleIndex, 'time', e.target.value)}
+                            min="08:00:00"
+                            max="17:00:00"
+                            step="1"
+                            required
+                          />
+                        </Form.Group>
+                      </Col>
+                      
+                      <Col md={3}>
+                        <Form.Group className="mb-2">
+                          <Form.Label>Liều lượng <span className="text-danger">*</span></Form.Label>
+                          <Form.Control
+                            type="number"
+                            value={schedule.dosage}
+                            onChange={(e) => handleScheduleChange(medIndex, scheduleIndex, 'dosage', e.target.value)}
+                            min="1"
+                            required
+                          />
+                        </Form.Group>
+                      </Col>
+                      
+                      <Col md={5}>
+                        <Form.Group className="mb-2">
+                          <Form.Label>Ghi chú</Form.Label>
+                          <Form.Control
+                            type="text"
+                            value={schedule.note}
+                            onChange={(e) => handleScheduleChange(medIndex, scheduleIndex, 'note', e.target.value)}
+                            placeholder="VD: Uống trước khi ăn"
+                          />
+                        </Form.Group>
+                      </Col>
+                    </Row>
+                  </div>
+                ))}
+              </div>
+              
+              <hr className="my-4" />
+            </div>
+          ))}
+          
+          <div className="d-flex justify-content-center mb-3">
+            <Button 
+              variant="outline-primary" 
+              onClick={addMedication}
+              className="w-100"
+            >
+              <PlusOutlined /> Thêm thuốc
+            </Button>
+          </div>
         </Form>
       </Modal.Body>
       

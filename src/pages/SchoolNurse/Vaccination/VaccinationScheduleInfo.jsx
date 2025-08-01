@@ -21,6 +21,15 @@ const REACTION_SEVERITY = [
   { label: "Nặng", value: 3 },
 ];
 
+// Bảng ánh xạ trạng thái đồng ý tiêm chủng
+const consentStatusMap = {
+  0: { color: 'blue', text: 'Chờ xử lý' },    // Pending
+  1: { color: 'orange', text: 'Đã gửi' },     // Sent
+  2: { color: 'green', text: 'Đã đồng ý' },   // Approved
+  3: { color: 'red', text: 'Từ chối' },       // Rejected
+  4: { color: 'gray', text: 'Hết hạn' },      // Expired
+};
+
 // Thêm bảng ánh xạ trạng thái từ tiếng Anh sang tiếng Việt
 const statusMap = {
   Registered: { color: 'orange', text: 'Đã đăng kí' },
@@ -234,7 +243,9 @@ export default function VaccinationScheduleInfo() {
     }
   };
 
-  const studentsChuaTiem = detail?.sessionStudents?.filter(s => s.statusName === 'Đã đăng kí') || [];
+  // Lọc học sinh chưa tiêm dựa vào trạng thái đồng ý (consentStatus = 2 tương ứng với Approved)
+  // và loại bỏ những học sinh đã tiêm xong (status = 4)
+  const studentsChuaTiem = detail?.sessionStudents?.filter(s => s.consentStatus === 2 && s.status !== 4) || [];
   
   // Use the records from the new API endpoint
   const studentsDaTiem = vaccinationRecords;
@@ -242,7 +253,10 @@ export default function VaccinationScheduleInfo() {
   const columnsChuaTiem = [
     { title: "Học sinh", dataIndex: "studentName", key: "studentName", render: (text) => <><UserOutlined /> {text}</> },
     { title: "Mã HS", dataIndex: "studentCode", key: "studentCode" },
-    { title: "Trạng thái", dataIndex: "statusName", key: "statusName", render: (text) => <Tag color={statusMap[text]?.color || "default"}>{statusMap[text]?.text || text}</Tag> },
+    { title: "Trạng thái", dataIndex: "consentStatus", key: "consentStatus", render: (status) => {
+      const statusInfo = consentStatusMap[status] || { color: 'default', text: 'Không xác định' };
+      return <Tag color={statusInfo.color}>{statusInfo.text}</Tag>;
+    }},
     { title: "Ghi nhận", key: "action", render: (_, record) => (
       <Button type="primary" icon={<FormOutlined />} onClick={() => openRecordModal(record)}>
         Ghi nhận
@@ -264,7 +278,7 @@ export default function VaccinationScheduleInfo() {
 
   // Filter students who haven't been vaccinated based on search term
   const filteredStudentsChuaTiem = detail?.sessionStudents
-    ?.filter(s => s.statusName === 'Registered')
+    ?.filter(s => s.consentStatus === 2 && s.status !== 4) // Approved status and not completed
     .filter(s => 
       s.studentName?.toLowerCase()
         .normalize('NFD')

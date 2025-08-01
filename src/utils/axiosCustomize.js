@@ -1,7 +1,14 @@
 import axios from "axios";
 
-import { RoutePaths } from "@/routes";
-import { EAuthToken } from "@/variables/common";
+// Định nghĩa các hằng số thay thế cho các import bị thiếu
+const RoutePaths = {
+  LOGIN: "/signin",
+  HOME: "/"
+};
+
+const EAuthToken = {
+  ACCESS_TOKEN: "accessToken"
+};
 
 const instance = axios.create({ baseURL: import.meta.env.VITE_API_URL });
 

@@ -94,8 +94,8 @@ const getListOfVaccines = async () => {
 };
 
 // Lấy tất cả đơn giao thuốc của phụ huynh
-const getAllParentMedicationDelivery = async (parentId) => {
-  return axios.get(`${BASE_URL}/parents/medication-deliveries/by-parent/${parentId}`, { headers: getAuthHeaders() });
+const getAllParentMedicationDelivery = async () => {
+  return axios.get(`${BASE_URL}/parents/medication-deliveries/parent/CurrentParent`, { headers: getAuthHeaders() });
 };
 
 // Tạo mới đơn giao thuốc của phụ huynh
@@ -143,11 +143,32 @@ const getPendingMedicationDeliveries = async () => {
   });
 };
 
+// Lấy danh sách đơn thuốc cần dùng trong ngày
+const getPendingMedicationUsageRecords = async () => {
+  return axios.get(`${BASE_URL}/medication-usage-records/pending`, {
+    headers: getAuthHeaders()
+  });
+};
+
 // Cập nhật trạng thái đơn thuốc
 const updateMedicationDeliveryStatus = async (parentMedicationDeliveryId, status) => {
   return axios.post(
     `${BASE_URL}/parents/medication-deliveries/update-status?parentMedicationDeliveryId=${parentMedicationDeliveryId}&status=${status}`,
     {},
+    { headers: getAuthHeaders() }
+  );
+};
+
+// Cập nhật trạng thái sử dụng thuốc
+const updateMedicationUsageRecord = async (usageRecordId, isTaken, note = "") => {
+  return axios.patch(
+    `${BASE_URL}/medication-usage-records/update-taken`,
+    {
+      id: usageRecordId,
+      isTaken,
+      takenAt: new Date().toISOString(),
+      note
+    },
     { headers: getAuthHeaders() }
   );
 };
@@ -362,6 +383,8 @@ export {
   createCheckupSchedule,
   getPendingMedicationDeliveries,
   updateMedicationDeliveryStatus,
+  getPendingMedicationUsageRecords,
+  updateMedicationUsageRecord,
   getCheckupSchedules,
   getNurseProfiles,
   createCheckupRecord,
