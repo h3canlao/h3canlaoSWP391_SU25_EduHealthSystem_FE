@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { getStudentsByParentId, getCheckupRecordsByStudentId } from '../../../services/apiServices';
-import { getUserInfo } from '../../../services/handleStorageApi';
+import { getStudentsByParentId, getCheckupRecordsByStudentId } from '../../../../services/apiServices';
+import { getUserInfo } from '../../../../services/handleStorageApi';
 import { Card, Avatar, Spin, Empty, Tag } from 'antd';
 import { FaUser, FaFileMedical, FaNotesMedical, FaRuler, FaWeight, FaEye, FaVolumeUp, FaHeartbeat, FaCalendar, FaComments } from 'react-icons/fa';
 import './ParentCheckupRecords.css';
