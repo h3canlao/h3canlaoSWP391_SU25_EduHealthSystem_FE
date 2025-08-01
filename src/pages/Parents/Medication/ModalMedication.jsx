@@ -1,117 +1,208 @@
-import React, { useState } from 'react';
-import { Modal, Form, InputNumber, DatePicker, Select, Input, Button, message } from 'antd';
+import React, { useState, useEffect } from "react";
+import Modal from "react-bootstrap/Modal";
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
 import { createParentMedicationDelivery } from '../../../services/apiServices';
-import { getAccessToken } from '../../../services/handleStorageApi';
+import "./ModalMedication.css";
+import { toast } from "react-toastify";
 
-const { TextArea } = Input;
+// Initial form data
+const initialFormData = {
+  medicationName: "",
+  studentId: "",
+  quantityDelivered: 1,
+  deliveredDate: new Date().toISOString().split('T')[0], // Default to today's date
+  deliveredTime: new Date().toTimeString().slice(0, 5), // Default to current time (HH:MM format)
+  notes: ""
+};
 
-const ModalMedication = ({ show, setShow, onClose, students, parentId }) => {
-  const [form] = Form.useForm();
+const ModalMedication = ({ show, setShow, onClose, students = [], parentId }) => {
+  // State management
+  const [formData, setFormData] = useState(initialFormData);
   const [loading, setLoading] = useState(false);
 
-  const defaultStudentId = students && students.length === 1 ? (students[0].id || students[0].studentId || students[0].studentCode) : undefined;
+  // Set default student if there's only one
+  useEffect(() => {
+    if (students.length === 1) {
+      setFormData(prev => ({ 
+        ...prev, 
+        studentId: students[0]?.id || students[0]?.studentId || students[0]?.studentCode 
+      }));
+    }
+  }, [students]);
 
-  const handleCancel = () => {
-    setShow(false);
-    form.resetFields();
-    if (onClose) onClose(false);
+  // Reset form when modal opens
+  useEffect(() => {
+    if (show) {
+      const defaultStudentId = students.length === 1 
+        ? students[0]?.id || students[0]?.studentId || students[0]?.studentCode 
+        : "";
+      
+      const now = new Date();
+      const currentTime = now.toTimeString().slice(0, 5); // HH:MM format
+      const currentDate = now.toISOString().split('T')[0]; // YYYY-MM-DD format
+      
+      setFormData({
+        ...initialFormData,
+        studentId: defaultStudentId,
+        deliveredDate: currentDate,
+        deliveredTime: currentTime
+      });
+    }
+  }, [show, students]);
+
+  // Handle input changes
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleOk = async () => {
+  // Close modal
+  const handleClose = () => {
+    setShow(false);
+    setFormData(initialFormData);
+    onClose?.(false);
+  };
+
+  // Submit form
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    
     try {
-      const values = await form.validateFields();
-      setLoading(true);
-      const data = {
-        medicationName: values.medicationName,
-        studentId: values.studentId,
+      // Create a formatted ISO datetime string that preserves Vietnam timezone (UTC+7)
+      const { deliveredDate, deliveredTime } = formData;
+      
+      // Create datetime string in Vietnam timezone (UTC+7)
+      const deliveredAt = `${deliveredDate}T${deliveredTime}:00+07:00`;
+      
+      // Submit data
+      await createParentMedicationDelivery({
+        medicationName: formData.medicationName,
+        studentId: formData.studentId,
         parentId,
-        quantityDelivered: values.quantityDelivered,  
-        deliveredAt: values.deliveredAt.format('YYYY-MM-DDTHH:mm:ss'),
-        notes: values.notes || ''
-      };
-      await createParentMedicationDelivery(data);
-      message.success('Gửi đơn thuốc thành công!');
+        quantityDelivered: Number(formData.quantityDelivered),
+        deliveredAt,
+        notes: formData.notes || ''
+      });
+      
+      toast.success('Gửi đơn thuốc thành công!');
       setShow(false);
-      form.resetFields();
-      if (onClose) onClose(true);
+      setFormData(initialFormData);
+      onClose?.(true);
     } catch (err) {
-      if (err && err.errorFields) return; // Lỗi validate
-      message.error('Gửi đơn thuốc thất bại!');
+      toast.error('Gửi đơn thuốc thất bại!');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Modal
-      open={show}
-      title="Gửi đơn thuốc mới"
-      onCancel={handleCancel}
-      footer={null}
-      destroyOnClose
-      centered
-    >
-      <Form
-        form={form}
-        layout="vertical"
-        initialValues={{
-          studentId: defaultStudentId,
-          quantityDelivered: 1,
-          notes: ''
-        }}
-        onFinish={handleOk}
-      >
-        <Form.Item
-          label="Tên thuốc"
-          name="medicationName"
-          rules={[{ required: true, message: 'Vui lòng nhập tên thuốc!' }]}
-        >
-          <Input placeholder="Nhập tên thuốc" />
-        </Form.Item>
-        <Form.Item
-          label="Chọn học sinh"
-          name="studentId"
-          rules={[{ required: true, message: 'Vui lòng chọn học sinh!' }]}
-        >
-          <Select disabled={students.length === 1} placeholder="Chọn học sinh">
-            {students.map(stu => (
-              <Select.Option key={stu.id || stu.studentId || stu.studentCode} value={stu.id || stu.studentId || stu.studentCode}>
-                {stu.firstName} {stu.lastName} ({stu.studentCode})
-              </Select.Option>
-            ))}
-          </Select>
-        </Form.Item>
-        <Form.Item
-          label="Số lượng thuốc giao"
-          name="quantityDelivered"
-          rules={[{ required: true, message: 'Vui lòng nhập số lượng!' }]}
-        >
-          <InputNumber min={1} style={{ width: '100%' }} placeholder="Nhập số lượng thuốc" />
-        </Form.Item>
-        <Form.Item
-          label="Thời gian giao"
-          name="deliveredAt"
-          rules={[{ required: true, message: 'Vui lòng chọn thời gian giao!' }]}
-        >
-          <DatePicker
-            showTime
-            style={{ width: '100%' }}
-            format="YYYY-MM-DD HH:mm:ss"
-            placeholder="Chọn thời gian giao"
-          />
-        </Form.Item>
-        <Form.Item
-          label="Ghi chú"
-          name="notes"
-        >
-          <TextArea rows={3} placeholder="Nhập ghi chú (nếu có)" />
-        </Form.Item>
-        <Form.Item>
-          <Button type="primary" htmlType="submit" loading={loading} block>
-            Gửi đơn thuốc
-          </Button>
-        </Form.Item>
-      </Form>
+    <Modal show={show} onHide={handleClose} centered>
+      <Modal.Header closeButton>
+        <Modal.Title>Gửi đơn thuốc mới</Modal.Title>
+      </Modal.Header>
+      
+      <Modal.Body>
+        <Form onSubmit={handleSubmit} className="modal-medication-form">
+          {/* Medication Name */}
+          <Form.Group className="mb-3">
+            <Form.Label>Tên thuốc <span className="text-danger">*</span></Form.Label>
+            <Form.Control
+              type="text"
+              name="medicationName"
+              value={formData.medicationName}
+              onChange={handleChange}
+              placeholder="Nhập tên thuốc"
+              required
+            />
+          </Form.Group>
+          
+          {/* Student Selection */}
+          <Form.Group className="mb-3">
+            <Form.Label>Chọn học sinh <span className="text-danger">*</span></Form.Label>
+            <Form.Select
+              name="studentId"
+              value={formData.studentId}
+              onChange={handleChange}
+              disabled={students.length === 1}
+              required
+            >
+              <option value="">Chọn học sinh</option>
+              {students.map(student => (
+                <option 
+                  key={student.id || student.studentId || student.studentCode}
+                  value={student.id || student.studentId || student.studentCode}
+                >
+                  {student.firstName} {student.lastName} ({student.studentCode})
+                </option>
+              ))}
+            </Form.Select>
+          </Form.Group>
+          
+          {/* Quantity */}
+          <Form.Group className="mb-3">
+            <Form.Label>Số lượng thuốc giao <span className="text-danger">*</span></Form.Label>
+            <Form.Control
+              type="number"
+              name="quantityDelivered"
+              value={formData.quantityDelivered}
+              onChange={handleChange}
+              min="1"
+              required
+            />
+          </Form.Group>
+          
+          {/* Delivery Date and Time */}
+          <Form.Group className="mb-3">
+            <Form.Label>Thời gian giao <span className="text-danger">*</span></Form.Label>
+            <Row>
+              <Col>
+                <Form.Control
+                  type="date"
+                  name="deliveredDate"
+                  value={formData.deliveredDate}
+                  onChange={handleChange}
+                  required
+                />
+              </Col>
+              <Col>
+                <Form.Control
+                  type="time"
+                  name="deliveredTime"
+                  value={formData.deliveredTime}
+                  onChange={handleChange}
+                  required
+                />
+              </Col>
+            </Row>
+          </Form.Group>
+          
+          {/* Notes */}
+          <Form.Group className="mb-3">
+            <Form.Label>Ghi chú</Form.Label>
+            <Form.Control
+              as="textarea"
+              name="notes"
+              value={formData.notes}
+              onChange={handleChange}
+              rows={3}
+              placeholder="Nhập ghi chú (nếu có)"
+            />
+          </Form.Group>
+        </Form>
+      </Modal.Body>
+      
+      <Modal.Footer>
+        <Button variant="secondary" onClick={handleClose}>
+          Đóng
+        </Button>
+        <Button variant="primary" onClick={handleSubmit} disabled={loading}>
+          {loading ? "Đang gửi..." : "Gửi đơn thuốc"}
+        </Button>
+      </Modal.Footer>
     </Modal>
   );
 };

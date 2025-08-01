@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { getStudentsByParentId, getCheckupSchedulesByStudentId, consentCheckupSchedule, getCheckupSchedulesMyChildren } from '../../../services/apiServices';
-import { getUserInfo } from '../../../services/handleStorageApi';
+import { getStudentsByParentId, getCheckupSchedulesByStudentId, consentCheckupSchedule, getCheckupSchedulesMyChildren } from '../../../../services/apiServices';
+import { getUserInfo } from '../../../../services/handleStorageApi';
 import { Card, Avatar, Tag, Spin, Empty, Modal, Input, Button, message } from 'antd';
 import { FaUser, FaCalendar, FaStethoscope, FaInfoCircle, FaIdBadge, FaChalkboardTeacher, FaClock, FaFlag } from 'react-icons/fa';
 import './ParentCheckupSchedules.css';
@@ -133,16 +133,6 @@ const ParentCheckupSchedules = () => {
                     {schedule.studentName}
                   </div>
                   <div className="schedule-details">
-                    {/* <div className="detail-row">
-                      <FaIdBadge className="detail-icon" />
-                      <span className="label">Mã học sinh:</span>
-                      <span className="value">{schedule.studentCode}</span>
-                    </div>
-                    <div className="detail-row">
-                      <FaChalkboardTeacher className="detail-icon" />
-                      <span className="label">Lớp:</span>
-                      <span className="value">{schedule.grade}{schedule.section}</span>
-                    </div> */}
                     <div className="detail-row">
                       <FaCalendar className="detail-icon" />
                       <span className="label">Ngày khám:</span>

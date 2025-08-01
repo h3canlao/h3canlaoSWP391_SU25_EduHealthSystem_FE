@@ -7,110 +7,70 @@ import { toast } from "react-toastify";
 export default function ParentVaccinationConsent() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [modal, setModal] = useState({ open: false, schedule: null, student: null, consentStatus: 0 });
+  const [modal, setModal] = useState({ open: false, schedule: null, student: null });
   const [note, setNote] = useState("");
   const [signature, setSignature] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const res = await getPendingVaccinationConsents();
-      setData(res.data?.data || []);
-    } catch (err) {
-      message.error("Không thể tải danh sách lịch tiêm.");
-    }
-    setLoading(false);
-  };
+  useEffect(() => { 
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const res = await getPendingVaccinationConsents();
+        setData(res.data?.data || []);
+      } catch {
+        message.error("Không thể tải danh sách lịch tiêm.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchData(); 
+  }, []);
 
-  useEffect(() => { fetchData(); }, []);
-
-  const openModal = (schedule, student, consentStatus) => {
-    setModal({ open: true, schedule, student, consentStatus });
+  const openModal = (schedule, student) => {
+    setModal({ open: true, schedule, student });
     setNote("");
     setSignature("");
   };
-  const closeModal = () => setModal({ open: false, schedule: null, student: null, consentStatus: 0 });
+  
+  const closeModal = () => setModal({ open: false, schedule: null, student: null });
 
-  // const handleSubmit = async () => {
-  //   if (!signature) return message.warning("Vui lòng nhập chữ ký phụ huynh.");
-  //   setSubmitting(true);
-  //   try {
-  //     const res = await acceptVaccinationConsent({
-  //       studentIds: [modal.student.studentId],
-  //       vaccinationScheduleId: modal.schedule.id,
-  //       parentNote: note,
-  //       parentSignature: signature,
-  //       consentStatus: modal.consentStatus
-  //     });
-      
-  //     // Check if there are any specific error messages in the data array
-  //     if (res?.data?.data && Array.isArray(res.data.data)) {
-  //       const failedRecord = res.data.data.find(item => !item.isSuccess);
-  //       if (failedRecord) {
-  //         // Show the specific error message from the failed record
-  //         toast.error(failedRecord.message);
-  //         closeModal();
-  //         fetchData();
-  //         return;
-  //       }
-  //     }
-      
-  //     // If no specific errors, show the general success message
-  //     toast.success(res?.data?.message);
-  //     closeModal();
-  //     fetchData();
-  //   } catch (err) {
-  //     toast.error(err.response?.data?.message || "Có lỗi xảy ra");
-  //   }
-  //   setSubmitting(false);
-  // };
-  const handleSubmit = async () => {
-    if (!signature) return message.warning("Vui lòng nhập chữ ký phụ huynh.");
+  const handleSubmit = async (consentStatus) => {
+    if (!signature) {
+      message.warning("Vui lòng nhập chữ ký phụ huynh.");
+      return;
+    }
+    
     setSubmitting(true);
+    
     try {
-      const res = await acceptVaccinationConsent({
+      await acceptVaccinationConsent({
         studentIds: [modal.student.studentId],
         vaccinationScheduleId: modal.schedule.id,
         parentNote: note,
         parentSignature: signature,
-        consentStatus: modal.consentStatus
+        consentStatus: consentStatus
       });
-  
-      // Check if there are messages in the response's data
-      if (res?.data?.data && Array.isArray(res.data.data)) {
-        const errorMessage = res.data.data[0]?.message;
-        if (errorMessage) {
-          toast.error(errorMessage); // Show error message using toast
-        }
-      }
-  
-      // For successful response
-      // const successMessage = res?.data?.message;
-      // if (successMessage) {
-      //   toast.success(successMessage); // Show success message using toast
-      // }
-  
+
       closeModal();
-      fetchData();
-    } catch (err) {
+      
+      // Refetch data
+      setLoading(true);
+      const res = await getPendingVaccinationConsents();
+      setData(res.data?.data || []);
+      setLoading(false);
+    } catch {
       toast.error("Có lỗi xảy ra, vui lòng thử lại.");
+    } finally {
+      setSubmitting(false);
     }
-    setSubmitting(false);
   };
+
   return (
-    <div
-      style={{
-        minHeight: "70vh",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center"
-      }}
-    >
-      <h2 style={{ fontWeight: 600, marginBottom: 24, textAlign: "center" }}>
-        Phiếu xác nhận tiêm chủng
-      </h2>
+    <div style={{ minHeight: "70vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+      <h2 style={{ fontWeight: 600, marginBottom: 24, textAlign: "center" }}>Phiếu xác nhận tiêm chủng</h2>
+      
       {loading ? (
         <Spin size="large" style={{ display: "block", margin: "40px auto" }} />
       ) : data.length === 0 ? (
@@ -120,13 +80,19 @@ export default function ParentVaccinationConsent() {
           grid={{ gutter: 16, column: 1 }}
           dataSource={data}
           style={{ width: "100%", maxWidth: 900 }}
-          renderItem={item => (
+          renderItem={(item) => (
             <Card
-              title={<>
-                <b>{item.campaignName}</b> - {item.vaccinationTypeName}
-                <Tag color="blue" style={{ marginLeft: 8 }}>{dayjs(item.scheduledAt).format("DD/MM/YYYY HH:mm")}</Tag>
-                <Tag color="orange">Hạn xác nhận: {dayjs(item.consentDeadline).format("DD/MM/YYYY HH:mm")}</Tag>
-              </>}
+              title={
+                <>
+                  <b>{item.campaignName}</b> - {item.vaccinationTypeName}
+                  <Tag color="blue" style={{ marginLeft: 8 }}>
+                    {dayjs(item.scheduledAt).format("DD/MM/YYYY HH:mm")}
+                  </Tag>
+                  <Tag color="orange">
+                    Hạn xác nhận: {dayjs(item.consentDeadline).format("DD/MM/YYYY HH:mm")}
+                  </Tag>
+                </>
+              }
               style={{ marginBottom: 16 }}
               bodyStyle={{ padding: 16 }}
             >
@@ -134,14 +100,11 @@ export default function ParentVaccinationConsent() {
                 dataSource={item.students}
                 renderItem={student => (
                   <List.Item actions={[
-                    student.consentStatus === 1 && (
-                      <>
-                        <Button type="primary" onClick={() => openModal(item, student, 2)}>Đồng ý</Button>
-                        <Button danger style={{ marginLeft: 8 }} onClick={() => openModal(item, student, 3)}>Từ chối</Button>
-                      </>
-                    ),
-                    student.consentStatus === 2 && <Tag color="green">Đã đồng ý</Tag>,
-                    student.consentStatus === 3 && <Tag color="red">Đã từ chối</Tag>
+                    student.consentStatus === 1 ? (
+                      <Button type="primary" onClick={() => openModal(item, student)}>
+                        Xác nhận
+                      </Button>
+                    ) : null
                   ]}>
                     <b>{student.studentName}</b> ({student.studentCode}) - Lớp {student.grade}{student.section}
                   </List.Item>
@@ -151,13 +114,12 @@ export default function ParentVaccinationConsent() {
           )}
         />
       )}
+      
       <Modal
         open={modal.open}
-        title={modal.consentStatus === 2 ? "Xác nhận đồng ý tiêm" : "Từ chối tiêm"}
+        title="Xác nhận đơn tiêm chủng"
         onCancel={closeModal}
-        onOk={handleSubmit}
-        okText={modal.consentStatus === 2 ? "Đồng ý" : "Từ chối"}
-        confirmLoading={submitting}
+        footer={null}
       >
         <p>Học sinh: <b>{modal.student?.studentName}</b></p>
         <Input.TextArea
@@ -172,6 +134,23 @@ export default function ParentVaccinationConsent() {
           value={signature}
           onChange={e => setSignature(e.target.value)}
         />
+        <div style={{ marginTop: 20, display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+          <Button onClick={closeModal}>Hủy</Button>
+          <Button 
+            type="primary" 
+            loading={submitting} 
+            onClick={() => handleSubmit(2)}
+          >
+            Đồng ý
+          </Button>
+          <Button 
+            danger 
+            loading={submitting}
+            onClick={() => handleSubmit(3)}
+          >
+            Từ chối
+          </Button>
+        </div>
       </Modal>
     </div>
   );

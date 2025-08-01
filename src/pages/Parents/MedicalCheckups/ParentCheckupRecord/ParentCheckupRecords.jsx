@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { getStudentsByParentId, getCheckupRecordsByStudentId } from '../../../services/apiServices';
-import { getUserInfo } from '../../../services/handleStorageApi';
+import { getStudentsByParentId, getCheckupRecordsByStudentId } from '../../../../services/apiServices';
+import { getUserInfo } from '../../../../services/handleStorageApi';
 import { Card, Avatar, Spin, Empty, Tag } from 'antd';
 import { FaUser, FaFileMedical, FaNotesMedical, FaRuler, FaWeight, FaEye, FaVolumeUp, FaHeartbeat, FaCalendar, FaComments } from 'react-icons/fa';
 import './ParentCheckupRecords.css';
@@ -33,12 +33,10 @@ const ParentCheckupRecords = () => {
           const res = await getCheckupRecordsByStudentId(student.id);
           if (Array.isArray(res.data.data) && res.data.data.length > 0) {
             allRecords.push({ student, records: res.data.data });
+            console.log('Lấy dữ liệu thành công cho học sinh:', student.fullName || student.firstName + ' ' + student.lastName);
           }
         } catch (err) {
-          // Nếu lỗi 400 (chưa có record) thì bỏ qua
-          if (!(err && err.response && err.response.status === 400)) {
-            console.error('Error fetching checkup records:', err);
-          }
+          console.error('Lỗi lấy hồ sơ khám:', err.message || 'Lỗi không xác định');
         }
       }
       setRecords(allRecords);
@@ -84,7 +82,6 @@ const ParentCheckupRecords = () => {
       ) : (
         <div className="records-list">
           {records.map(({ student, records }) => {
-            console.log('Student image:', student.image); // Debug log
             return (
               <div className="student-record-group" key={student.id}>
                 <div className="student-info">
