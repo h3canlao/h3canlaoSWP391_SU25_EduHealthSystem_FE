@@ -10,12 +10,12 @@ import ConfirmEmail from "@/pages/Parents/Auth/2FA/ConfirmEmail/confirmEmail";
 import SendMedication from "./pages/Parents/Medication/SendMedication";
 import StudentProfiles from "./pages/Parents/StudentProfiles/StudentProfiles";
 import Parents from "./pages/Parents/Parents";
-import ParentCheckupSchedules from "./pages/Parents/MedicalCheckups/ParentCheckupSchedules";
-import ParentCheckupRecords from "./pages/Parents/MedicalCheckups/ParentCheckupRecords";
+import ParentCheckupSchedules from "./pages/Parents/MedicalCheckups/ParentCheckupSchedule/ParentCheckupSchedules";
+import ParentCheckupRecords from "./pages/Parents/MedicalCheckups/ParentCheckupRecord/ParentCheckupRecords";
 import Admin from "./pages/Admin/Admin";
 import ManageUser from "./pages/Admin/Features/ManageUser";
 
-import ParentCounselingRecords from "./pages/Parents/MedicalCheckups/ParentCounselingRecords";
+import ParentCounselingRecords from "./pages/Parents/MedicalCheckups/ParentCounseling/ParentCounselingRecords";
 import MedicationManager from "./pages/Admin/Medication/MedicationManager";
 import VaccinationCampaignAdmin from "./pages/Admin/VaccinationCampaign/VaccinationCampaign";
 import VaccinationScheduleAdmin from "./pages/Admin/VaccinationSchedule/VaccinationSchedule";

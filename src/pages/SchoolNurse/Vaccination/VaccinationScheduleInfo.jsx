@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Card, Typography, Table, Tag, Button, Spin, Modal, message } from "antd";
-import { UserOutlined, CheckCircleOutlined, ClockCircleOutlined, FormOutlined, MedicineBoxOutlined, ArrowLeftOutlined, EditOutlined } from "@ant-design/icons";
+import { Card, Typography, Table, Tag, Button, Spin, Modal, message, Input } from "antd";
+import { UserOutlined, CheckCircleOutlined, ClockCircleOutlined, FormOutlined, MedicineBoxOutlined, ArrowLeftOutlined, EditOutlined, SearchOutlined } from "@ant-design/icons";
 import { 
   getVaccinationScheduleDetail, 
   createVaccinationRecord, 
@@ -21,6 +21,14 @@ const REACTION_SEVERITY = [
   { label: "Nặng", value: 3 },
 ];
 
+// Thêm bảng ánh xạ trạng thái từ tiếng Anh sang tiếng Việt
+const statusMap = {
+  Registered: { color: 'orange', text: 'Đã đăng kí' },
+  Completed: { color: 'green', text: 'Hoàn thành' },
+  Pending: { color: 'orange', text: 'Chờ tiêm' },
+  Cancelled: { color: 'red', text: 'Đã huỷ' },
+};
+
 export default function VaccinationScheduleInfo() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -40,6 +48,8 @@ export default function VaccinationScheduleInfo() {
   });
   const [vaccinationRecords, setVaccinationRecords] = useState([]);
   const [recordsLoading, setRecordsLoading] = useState(false);
+  const [searchPending, setSearchPending] = useState("");
+  const [searchVaccinated, setSearchVaccinated] = useState("");
 
   const loadData = () => {
     setLoading(true);
@@ -92,14 +102,15 @@ export default function VaccinationScheduleInfo() {
     setUpdateModalOpen(true);
   };
 
+  // Modify the checkbox handlers to allow both options to be selected simultaneously
+
   // Handler for 24h reaction checkbox in create form
   const handleReaction24hChange = (e) => {
     const checked = e.target.checked;
     setForm(f => ({ 
       ...f, 
-      reactionFollowup24h: checked,
-      // If 24h is checked, automatically uncheck 72h
-      reactionFollowup72h: checked ? false : f.reactionFollowup72h
+      reactionFollowup24h: checked
+      // Remove the code that automatically unsets reactionFollowup72h
     }));
   };
 
@@ -108,9 +119,8 @@ export default function VaccinationScheduleInfo() {
     const checked = e.target.checked;
     setForm(f => ({ 
       ...f, 
-      reactionFollowup72h: checked,
-      // If 72h is checked, automatically uncheck 24h
-      reactionFollowup24h: checked ? false : f.reactionFollowup24h
+      reactionFollowup72h: checked
+      // Remove the code that automatically unsets reactionFollowup24h
     }));
   };
 
@@ -119,9 +129,8 @@ export default function VaccinationScheduleInfo() {
     const checked = e.target.checked;
     setUpdateForm(f => ({ 
       ...f, 
-      reactionFollowup24h: checked,
-      // If 24h is checked, automatically uncheck 72h
-      reactionFollowup72h: checked ? false : f.reactionFollowup72h
+      reactionFollowup24h: checked
+      // Remove the code that automatically unsets reactionFollowup72h
     }));
   };
 
@@ -130,9 +139,8 @@ export default function VaccinationScheduleInfo() {
     const checked = e.target.checked;
     setUpdateForm(f => ({ 
       ...f, 
-      reactionFollowup72h: checked,
-      // If 72h is checked, automatically uncheck 24h
-      reactionFollowup24h: checked ? false : f.reactionFollowup24h
+      reactionFollowup72h: checked
+      // Remove the code that automatically unsets reactionFollowup24h
     }));
   };
 
@@ -161,23 +169,23 @@ export default function VaccinationScheduleInfo() {
         });
         
         // Step 3: Create vaccination record
-        await createVaccinationRecord({
-          studentId: selectedStudent.studentId,
-          scheduleId: id,
-          administeredDate: form.administeredDate.toDate().toISOString(),
-          vaccinatedById: nurseId,
-          vaccinatedAt: form.administeredDate.toDate().toISOString(),
-          reactionFollowup24h: form.reactionFollowup24h,
-          reactionFollowup72h: form.reactionFollowup72h,
-          reactionSeverity: form.reactionSeverity,
-        });
+      await createVaccinationRecord({
+        studentId: selectedStudent.studentId,
+        scheduleId: id,
+        administeredDate: form.administeredDate.toDate().toISOString(),
+        vaccinatedById: nurseId,
+        vaccinatedAt: form.administeredDate.toDate().toISOString(),
+        reactionFollowup24h: form.reactionFollowup24h,
+        reactionFollowup72h: form.reactionFollowup72h,
+        reactionSeverity: form.reactionSeverity,
+      });
         
         message.success("Ghi nhận tiêm chủng và check-in thành công!");
         
-        setModalOpen(false);
-        
-        // reload lại data
-        loadData();
+      setModalOpen(false);
+      
+      // reload lại data
+      loadData();
       } else {
         message.error("Không tìm thấy thông tin phiên cho học sinh này, không thể ghi nhận tiêm chủng!");
       }
@@ -226,7 +234,7 @@ export default function VaccinationScheduleInfo() {
     }
   };
 
-  const studentsChuaTiem = detail?.sessionStudents?.filter(s => s.statusName === 'Registered') || [];
+  const studentsChuaTiem = detail?.sessionStudents?.filter(s => s.statusName === 'Đã đăng kí') || [];
   
   // Use the records from the new API endpoint
   const studentsDaTiem = vaccinationRecords;
@@ -234,7 +242,7 @@ export default function VaccinationScheduleInfo() {
   const columnsChuaTiem = [
     { title: "Học sinh", dataIndex: "studentName", key: "studentName", render: (text) => <><UserOutlined /> {text}</> },
     { title: "Mã HS", dataIndex: "studentCode", key: "studentCode" },
-    { title: "Trạng thái", dataIndex: "statusName", key: "statusName", render: (text) => <Tag color={text === "Registered" ? "orange" : "green"}>{text}</Tag> },
+    { title: "Trạng thái", dataIndex: "statusName", key: "statusName", render: (text) => <Tag color={statusMap[text]?.color || "default"}>{statusMap[text]?.text || text}</Tag> },
     { title: "Ghi nhận", key: "action", render: (_, record) => (
       <Button type="primary" icon={<FormOutlined />} onClick={() => openRecordModal(record)}>
         Ghi nhận
@@ -246,13 +254,31 @@ export default function VaccinationScheduleInfo() {
   const columnsDaTiem = [
     { title: "Học sinh", dataIndex: "studentName", key: "studentName", render: (text) => <><UserOutlined /> {text}</> },
     { title: "Mã HS", dataIndex: "studentCode", key: "studentCode" },
-    { title: "Trạng thái", dataIndex: "sessionStatus", key: "sessionStatus", render: (text) => <Tag color={"green"}>{text}</Tag> },
+    { title: "Trạng thái", dataIndex: "sessionStatus", key: "sessionStatus", render: (text) => <Tag color={statusMap[text]?.color || "green"}>{statusMap[text]?.text || text}</Tag> },
     { title: "Cập nhật", key: "update", render: (_, record) => (
       <Button type="primary" icon={<EditOutlined />} onClick={() => openUpdateModal(record)}>
         Cập nhật
       </Button>
     ) },
   ];
+
+  // Filter students who haven't been vaccinated based on search term
+  const filteredStudentsChuaTiem = detail?.sessionStudents
+    ?.filter(s => s.statusName === 'Registered')
+    .filter(s => 
+      s.studentName?.toLowerCase()
+        .normalize('NFD')
+        .replace(/\p{Diacritic}/gu, '')
+        .includes(searchPending.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, ''))
+    ) || [];
+  
+  // Filter vaccinated students based on search term
+  const filteredStudentsDaTiem = vaccinationRecords.filter(s => 
+    s.studentName?.toLowerCase()
+      .normalize('NFD')
+      .replace(/\p{Diacritic}/gu, '')
+      .includes(searchVaccinated.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, ''))
+  );
 
   return (
     <div style={{ maxWidth: 1300, margin: "0 auto" }}>
@@ -288,14 +314,25 @@ export default function VaccinationScheduleInfo() {
                 <Title level={5} style={{ marginBottom: 16, position: 'sticky', top: 0, background: 'white', padding: '10px 0', zIndex: 1 }}>
                   <ClockCircleOutlined style={{ color: "#faad14" }} /> Chưa tiêm
                 </Title>
-                <div style={{ height: '400px', overflow: 'hidden' }}>
+                
+                {/* Search input for pending students */}
+                <Input 
+                  placeholder="Tìm kiếm học sinh..." 
+                  prefix={<SearchOutlined />} 
+                  value={searchPending}
+                  onChange={e => setSearchPending(e.target.value)}
+                  style={{ marginBottom: 16 }}
+                  allowClear
+                />
+                
+                <div style={{ height: '370px', overflow: 'hidden' }}>
                   <Table
-                    dataSource={studentsChuaTiem}
+                    dataSource={filteredStudentsChuaTiem}
                     columns={columnsChuaTiem}
                     rowKey="id"
                     pagination={false}
                     locale={{ emptyText: "Không có học sinh nào chưa tiêm" }}
-                    scroll={{ y: 420 }}
+                    scroll={{ y: 370 }}
                   />
                 </div>
               </div>
@@ -314,15 +351,26 @@ export default function VaccinationScheduleInfo() {
                 <Title level={5} style={{ marginBottom: 16, position: 'sticky', top: 0, background: 'white', padding: '10px 0', zIndex: 1 }}>
                   <CheckCircleOutlined style={{ color: "#52c41a" }} /> Đã tiêm
                 </Title>
-                <div style={{ height: '400px', overflow: 'auto' }}>
+                
+                {/* Search input for vaccinated students */}
+                <Input 
+                  placeholder="Tìm kiếm học sinh..." 
+                  prefix={<SearchOutlined />} 
+                  value={searchVaccinated}
+                  onChange={e => setSearchVaccinated(e.target.value)}
+                  style={{ marginBottom: 16 }}
+                  allowClear
+                />
+                
+                <div style={{ height: '370px', overflow: 'auto' }}>
                   <Table
-                    dataSource={studentsDaTiem}
+                    dataSource={filteredStudentsDaTiem}
                     columns={columnsDaTiem}
                     rowKey="id"
                     pagination={false}
                     loading={recordsLoading}
                     locale={{ emptyText: "Chưa có học sinh nào được tiêm" }}
-                    scroll={{ y: 420 }}
+                    scroll={{ y: 370 }}
                   />
                 </div>
               </div>
@@ -347,7 +395,6 @@ export default function VaccinationScheduleInfo() {
                 type="checkbox" 
                 checked={form.reactionFollowup24h} 
                 onChange={handleReaction24hChange} 
-                disabled={form.reactionFollowup72h} 
                 style={{ marginLeft: 8 }} 
               />
             </div>
@@ -357,7 +404,6 @@ export default function VaccinationScheduleInfo() {
                 type="checkbox" 
                 checked={form.reactionFollowup72h} 
                 onChange={handleReaction72hChange} 
-                disabled={form.reactionFollowup24h} 
                 style={{ marginLeft: 8 }} 
               />
             </div>
@@ -389,7 +435,6 @@ export default function VaccinationScheduleInfo() {
                 type="checkbox" 
                 checked={updateForm.reactionFollowup24h} 
                 onChange={handleUpdateReaction24hChange} 
-                disabled={updateForm.reactionFollowup72h} 
                 style={{ marginLeft: 8 }} 
               />
             </div>
@@ -399,7 +444,6 @@ export default function VaccinationScheduleInfo() {
                 type="checkbox" 
                 checked={updateForm.reactionFollowup72h} 
                 onChange={handleUpdateReaction72hChange} 
-                disabled={updateForm.reactionFollowup24h} 
                 style={{ marginLeft: 8 }} 
               />
             </div>

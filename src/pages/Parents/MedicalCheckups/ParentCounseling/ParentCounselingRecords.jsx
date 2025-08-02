@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { getStudentsByParentId, getCounselingAppointmentsByStudentId } from '../../../services/apiServices';
-import { getUserInfo } from '../../../services/handleStorageApi';
+import { getStudentsByParentId, getCounselingAppointmentsByStudentId } from '../../../../services/apiServices';
+import { getUserInfo } from '../../../../services/handleStorageApi';
 import { Card, Avatar, Spin, Empty, Tag } from 'antd';
 import { FaUser, FaComments, FaUserMd, FaCalendar, FaClock, FaStickyNote, FaClipboardCheck, FaCheckCircle } from 'react-icons/fa';
 import './ParentCounselingRecords.css';
@@ -86,11 +86,11 @@ const ParentCounselingRecords = () => {
                 <div className="student-info">
                   <Avatar 
                     size={56} 
-                    src={student.image || "https://static.vecteezy.com/system/resources/previews/012/941/843/non_2x/illustration-of-boy-avatar-student-s-character-face-vector.jpg"} 
+                    src={student.image || "https://images.icon-icons.com/3310/PNG/512/student_man_avatar_user_toga_school_university_icon_209264.png"} 
                     className="student-avatar"
                     onError={(e) => {
                       console.log('Avatar load error for student (counseling):', student.id, 'image:', student.image);
-                      e.target.src = "https://static.vecteezy.com/system/resources/previews/012/941/843/non_2x/illustration-of-boy-avatar-student-s-character-face-vector.jpg";
+                      e.target.src = "https://images.icon-icons.com/3310/PNG/512/student_man_avatar_user_toga_school_university_icon_209264.png";
                     }}
                   />
                   <div>

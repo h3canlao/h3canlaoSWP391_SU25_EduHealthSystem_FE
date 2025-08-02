@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { getStudentsByParentId, getCheckupSchedulesByStudentId, consentCheckupSchedule, getCheckupSchedulesMyChildren } from '../../../services/apiServices';
-import { getUserInfo } from '../../../services/handleStorageApi';
+import { getStudentsByParentId, getCheckupSchedulesByStudentId, consentCheckupSchedule, getCheckupSchedulesMyChildren } from '../../../../services/apiServices';
+import { getUserInfo } from '../../../../services/handleStorageApi';
 import { Card, Avatar, Tag, Spin, Empty, Modal, Input, Button, message } from 'antd';
 import { FaUser, FaCalendar, FaStethoscope, FaInfoCircle, FaIdBadge, FaChalkboardTeacher, FaClock, FaFlag } from 'react-icons/fa';
 import './ParentCheckupSchedules.css';
@@ -124,7 +124,7 @@ const ParentCheckupSchedules = () => {
               <div className="card-flex">
                 <Avatar 
                   size={64} 
-                  src="https://static.vecteezy.com/system/resources/previews/012/941/843/non_2x/illustration-of-boy-avatar-student-s-character-face-vector.jpg"
+                  src="https://images.icon-icons.com/3310/PNG/512/student_man_avatar_user_toga_school_university_icon_209264.png"
                   className="student-avatar"
                 />
                 <div className="card-info">
@@ -133,16 +133,6 @@ const ParentCheckupSchedules = () => {
                     {schedule.studentName}
                   </div>
                   <div className="schedule-details">
-                    {/* <div className="detail-row">
-                      <FaIdBadge className="detail-icon" />
-                      <span className="label">Mã học sinh:</span>
-                      <span className="value">{schedule.studentCode}</span>
-                    </div>
-                    <div className="detail-row">
-                      <FaChalkboardTeacher className="detail-icon" />
-                      <span className="label">Lớp:</span>
-                      <span className="value">{schedule.grade}{schedule.section}</span>
-                    </div> */}
                     <div className="detail-row">
                       <FaCalendar className="detail-icon" />
                       <span className="label">Ngày khám:</span>

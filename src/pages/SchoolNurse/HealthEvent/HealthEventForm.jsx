@@ -16,6 +16,8 @@ const EVENT_TYPE = [
   { label: "Khác", value: 4 },   
   { label: "Phản ứng vắc xin", value: 5 },
 ];
+
+// Keep for reference but we won't use in UI
 const EVENT_CATEGORY = [
   { label: "Tiêm chủng", value: 0 }, // Vaccination
   { label: "Tư vấn", value: 0 },    // Consultation
@@ -27,6 +29,7 @@ export default function HealthEventForm() {
   const [submitting, setSubmitting] = useState(false);
   const [step, setStep] = useState(0);
   const [createdEventId, setCreatedEventId] = useState(null);
+  const [form] = Form.useForm();
 
   useEffect(() => {
     setLoading(true);
@@ -40,12 +43,19 @@ export default function HealthEventForm() {
       .finally(() => setLoading(false));
   }, []);
 
+  // Set the default value for eventCategory when the form initializes
+  useEffect(() => {
+    form.setFieldsValue({
+      eventCategory: 0 // Set default to "Tư vấn" (consultation)
+    });
+  }, [form]);
+
   const onFinish = async (values) => {
     setSubmitting(true);
     try {
       const payload = {
         studentId: values.studentId,
-        eventCategory: values.eventCategory, 
+        eventCategory: 0, // Always set to "Tư vấn" (consultation)
         vaccinationRecordId: null, 
         eventType: values.eventType, 
         description: values.description,
@@ -83,7 +93,12 @@ export default function HealthEventForm() {
             <PlusCircleOutlined /> Khai báo sự kiện y tế
           </Title>
           {loading ? <Spin /> : (
-            <Form layout="vertical" onFinish={onFinish} className="health-event-form">
+            <Form 
+              form={form}
+              layout="vertical" 
+              onFinish={onFinish} 
+              className="health-event-form"
+            >
               <Form.Item label="Học sinh" name="studentId" rules={[{ required: true, message: "Chọn học sinh" }]}> 
                 <Select
                   placeholder="Chọn học sinh"
@@ -104,10 +119,9 @@ export default function HealthEventForm() {
                   {EVENT_TYPE.map(e => <Option key={e.value} value={e.value}>{e.label}</Option>)}
                 </Select>
               </Form.Item>
-              <Form.Item label="Loại lịch" name="eventCategory" rules={[{ required: true, message: "Chọn loại lịch" }]}> 
-                <Select placeholder="Chọn loại lịch">
-                  {EVENT_CATEGORY.map(e => <Option key={e.value} value={e.value}>{e.label}</Option>)}
-                </Select>
+              {/* Hidden field for eventCategory with default value */}
+              <Form.Item name="eventCategory" hidden={true}>
+                <Input type="hidden" />
               </Form.Item>
               <Form.Item label="Mô tả" name="description" rules={[{ required: true, message: "Nhập mô tả" }]}> 
                 <Input.TextArea rows={3} placeholder="Nhập mô tả sự kiện" />

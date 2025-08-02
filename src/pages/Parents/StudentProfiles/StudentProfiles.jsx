@@ -8,6 +8,7 @@ import "./StudentProfiles.css";
 
 const { confirm } = Modal;
 
+// Main Layout
 const StudentCard = ({ student, onClick }) => {
   const imageUrl = student.image || "https://images.icon-icons.com/3310/PNG/512/student_man_avatar_user_toga_school_university_icon_209264.png";
   return (
@@ -40,7 +41,7 @@ const StudentProfiles = () => {
         return;
       }
       try {
-        const response = await getStudentsByParentId(userId);
+        const response = await getStudentsByParentId(userId); 
         const studentData = Array.isArray(response.data.data) ? response.data.data : [];
         setStudents(studentData);
       } catch (error) {
@@ -67,8 +68,7 @@ const StudentProfiles = () => {
           cancelText: "Hủy",
           onOk: async () => {
             try {
-              const newProfile = { studentCode: student.studentCode };
-              await createHealthProfile(newProfile);
+              await createHealthProfile(student.studentCode);
               toast.success("Tạo hồ sơ sức khỏe thành công!");
               const res = await getNewestHealthProfile(student.studentCode);
               setHealthProfile(res?.data?.data || null);
@@ -90,7 +90,6 @@ const StudentProfiles = () => {
   };
 
   const resetModalData = () => setHealthProfile(null);
-  const handleProfileUpdate = () => toast.success("Cập nhập thành công!");
 
   return (
     <div className="student-outer-container">
@@ -105,7 +104,7 @@ const StudentProfiles = () => {
         ) : (
           <div className="students-grid">
             {students.map((student) => (
-              <StudentCard key={student.id} student={student} onClick={handleCardClick} />
+              <StudentCard student={student} onClick={handleCardClick} />
             ))}
           </div>
         )}
@@ -114,7 +113,6 @@ const StudentProfiles = () => {
           setShow={setShowModal}
           healthProfile={healthProfile}
           resetData={resetModalData}
-          onUpdated={handleProfileUpdate}
         />
       </div>
     </div>

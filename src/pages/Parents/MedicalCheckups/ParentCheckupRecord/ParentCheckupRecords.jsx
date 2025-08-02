@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { getStudentsByParentId, getCheckupRecordsByStudentId } from '../../../services/apiServices';
-import { getUserInfo } from '../../../services/handleStorageApi';
+import { getStudentsByParentId, getCheckupRecordsByStudentId } from '../../../../services/apiServices';
+import { getUserInfo } from '../../../../services/handleStorageApi';
 import { Card, Avatar, Spin, Empty, Tag } from 'antd';
 import { FaUser, FaFileMedical, FaNotesMedical, FaRuler, FaWeight, FaEye, FaVolumeUp, FaHeartbeat, FaCalendar, FaComments } from 'react-icons/fa';
 import './ParentCheckupRecords.css';
@@ -33,12 +33,10 @@ const ParentCheckupRecords = () => {
           const res = await getCheckupRecordsByStudentId(student.id);
           if (Array.isArray(res.data.data) && res.data.data.length > 0) {
             allRecords.push({ student, records: res.data.data });
+            console.log('Lấy dữ liệu thành công cho học sinh:', student.fullName || student.firstName + ' ' + student.lastName);
           }
         } catch (err) {
-          // Nếu lỗi 400 (chưa có record) thì bỏ qua
-          if (!(err && err.response && err.response.status === 400)) {
-            console.error('Error fetching checkup records:', err);
-          }
+          console.error('Lỗi lấy hồ sơ khám:', err.message || 'Lỗi không xác định');
         }
       }
       setRecords(allRecords);
@@ -84,17 +82,16 @@ const ParentCheckupRecords = () => {
       ) : (
         <div className="records-list">
           {records.map(({ student, records }) => {
-            console.log('Student image:', student.image); // Debug log
             return (
               <div className="student-record-group" key={student.id}>
                 <div className="student-info">
                   <Avatar 
                     size={56} 
-                    src={student.image || "https://static.vecteezy.com/system/resources/previews/012/941/843/non_2x/illustration-of-boy-avatar-student-s-character-face-vector.jpg"} 
+                    src={student.image || "https://images.icon-icons.com/3310/PNG/512/student_man_avatar_user_toga_school_university_icon_209264.png"} 
                     className="student-avatar"
                     onError={(e) => {
                       console.log('Avatar load error for student:', student.id, 'image:', student.image);
-                      e.target.src = "https://static.vecteezy.com/system/resources/previews/012/941/843/non_2x/illustration-of-boy-avatar-student-s-character-face-vector.jpg";
+                      e.target.src = "https://images.icon-icons.com/3310/PNG/512/student_man_avatar_user_toga_school_university_icon_209264.png";
                     }}
                   />
                   <div>
@@ -111,13 +108,10 @@ const ParentCheckupRecords = () => {
                         <div className="detail-row"><FaWeight className="detail-icon" /><span className="label">Cân nặng:</span><span className="value">{record.weightKg} kg</span></div>
                         <div className="detail-row">
                           <FaEye className="detail-icon" />
-                          <span className="label">Thị lực trái:</span>
-                          <span className="value">{visionLevelMap[record.visionLeft] ?? record.visionLeft}</span>
-                        </div>
-                        <div className="detail-row">
-                          <FaEye className="detail-icon" />
-                          <span className="label">Thị lực phải:</span>
-                          <span className="value">{visionLevelMap[record.visionRight] ?? record.visionRight}</span>
+                          <span className="label">Thị lực:</span>
+                          <span className="value">
+                            {visionLevelMap[record.visionLeft] ?? record.visionLeft}/{visionLevelMap[record.visionRight] ?? record.visionRight}
+                          </span>
                         </div>
                         <div className="detail-row">
                           <FaVolumeUp className="detail-icon" />
