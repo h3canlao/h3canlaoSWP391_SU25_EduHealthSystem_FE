@@ -68,7 +68,7 @@ import UserManagement from "./pages/Admin/Features/ManageUser";
 import CheckupScheduleDetail from "./pages/Admin/CheckupSchedule/CheckupScheduleDetail";
 import Blog from "./pages/Blog";
 import Homepage from "./pages/Homepage";
-
+import HealthEventDetail from "./pages/SchoolNurse/HealthEvent/HealthEventDetail";
 
 const Router = () => {
   return (
@@ -151,6 +151,7 @@ const Router = () => {
           <Route path="vaccination-schedules/:id" element={<VaccinationScheduleInfo />} />
           <Route path="vaccination-records" element={<VaccinationRecords />} />
           <Route path="health-event" element={<HealthEventTabs />} />
+          <Route path="health-event/:id" element={<HealthEventDetail />} />
         </Route>
       </Routes>
       <ToastContainer
