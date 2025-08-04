@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { addCounselingAppointmentNote } from '../../../services/apiServices';
+import { addCounselingAppointmentNote } from '../../../../services/apiServices';
 import { toast } from 'react-toastify';
 import { FaTimes, FaStickyNote, FaClipboardCheck } from 'react-icons/fa';
-import './CheckupRecordModal.css';
+import '../CreateCheckup/CheckupRecordModal.css';
 
 const AddNoteCounselingModal = ({ appointment, onClose, onNoteAdded }) => {
   const [notes, setNotes] = useState(appointment.notes || '');
@@ -36,13 +36,14 @@ const AddNoteCounselingModal = ({ appointment, onClose, onNoteAdded }) => {
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={e => e.stopPropagation()}>
-        <div className="modal-header" style={{background:'#ffb347'}}>
+    <div className="checkup-record-modal">
+      <div className="checkup-record-backdrop" onClick={onClose}></div>
+      <div className="checkup-record-content" onClick={e => e.stopPropagation()}>
+        <div className="checkup-record-header" style={{background:'#ffb347'}}>
           <h2><FaStickyNote/> Ghi chú tư vấn</h2>
           <button className="close-btn" onClick={onClose}><FaTimes/></button>
         </div>
-        <div className="modal-body">
+        <div className="checkup-record-body">
           <form onSubmit={handleSubmit}>
             <div className="form-section">
               <label style={{fontWeight:600,marginBottom:8,display:'block'}}><FaStickyNote/> Ghi chú</label>

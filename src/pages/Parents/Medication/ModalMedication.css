@@ -53,3 +53,64 @@
   color: #212529;
   font-weight: 500;
 }
+
+/* Medication item styling */
+.medication-item {
+  position: relative;
+}
+
+.medication-item h5 {
+  color: #007bff;
+  font-weight: 600;
+}
+
+/* Schedule item styling */
+.daily-schedule {
+  margin-top: 1rem;
+}
+
+.schedule-item {
+  background-color: #f8f9fa;
+  transition: all 0.2s;
+}
+
+.schedule-item:hover {
+  background-color: #f1f3f5;
+}
+
+/* Add button styling */
+.btn-outline-primary {
+  color: #007bff;
+  border-color: #007bff;
+}
+
+.btn-outline-primary:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+.btn-outline-danger {
+  color: #dc3545;
+  border-color: #dc3545;
+}
+
+.btn-outline-danger:hover {
+  background-color: #dc3545;
+  color: white;
+}
+
+/* Make the modal scrollable on small screens */
+.modal-body {
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  .modal-body {
+    padding: 1rem;
+  }
+  
+  .schedule-item {
+    padding: 0.75rem !important;
+  }
+}

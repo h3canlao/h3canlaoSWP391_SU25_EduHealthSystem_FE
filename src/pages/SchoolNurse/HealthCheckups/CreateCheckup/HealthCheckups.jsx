@@ -1,115 +1,56 @@
-import React, { useState, useEffect } from 'react';
-import { getCheckupSchedules } from '../../../services/apiServices';
+import React, { useState, useEffect, useMemo } from 'react';
+import { getCheckupSchedules } from '../../../../services/apiServices';
 import { toast } from 'react-toastify';
 import { FaCalendar, FaUser, FaClock, FaStethoscope, FaEye, FaSearch } from 'react-icons/fa';
 import CheckupRecordModal from './CheckupRecordModal';
 import './HealthCheckups.css';
 
 const HealthCheckups = () => {
-  const [checkupSchedules, setCheckupSchedules] = useState([]);
-  const [filteredSchedules, setFilteredSchedules] = useState([]);
+  // State quản lý
+  const [schedules, setSchedules] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedSchedule, setSelectedSchedule] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [selectedSchedule, setSelectedSchedule] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchType, setSearchType] = useState('student'); // 'student' or 'campaign'
+  const [searchType, setSearchType] = useState('student');
 
+  // Tải danh sách lịch khám
   useEffect(() => {
-    fetchCheckupSchedules();
-  }, []);
-
-  useEffect(() => {
-    filterSchedules();
-  }, [checkupSchedules, searchQuery, searchType]);
-
-  const fetchCheckupSchedules = async () => {
-    try {
-      setLoading(true);
-      const response = await getCheckupSchedules();
-      if (response.data.isSuccess) {
-        setCheckupSchedules(response.data.data);
-        setFilteredSchedules(response.data.data);
+    getCheckupSchedules()
+      .then(res => {
+        if (res.data?.isSuccess) {
+          setSchedules(res.data.data || []);
       } else {
         toast.error('Không thể tải danh sách lịch khám');
       }
-    } catch (error) {
-      console.error('Error fetching checkup schedules:', error);
-      toast.error('Có lỗi xảy ra khi tải danh sách lịch khám');
-    } finally {
-      setLoading(false);
-    }
-  };
+      })
+      .catch(() => toast.error('Có lỗi xảy ra khi tải danh sách lịch khám'))
+      .finally(() => setLoading(false));
+  }, []);
 
-  const filterSchedules = () => {
-    if (!searchQuery.trim()) {
-      setFilteredSchedules(checkupSchedules);
-      return;
-    }
+  // Lọc danh sách theo tìm kiếm
+  const filteredSchedules = useMemo(() => {
+    if (!searchQuery.trim()) return schedules;
 
     const query = searchQuery.toLowerCase().trim();
-    const filtered = checkupSchedules.filter((schedule) => {
-      if (searchType === 'student') {
-        return schedule.studentName.toLowerCase().includes(query);
-      } else {
-        return schedule.campaignName.toLowerCase().includes(query);
-      }
-    });
+    return schedules.filter(schedule => 
+      searchType === 'student' 
+        ? (schedule.studentName || '').toLowerCase().includes(query)
+        : (schedule.campaignName || '').toLowerCase().includes(query)
+    );
+  }, [schedules, searchQuery, searchType]);
 
-    setFilteredSchedules(filtered);
-  };
+  // Định dạng ngày giờ
+  const formatDate = date => new Date(date).toLocaleDateString('vi-VN');
+  const formatTime = date => new Date(date).toLocaleTimeString('vi-VN', {hour: '2-digit', minute: '2-digit'});
 
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
-  };
-
-  const handleSearchTypeChange = (type) => {
-    setSearchType(type);
-  };
-
-  const handleClearSearch = () => {
-    setSearchQuery('');
-  };
-
-  const handleScheduleClick = (schedule) => {
+  // Xử lý click vào card lịch khám
+  const handleCardClick = schedule => {
     setSelectedSchedule(schedule);
     setShowModal(true);
   };
 
-  const handleModalClose = () => {
-    setShowModal(false);
-    setSelectedSchedule(null);
-  };
-
-  const handleRecordCreated = () => {
-    fetchCheckupSchedules(); // Refresh the list
-    handleModalClose();
-  };
-
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('vi-VN', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    });
-  };
-
-  const formatTime = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleTimeString('vi-VN', {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
-
-  const getStatusBadge = (hasRecord) => {
-    return hasRecord ? (
-      <span className="status-badge completed">Đã khám</span>
-    ) : (
-      <span className="status-badge pending">Chưa khám</span>
-    );
-  };
-
+  // Hiển thị loading
   if (loading) {
     return (
       <div className="health-checkups-container">
@@ -123,6 +64,7 @@ const HealthCheckups = () => {
 
   return (
     <div className="health-checkups-container">
+      {/* Phần tiêu đề */}
       <div className="health-checkups-header">
         <div className="header-content">
           <h1>
@@ -133,38 +75,38 @@ const HealthCheckups = () => {
         </div>
       </div>
 
+      {/* Thanh tìm kiếm */}
       <div className="search-container">
         <div className="search-input-wrapper">
           <FaSearch className="search-icon" />
           <input
             type="text"
-            placeholder={searchType === 'student' ? "Tìm kiếm theo tên học sinh..." : "Tìm kiếm theo tên chiến dịch..."}
+            placeholder={`Tìm kiếm theo ${searchType === 'student' ? 'tên học sinh' : 'tên chiến dịch'}...`}
             value={searchQuery}
-            onChange={handleSearchChange}
+            onChange={e => setSearchQuery(e.target.value)}
             className="search-input"
           />
           {searchQuery && (
-            <button className="clear-search-btn" onClick={handleClearSearch}>
-              ×
-            </button>
+            <button className="clear-search-btn" onClick={() => setSearchQuery('')}>×</button>
           )}
         </div>
         <div className="search-type-toggle">
           <button
             className={`toggle-btn ${searchType === 'student' ? 'active' : ''}`}
-            onClick={() => handleSearchTypeChange('student')}
+            onClick={() => setSearchType('student')}
           >
             Tên học sinh
           </button>
           <button
             className={`toggle-btn ${searchType === 'campaign' ? 'active' : ''}`}
-            onClick={() => handleSearchTypeChange('campaign')}
+            onClick={() => setSearchType('campaign')}
           >
             Tên chiến dịch
           </button>
         </div>
       </div>
 
+      {/* Hiển thị danh sách lịch khám */}
       <div className="health-checkups-content">
         {filteredSchedules.length === 0 ? (
           <div className="empty-state">
@@ -174,20 +116,21 @@ const HealthCheckups = () => {
           </div>
         ) : (
           <div className="schedules-grid">
-            {filteredSchedules.map((schedule) => (
+            {filteredSchedules.map(schedule => (
               <div
                 key={schedule.id}
                 className={`schedule-card ${schedule.hasRecord ? 'completed' : 'pending'}`}
-                onClick={() => handleScheduleClick(schedule)}
+                onClick={() => handleCardClick(schedule)}
               >
                 <div className="card-header">
                   <div className="campaign-info">
                     <h3>{schedule.campaignName}</h3>
-                    <span className="campaign-id">ID: {schedule.campaignId.slice(0, 8)}...</span>
+                    <span className="campaign-id">ID: {schedule.campaignId?.slice(0, 8)}...</span>
                   </div>
-                  {getStatusBadge(schedule.hasRecord)}
+                  <span className={`status-badge ${schedule.hasRecord ? 'completed' : 'pending'}`}>
+                    {schedule.hasRecord ? 'Đã khám' : 'Chưa khám'}
+                  </span>
                 </div>
-
                 <div className="card-body">
                   <div className="student-info">
                     <div className="info-row">
@@ -229,13 +172,6 @@ const HealthCheckups = () => {
                       </div>
                     </div>
                   </div>
-
-                  {schedule.specialNotes && (
-                    <div className="notes-section">
-                      <span className="label">Ghi chú:</span>
-                      <p className="notes-text">{schedule.specialNotes}</p>
-                    </div>
-                  )}
                 </div>
 
                 <div className="card-footer">
@@ -250,11 +186,12 @@ const HealthCheckups = () => {
         )}
       </div>
 
-      {showModal && selectedSchedule && (
+      {/* Modal tạo hồ sơ khám */}
+      {showModal && (
         <CheckupRecordModal
+          show={showModal}
+          setShow={setShowModal}
           schedule={selectedSchedule}
-          onClose={handleModalClose}
-          onRecordCreated={handleRecordCreated}
         />
       )}
     </div>

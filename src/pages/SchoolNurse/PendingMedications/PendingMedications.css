@@ -1,131 +1,118 @@
 .pending-medications {
   padding: 24px;
-  background-color: #f5f7fa;
-  height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
+  background-color: #f5f8fa;
+  min-height: 100vh;
 }
 
 .pending-medications-container {
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  height: 100%;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  padding: 20px;
+  background-color: #fff;
 }
 
 .pending-medications .ant-card-body {
-  padding: 24px;
-  background-color: #fff;
-  border-radius: 24px;
+  padding: 20px 24px;
 }
 
 .page-header {
-  text-align: center;
   margin-bottom: 24px;
-  flex-shrink: 0;
 }
 
 .page-header .ant-typography {
-  margin-bottom: 8px !important;
+  margin-bottom: 0;
 }
 
 .page-header .ant-typography h3 {
-  color: #1d3557;
+  font-size: 1.75rem;
   font-weight: 700;
-  margin-bottom: 8px !important;
+  color: #1a3353;
+  margin-bottom: 8px;
 }
 
 .page-header .ant-typography .ant-typography-secondary {
-  color: #6c757d;
-  font-size: 16px;
+  font-size: 1rem;
+  color: #637381;
 }
 
 .medications-container {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  margin-top: 20px;
 }
 
 .medication-card {
-  transition: all 0.3s ease;
-  border: 1px solid #e8e8e8;
-  background-color: #fff !important;
+  transition: all 0.3s;
+  animation: fadeInUp 0.5s;
 }
 
 .medication-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
-  border-color: #722ed1;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
 
 .medication-card .ant-card-body {
-  background: #fff;
+  padding: 16px;
 }
 
-/* Button styling */
 .pending-medications .ant-btn {
   border-radius: 8px;
+  height: 36px;
+  padding: 0 16px;
   font-weight: 500;
-  transition: all 0.3s ease;
 }
 
 .pending-medications .ant-btn-primary {
-  background: linear-gradient(135deg, #722ed1 0%, #531dab 100%);
-  border: none;
-  box-shadow: 0 2px 4px rgba(114, 46, 209, 0.3);
+  background-color: #722ed1;
+  border-color: #722ed1;
+  box-shadow: 0 2px 0 rgba(114, 46, 209, 0.05);
 }
 
 .pending-medications .ant-btn-primary:hover {
-  background: linear-gradient(135deg, #9254de 0%, #722ed1 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(114, 46, 209, 0.4);
+  background-color: #9254de;
+  border-color: #9254de;
 }
 
-/* Tag styling */
 .pending-medications .ant-tag {
-  border-radius: 6px;
-  font-weight: 500;
+  border-radius: 4px;
+  padding: 2px 8px;
 }
 
-/* Modal styling */
 .pending-medications .ant-modal-content {
   border-radius: 12px;
 }
 
 .pending-medications .ant-modal-header {
-  border-radius: 12px 12px 0 0;
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
 }
 
-/* Select styling */
 .pending-medications .ant-select {
-  border-radius: 8px;
+  width: 100%;
 }
 
 .pending-medications .ant-select-selector {
   border-radius: 8px !important;
+  height: 40px !important;
 }
 
-/* Loading and completion states */
 .pending-medications .ant-spin {
   color: #722ed1;
 }
 
-/* Responsive design */
 @media (max-width: 768px) {
   .pending-medications {
     padding: 16px;
   }
-  
+
   .pending-medications .ant-card-body {
     padding: 16px;
   }
-  
+
   .medication-card {
     margin-bottom: 12px;
   }
-  
+
   .medication-card .ant-card-body {
-    padding: 16px !important;
+    padding: 12px;
   }
 }
 
@@ -133,42 +120,40 @@
   .pending-medications {
     padding: 12px;
   }
-  
+
   .pending-medications .ant-card-body {
     padding: 12px;
   }
-  
+
   .page-header .ant-typography h3 {
-    font-size: 20px;
+    font-size: 1.5rem;
   }
-  
+
   .page-header .ant-typography .ant-typography-secondary {
-    font-size: 14px;
+    font-size: 0.875rem;
   }
 }
 
-/* Custom scrollbar */
 .pending-medications::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
 .pending-medications::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
+  background-color: #f1f1f1;
+  border-radius: 10px;
 }
 
 .pending-medications::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 3px;
+  background-color: #c1c1c1;
+  border-radius: 10px;
 }
 
 .pending-medications::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  background-color: #a3a3a3;
 }
 
-/* Animation for cards */
 .medication-card {
-  animation: fadeInUp 0.6s ease-out;
+  overflow: visible !important;
 }
 
 @keyframes fadeInUp {
@@ -182,23 +167,141 @@
   }
 }
 
-/* Status tag animations */
 .medication-card .ant-tag {
-  transition: all 0.3s ease;
+  transition: all 0.3s;
 }
 
 .medication-card:hover .ant-tag {
   transform: scale(1.05);
 }
 
-/* Button hover effects */
 .medication-card .ant-btn {
-  transition: all 0.3s ease;
+  transition: all 0.3s;
 }
 
 .medication-card .ant-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(114, 46, 209, 0.3);
+  transform: translateY(-2px);
+}
+
+/* New medication display styles */
+.medications-container {
+  margin-top: 16px;
+}
+
+.medications-collapse {
+  background: transparent !important;
+}
+
+.medication-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  color: #1d3557;
+}
+
+.medication-name {
+  margin-left: 5px;
+  font-size: 1rem;
+}
+
+.ant-collapse-header {
+  padding: 12px 16px !important;
+  border-radius: 8px !important;
+  background-color: #f0f7ff !important;
+}
+
+.medication-details {
+  padding: 12px;
+  background-color: #fcfcfc;
+  border-radius: 8px;
+}
+
+.schedule-divider {
+  margin: 16px 0 12px;
+  font-size: 0.9rem;
+  color: #00529b;
+}
+
+.schedule-display-item {
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 8px;
+  border-left: 3px solid #007bff;
+}
+
+/* Tab styling */
+.medications-tabs .ant-tabs-nav {
+  margin-bottom: 24px;
+}
+
+.medications-tabs .ant-tabs-tab {
+  padding: 10px 20px;
+  font-size: 16px;
+  transition: all 0.3s;
+}
+
+.medications-tabs .ant-tabs-tab:hover {
+  color: #722ed1;
+}
+
+.medications-tabs .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: #722ed1;
+  font-weight: 600;
+}
+
+.medications-tabs .ant-tabs-ink-bar {
+  background-color: #722ed1;
+  height: 3px;
+  border-radius: 3px;
+}
+
+/* Today's medications card styling */
+.today-medication-card {
+  border-left: 4px solid #faad14;
+}
+
+.today-medication-card.completed {
+  border-left: 4px solid #52c41a;
+}
+
+.today-medication-card .medication-time {
+  color: #faad14;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+/* Button group in today's medication card */
+.today-medication-card .ant-btn {
+  height: 32px;
+}
+
+.today-medication-card .ant-btn-danger {
+  background-color: #fff;
+  color: #f5222d;
+  border-color: #f5222d;
+}
+
+.today-medication-card .ant-btn-danger:hover {
+  background-color: #fff1f0;
+  color: #ff4d4f;
+  border-color: #ff4d4f;
+}
+
+@media (max-width: 768px) {
+  .ant-collapse-header {
+    padding: 8px 12px !important;
+  }
+  
+  .schedule-display-item {
+    padding: 8px;
+  }
+  
+  .medications-tabs .ant-tabs-tab {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
 }
 
  

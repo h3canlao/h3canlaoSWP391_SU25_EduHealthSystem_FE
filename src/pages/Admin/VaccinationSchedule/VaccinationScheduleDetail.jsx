@@ -81,8 +81,8 @@ const VaccinationScheduleDetail = () => {
       dataIndex: "status",
       key: "status",
       render: (status, record) => {
-        const opt = studentStatusMap[record.status] || {};
-        return <Tag color={opt.color}>{record.statusName || opt.label}</Tag>;
+        const opt = studentStatusMap[record.consentStatus] || {};
+        return <Tag color={opt.color}>{record.consentStatusName || opt.label}</Tag>;
       },
     },
     {
