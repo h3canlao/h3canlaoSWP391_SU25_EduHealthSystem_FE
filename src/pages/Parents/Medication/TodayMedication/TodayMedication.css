@@ -1,0 +1,124 @@
+.medication-container {
+  padding: 24px;
+  background-color: #f0f2f5;
+  min-height: 100vh;
+}
+
+.medication-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  background-color: #fff;
+  padding: 16px 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.medication-content {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+}
+
+.medication-record-card {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s;
+}
+
+.medication-record-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.medication-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.student-info {
+  display: flex;
+  align-items: center;
+}
+
+.student-name {
+  font-size: 16px;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.student-details {
+  font-size: 13px;
+}
+
+.status-tag {
+  padding: 4px 8px;
+  font-size: 14px;
+  border-radius: 4px;
+}
+
+.medication-details {
+  padding: 8px 0;
+}
+
+.detail-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  margin-right: 24px;
+  margin-bottom: 8px;
+}
+
+.detail-icon {
+  margin-right: 8px;
+  color: #1890ff;
+}
+
+.medication-list {
+  max-height: calc(100vh - 250px);
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+@media (max-width: 768px) {
+  .medication-container {
+    padding: 12px;
+  }
+  
+  .medication-header, 
+  .medication-content {
+    padding: 12px;
+  }
+  
+  .detail-row {
+    flex-direction: column;
+  }
+  
+  .detail-item {
+    margin-right: 0;
+  }
+  
+  .student-info {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .student-info .ant-avatar {
+    margin-bottom: 8px;
+    margin-right: 0;
+  }
+} 

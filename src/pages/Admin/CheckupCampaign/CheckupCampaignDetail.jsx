@@ -10,18 +10,19 @@ import {
 import dayjs from "dayjs";
 
 const statusOptions = [
-  { value: 0, label: "Đang lên kế hoạch", color: "default" },
-  { value: 1, label: "Đã lên lịch", color: "cyan" },
-  { value: 2, label: "Đang thực hiện", color: "blue" },
-  { value: 3, label: "Đã hoàn thành", color: "green" },
-  { value: 4, label: "Đã hủy", color: "red" },
+  { value: 0, label: "Chờ ký", color: "default", badge: "processing" },
+  { value: 1, label: "Đã gửi thông báo", color: "blue", badge: "warning" },
+  { value: 2, label: "Phụ huynh đã đồng ý", color: "green", badge: "success" },
+  { value: 3, label: "Phụ huynh từ chối", color: "red", badge: "error" },
+  { value: 4, label: "Hết hạn ký", color: "red", badge: "error" },
 ];
 
 const scheduleStatusOptions = [
-  { value: 0, label: "Chưa diễn ra", color: "default", badge: "processing" },
-  { value: 1, label: "Đang diễn ra", color: "blue", badge: "warning" },
-  { value: 2, label: "Đã hoàn thành", color: "green", badge: "success" },
-  { value: 3, label: "Đã hủy", color: "red", badge: "error" },
+  { value: 0, label: "Chờ ký", color: "default", badge: "processing" },
+  { value: 1, label: "Đã gửi thông báo", color: "blue", badge: "warning" },
+  { value: 2, label: "Phụ huynh đã đồng ý", color: "green", badge: "success" },
+  { value: 3, label: "Phụ huynh từ chối", color: "red", badge: "error" },
+  { value: 4, label: "Hết hạn ký", color: "red", badge: "error" },
 ];
 
 const CheckupCampaignDetail = () => {
@@ -94,11 +95,11 @@ const CheckupCampaignDetail = () => {
     },
     {
       title: "Trạng thái",
-      dataIndex: "scheduleStatus",
-      key: "scheduleStatus",
+      dataIndex: "parentConsentStatus",
+      key: "parentConsentStatus",
       render: (status, record) => {
-        const opt = scheduleStatusOptions[record.scheduleStatus] || {};
-        return <Badge status={opt.badge} text={record.scheduleStatusName || opt.label} />;
+        const opt = scheduleStatusOptions[record.parentConsentStatus] || {};
+        return <Badge status={opt.badge} text={record.parentConsentStatus || opt.label} />;
       },
     },
     {

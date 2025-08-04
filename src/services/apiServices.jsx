@@ -1,10 +1,10 @@
-import axios from 'axios';
+import axios from "axios";
 
-const BASE_URL = 'https://localhost:7096/api';
+const BASE_URL = "https://localhost:7096/api";
 
 // Helper to get Authorization headers from localStorage
 const getAuthHeaders = () => {
-  const token = localStorage.getItem('accessToken');
+  const token = localStorage.getItem("accessToken");
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
@@ -53,7 +53,7 @@ const getStudentsByParentId = async (parentId) => {
 // Lấy user hiện tại
 const currentUsers = async () => {
   return axios.get(`${BASE_URL}/Auth/current-user`, {
-    headers: getAuthHeaders()
+    headers: getAuthHeaders(),
   });
 };
 
@@ -64,11 +64,9 @@ const getNewestHealthProfile = async (studentCode) => {
 
 // Update health profile theo studentCode
 const updateHealthProfile = async (studentCode, updatedHealthProfile) => {
-  return axios.put(
-    `${BASE_URL}/health-profiles/student/${studentCode}`,
-    updatedHealthProfile,
-    { headers: getAuthHeaders() }
-  );
+  return axios.put(`${BASE_URL}/health-profiles/student/${studentCode}`, updatedHealthProfile, {
+    headers: getAuthHeaders(),
+  });
 };
 const createHealthProfile = async (profileData) => {
   return axios.post(`${BASE_URL}/health-profiles`, profileData, { headers: getAuthHeaders() });
@@ -82,14 +80,14 @@ const acceptVaccine = async (data) => {
 // Lấy danh sách lịch tiêm sắp tới
 const getUpcomingVaccines = async () => {
   return axios.get(`${BASE_URL}/parent/vaccinations/upcoming`, {
-    headers: getAuthHeaders()
+    headers: getAuthHeaders(),
   });
 };
 
 // Lấy danh sách lịch tiêm chưa xác nhận
 const getListOfVaccines = async () => {
   return axios.get(`${BASE_URL}/parent/vaccinations/pending-consent`, {
-    headers: getAuthHeaders()
+    headers: getAuthHeaders(),
   });
 };
 
@@ -101,28 +99,28 @@ const getAllParentMedicationDelivery = async () => {
 // Tạo mới đơn giao thuốc của phụ huynh
 const createParentMedicationDelivery = async (data) => {
   return axios.post(`${BASE_URL}/parents/medication-deliveries`, data, {
-    headers: getAuthHeaders()
+    headers: getAuthHeaders(),
   });
 };
 
 // Lấy danh sách loại vaccine
 const getVaccineTypes = async () => {
   return axios.get(`${BASE_URL}/VaccineType?pageNumber=1&pageSize=20`, {
-    headers: getAuthHeaders()
+    headers: getAuthHeaders(),
   });
 };
 
 // Tạo chiến dịch tiêm chủng
 const createVaccinationCampaign = async (data) => {
   return axios.post(`${BASE_URL}/VaccinationCampaign`, data, {
-    headers: getAuthHeaders()
+    headers: getAuthHeaders(),
   });
 };
 
 // Tạo lịch tiêm chủng
 const createVaccinationSchedule = async (data) => {
   return axios.post(`${BASE_URL}/VaccinationSchedule`, data, {
-    headers: getAuthHeaders()
+    headers: getAuthHeaders(),
   });
 };
 
@@ -139,7 +137,7 @@ const createCheckupSchedule = async (data) => {
 // Lấy danh sách đơn thuốc giao của phụ huynh (tất cả trạng thái)
 const getPendingMedicationDeliveries = async () => {
   return axios.get(`${BASE_URL}/parents/medication-deliveries`, {
-    headers: getAuthHeaders()
+    headers: getAuthHeaders(),
   });
 };
 
@@ -176,7 +174,7 @@ const updateMedicationUsageRecord = async (usageRecordId, isTaken, note = "") =>
 // Lấy danh sách lịch khám sức khỏe
 const getCheckupSchedules = async () => {
   return axios.get(`${BASE_URL}/CheckupSchedule/with-parent-acpt?pageNumber=1&pageSize=50`, {
-    headers: getAuthHeaders()
+    headers: getAuthHeaders(),
   });
 };
 
@@ -184,52 +182,61 @@ const getCheckupSchedules = async () => {
 const getCheckupSchedulesByStudentId = async (studentId) => {
   return axios.get(`${BASE_URL}/CheckupSchedule/Student`, {
     params: { studentId },
-    headers: getAuthHeaders()
+    headers: getAuthHeaders(),
   });
 };
 
 // Xác nhận consent lịch khám sức khỏe
 const consentCheckupSchedule = async (scheduleId, consentStatus, notes) => {
-  return axios.post(`${BASE_URL}/CheckupSchedule/consent`, {
-    scheduleId,
-    consentStatus,
-    notes
-  }, {
-    headers: getAuthHeaders()
-  });
+  return axios.post(
+    `${BASE_URL}/CheckupSchedule/consent`,
+    {
+      scheduleId,
+      consentStatus,
+      notes,
+    },
+    {
+      headers: getAuthHeaders(),
+    }
+  );
 };
 
 // Lấy danh sách nurse profiles
 const getNurseProfiles = async () => {
   return axios.get(`${BASE_URL}/NurseProfile/all`, {
-    headers: getAuthHeaders()
+    headers: getAuthHeaders(),
   });
 };
 
 // Tạo checkup record
 const createCheckupRecord = async (data) => {
   return axios.post(`${BASE_URL}/checkup-records`, data, {
-    headers: getAuthHeaders()
+    headers: getAuthHeaders(),
   });
 };
 
 // Lấy danh sách lịch tư vấn theo staffId
 const getCounselingAppointmentsByStaffId = async (staffId) => {
   return axios.get(`${BASE_URL}/counseling-appointments/staff/${staffId}`, {
-    headers: getAuthHeaders()
+    headers: getAuthHeaders(),
   });
 };
 
 // Thêm ghi chú cho counseling appointment
 const addCounselingAppointmentNote = async (data) => {
   return axios.post(`${BASE_URL}/counseling-appointments/add-note`, data, {
-    headers: getAuthHeaders()
+    headers: getAuthHeaders(),
   });
 };
 
 // Lấy hồ sơ khám sức khỏe theo studentId
 export const getCheckupRecordsByStudentId = async (studentId) => {
   return axios.get(`${BASE_URL}/checkup-records/by-id/${studentId}`, { headers: getAuthHeaders() });
+};
+
+// Lấy thông tin uống thuốc theo studentId
+export const getMedicationUsageRecordsByStudentId = async (studentId) => {
+  return axios.get(`${BASE_URL}/medication-usage-records/student/${studentId}`, { headers: getAuthHeaders() });
 };
 
 // Lấy lịch tư vấn theo studentId
@@ -240,14 +247,14 @@ export const getCounselingAppointmentsByStudentId = async (studentId) => {
 // Lấy danh sách checkup records theo staffId (nurseId)
 export const getCheckupRecordsByStaffId = async (staffId) => {
   return axios.get(`${BASE_URL}/checkup-records/staff/${staffId}`, {
-    headers: getAuthHeaders()
+    headers: getAuthHeaders(),
   });
 };
 
 // Lấy lịch khám sức khỏe của tất cả con (my-children)
 const getCheckupSchedulesMyChildren = async () => {
   return axios.get(`${BASE_URL}/CheckupSchedule/my-children`, {
-    headers: getAuthHeaders()
+    headers: getAuthHeaders(),
   });
 };
 
@@ -285,12 +292,14 @@ export const getVaccinationSchedulesMyChildren = () =>
 
 // Lấy danh sách lô vật tư y tế
 const getMedicalSupplyLots = async () => {
-  return axios.get(`${BASE_URL}/MedicalSupplyLot?pageNumber=1&pageSize=50&includeDeleted=false`, { headers: getAuthHeaders() });
+  return axios.get(`${BASE_URL}/MedicalSupplyLot?pageNumber=1&pageSize=50&includeDeleted=false`, {
+    headers: getAuthHeaders(),
+  });
 };
 
 // Cập nhật điều trị cho sự kiện y tế
 const updateHealthEventTreatment = async (data) => {
-  // data: { healthEventId, supplyUsages: [{ medicalSupplyLotId, quantityUsed, notes }] } 
+  // data: { healthEventId, supplyUsages: [{ medicalSupplyLotId, quantityUsed, notes }] }
   return axios.put(`${BASE_URL}/HealthEvent/treatment`, data, { headers: getAuthHeaders() });
 };
 
@@ -299,14 +308,38 @@ const getHealthEvents = async () => {
   return axios.get(`${BASE_URL}/HealthEvent`, { headers: getAuthHeaders() });
 };
 
-// Lấy danh sách sự kiện y tế của con (dành cho phụ huynh)
+export const getHealthEventById = async (id) => {
+  return axios.get(`${BASE_URL}/HealthEvent/${id}`, { headers: getAuthHeaders() });
+};
+
+export const resolveHealthEvent = async (id, completionNotes) => {
+  return axios.put(`${BASE_URL}/HealthEvent/${id}/resolve`, completionNotes, { headers: getAuthHeaders() });
+};
+export const treatHealthEvent = async (id, treatData) => {
+  return axios.put(`${BASE_URL}/HealthEvent/${id}/treat`, treatData, { headers: getAuthHeaders() });
+};
+
+export const handoverHealthEvent = async (id, handoverData) => {
+  return axios.put(`${BASE_URL}/HealthEvent/${id}/handover`, handoverData, { headers: getAuthHeaders() });
+};
+
+export const getUsers = async (params) => {
+  // Params có thể là { role: 'Nurse' } hoặc { role: 'Teacher' } để lọc
+  return axios.get(`${BASE_URL}/User`, { params, headers: getAuthHeaders() });
+};
+
+export const getMedicationLots = async (params) => {
+  // Params có thể là { inStock: true }
+  return axios.get(`${BASE_URL}/MedicationLot`, { params, headers: getAuthHeaders() });
+};
+
 const getHealthEventsMyChild = async () => {
   return axios.get(`${BASE_URL}/HealthEvent/myChild`, { headers: getAuthHeaders() });
 };
 
 export const declareVaccination = (payload) => {
   return axios.post(`${BASE_URL}/parent/vaccinations`, payload, {
-    headers: getAuthHeaders()
+    headers: getAuthHeaders(),
   });
 };
 
@@ -322,11 +355,11 @@ export const getAllVaccinationRecords = () => {
 export const updateVaccinationRecord = async (id, data) => {
   console.log(`Sending update to: ${BASE_URL}/VaccinationRecord/${id}`);
   console.log("With data:", data);
-  
+
   if (!id) {
     throw new Error("ID is required for updating vaccination record");
   }
-  
+
   return axios.put(`${BASE_URL}/VaccinationRecord/${id}`, data, { headers: getAuthHeaders() });
 };
 
@@ -345,17 +378,17 @@ export const getSessionStudents = async (studentId, vaccinationScheduleId) => {
   const params = {};
   if (studentId) params.studentId = studentId;
   if (vaccinationScheduleId) params.vaccinationScheduleId = vaccinationScheduleId;
-  
-  return axios.get(`${BASE_URL}/session-students`, { 
+
+  return axios.get(`${BASE_URL}/session-students`, {
     params,
-    headers: getAuthHeaders() 
+    headers: getAuthHeaders(),
   });
 };
 
 // Update session student check-in time
 export const updateSessionStudentCheckInTime = async (data) => {
   return axios.put(`${BASE_URL}/session-students/check-in-time`, data, {
-    headers: getAuthHeaders()
+    headers: getAuthHeaders(),
   });
 };
 
@@ -397,6 +430,4 @@ export {
   updateHealthEventTreatment,
   getHealthEvents,
   getHealthEventsMyChild,
-
 };
-

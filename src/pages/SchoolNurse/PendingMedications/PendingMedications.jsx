@@ -141,6 +141,7 @@ const PendingMedications = () => {
                           onClick={() => showModal(medication)}
                           style={{ borderRadius: 6, background: '#722ed1', borderColor: '#722ed1' }}
                         >
+                          {/* < Nút cập nhật /> */}
                           Cập nhật
                         </Button>
                       </div>
@@ -149,20 +150,20 @@ const PendingMedications = () => {
                     {/* Chi tiết các thuốc trong đơn */}
                     {medication.medications && medication.medications.length > 0 ? (
                       <div className="medications-container" style={{ marginTop: 16 }}>
-                        <Collapse bordered={false} className="medications-collapse" expandIconPosition="end">
-                          {medication.medications.map((med, idx) => (
-                            <Panel 
-                              key={med.id || `med-${idx}`}
-                              header={<div className="medication-panel-header">
-                                <MedicineBoxOutlined /> <span className="medication-name">{med.medicationName}</span>
-                              </div>}
-                            >
-                              <div className="medication-details">
-                                <div><Text strong>Số lượng tổng:</Text> {med.totalQuantity}</div>
-                                <div><Text strong>Đã sử dụng:</Text> {med.quantityUsed}</div>
-                                <div><Text strong>Còn lại:</Text> {med.quantityRemaining}</div>
-                                <div><Text strong>Hướng dẫn sử dụng:</Text> {med.dosageInstruction || '-'}</div>
-                                
+                          <Collapse bordered={false} className="medications-collapse" expandIconPosition="end">
+                            {medication.medications.map((med, idx) => (
+                              <Panel 
+                                key={med.id || `med-${idx}`}
+                                header={<div className="medication-panel-header">
+                                  <MedicineBoxOutlined /> <span className="medication-name">{med.medicationName}</span>
+                                </div>}
+                              >
+                                <div className="medication-details">
+                                  <div><Text strong>Số lượng tổng:</Text> {med.totalQuantity}</div>
+                                  <div><Text strong>Đã sử dụng:</Text> {med.quantityUsed}</div>
+                                  <div><Text strong>Còn lại:</Text> {med.quantityRemaining}</div>
+                                  <div><Text strong>Hướng dẫn sử dụng:</Text> {med.dosageInstruction || '-'}</div>
+                                  
                                 {med.dailySchedule?.length > 0 && (
                                   <div className="daily-schedules">
                                     <div className="schedule-divider">Lịch uống thuốc</div>

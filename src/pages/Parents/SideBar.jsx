@@ -12,10 +12,20 @@ import {
   CheckCircleOutlined,
 } from "@ant-design/icons";
 import Sidebar from "@/components/Sidebar";
+import { Link } from "react-router-dom";
 
 const routes = [
   { key: "/parents/student-profiles", icon: <UserOutlined />, label: "Hồ sơ học sinh" },
-  { key: "/parents/send-medication", icon: <MedicineBoxOutlined />, label: "Gửi thuốc" },
+  
+  {
+    key: "medication",
+    icon: <MedicineBoxOutlined />, 
+    label: "Gửi thuốc",
+    children: [
+      { key: "/parents/send-medication", icon: <MedicineBoxOutlined />, label: "Gửi thuốc" },
+      { key: "/parents/today-medication", icon: <CheckCircleOutlined />, label: "Theo dõi uống thuốc" },
+    ]
+  },
 
   {
     

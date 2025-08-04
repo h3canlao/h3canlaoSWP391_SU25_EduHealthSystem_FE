@@ -11,8 +11,8 @@ const initialFormData = {
   allergies: "",
   chronicConditions: "",
   treatmentHistory: "",
-  vision: "1",
-  hearing: "1",
+  vision: "",
+  hearing: "",
   vaccinationSummary: "",
 };
 
@@ -277,7 +277,7 @@ const HealthProfileForm = ({ formData, handleChange }) => (
 /**
  * Form khai báo vắc xin đã tiêm
  */
-const VaccineDeclarationForm = ({ studentId, formData, setFormData }) => {
+const VaccineDeclarationForm = ({ studentId }) => {
   // State quản lý
   const [vaccineTypes, setVaccineTypes] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -324,19 +324,6 @@ const VaccineDeclarationForm = ({ studentId, formData, setFormData }) => {
         administeredAt: new Date().toISOString() 
       }]);
       
-      // Tìm tên vắc xin đã chọn
-      const selectedVaccine = vaccineTypes.find(v => v.id === vaccineTypeId);
-      const vaccineName = selectedVaccine ? selectedVaccine.name : "Vắc xin không xác định";
-
-      // Tạo dòng mới và cập nhật tóm tắt
-      const newEntry = `- ${vaccineName} - ${doseNumber} mũi`;
-      const updatedSummary = formData.vaccinationSummary 
-        ? `${formData.vaccinationSummary}\n${newEntry}` 
-        : newEntry;
-        
-      // Cập nhật form data
-      setFormData(prev => ({ ...prev, vaccinationSummary: updatedSummary }));
-      
       // Hiển thị thông báo thành công
       toast.success("Khai báo vắc xin thành công!");
       
@@ -352,7 +339,7 @@ const VaccineDeclarationForm = ({ studentId, formData, setFormData }) => {
   return (
     <div className="row">
       {/* Form khai báo vắc xin */}
-      <div className="col-md-6">
+      <div className="col-12">
         <form onSubmit={handleSubmit} className="p-3 border rounded">
           <h5 className="text-center mb-3">Khai báo vắc xin đã tiêm</h5>
           
@@ -385,34 +372,11 @@ const VaccineDeclarationForm = ({ studentId, formData, setFormData }) => {
           <button 
             type="submit" 
             className="btn btn-primary" 
-            disabled={submitting || loading} 
-            style={{ width: "100%" }}
+            disabled={submitting || loading}
           >
             {submitting ? "Đang gửi..." : "Khai báo"}
           </button>
         </form>
-      </div>
-      
-      {/* Hiển thị tóm tắt tiêm chủng */}
-      <div className="col-md-6">
-        <div className="border rounded p-3 h-100">
-          <h5 className="text-center mb-3">Tóm tắt tiêm chủng</h5>
-          
-          {/* Khung hiển thị tóm tắt */}
-          <div className="bg-light rounded p-3" style={{ minHeight: '150px', maxHeight: '240px', overflowY: 'auto' }}>
-            {formData.vaccinationSummary ? (
-              <pre style={{ whiteSpace: 'pre-wrap', margin: 0, fontFamily: 'inherit' }}>
-                {formData.vaccinationSummary}
-              </pre>
-            ) : (
-              <p className="text-center text-muted my-4">Chưa có thông tin tiêm chủng</p>
-            )}
-          </div>
-          
-          <div className="mt-2 text-center">
-            <small className="text-muted">Các khai báo mới sẽ được tự động thêm vào tóm tắt này</small>
-          </div>
-        </div>
       </div>
     </div>
   );

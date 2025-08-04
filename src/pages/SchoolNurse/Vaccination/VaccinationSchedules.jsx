@@ -36,7 +36,7 @@ export default function VaccinationSchedules() {
       <Title level={3} style={{ color: "#4FC3F7", marginBottom: 24 }}>
         <ScheduleOutlined /> Lịch tiêm chủng
       </Title>
-      
+
       {loading ? <Spin /> : (
         schedules.length === 0 ? (
           <Empty description="Không có lịch tiêm nào" />
