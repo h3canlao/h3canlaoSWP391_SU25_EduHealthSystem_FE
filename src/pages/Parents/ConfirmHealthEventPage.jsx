@@ -27,10 +27,6 @@ const ConfirmHealthEventPage = () => {
         await confirmHealthEventByParent(id, token);
 
         message.success("Xác nhận thông báo thành công!");
-
-        setTimeout(() => {
-          navigate("/"); // Chuyển hướng về dashboard
-        }, 2000);
       } catch (err) {
         console.error("Lỗi khi xác nhận:", err);
         const errorMessage =
@@ -43,13 +39,13 @@ const ConfirmHealthEventPage = () => {
     processConfirmation();
   }, [id, location.search, navigate]);
 
-  if (loading) {
-    return (
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
-        <Spin tip="Đang xử lý xác nhận, vui lòng chờ..." size="large" />
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+  //       <Spin tip="Đang xử lý xác nhận, vui lòng chờ..." size="large" />
+  //     </div>
+  //   );
+  // }
 
   if (error) {
     return (
@@ -70,7 +66,11 @@ const ConfirmHealthEventPage = () => {
     <Result
       status="success"
       title="Đã xác nhận thông báo thành công!"
-      subTitle="Bạn sẽ được tự động chuyển về trang chính trong vài giây."
+      extra={[
+        <Button type="primary" key="dashboard" onClick={() => navigate("/")}>
+          Về Trang chủ
+        </Button>,
+      ]}
     />
   );
 };
