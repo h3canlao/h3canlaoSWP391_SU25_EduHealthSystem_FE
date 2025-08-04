@@ -32,6 +32,7 @@ const ConfirmHealthEventPage = () => {
         const errorMessage =
           err.response?.data?.message || "Xác nhận không thành công. Vui lòng thử lại hoặc liên hệ với nhà trường.";
         setError(errorMessage);
+      } finally {
         setLoading(false);
       }
     };
@@ -39,13 +40,13 @@ const ConfirmHealthEventPage = () => {
     processConfirmation();
   }, [id, location.search, navigate]);
 
-  // if (loading) {
-  //   return (
-  //     <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
-  //       <Spin tip="Đang xử lý xác nhận, vui lòng chờ..." size="large" />
-  //     </div>
-  //   );
-  // }
+  if (loading) {
+    return (
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+        <Spin tip="Đang xử lý xác nhận, vui lòng chờ..." size="large" />
+      </div>
+    );
+  }
 
   if (error) {
     return (
