@@ -25,8 +25,8 @@ import VaccineManager from "./pages/Admin/Vaccine/VaccineManager";
 // SchoolNurse imports
 import SchoolNurse from "./pages/SchoolNurse/SchoolNurse";
 import PendingMedications from "./pages/SchoolNurse/PendingMedications/PendingMedications";
-import HealthCheckups from "./pages/SchoolNurse/HealthCheckups/HealthCheckups";
-import CounselingAppointments from "./pages/SchoolNurse/HealthCheckups/CounselingAppointments";
+import HealthCheckups from "./pages/SchoolNurse/HealthCheckups/CreateCheckup/HealthCheckups";
+import CounselingAppointments from "./pages/SchoolNurse/HealthCheckups/CounselingAppointment/CounselingAppointments";
 import Dashboard from "./pages/SchoolNurse/Dashboard";
 
 import MedicalSupplyDetail from "./pages/Admin/MedicalSupply/MedicalSupplyAdminDetail";
@@ -143,7 +143,6 @@ const Router = () => {
         >
           <Route index element={<Dashboard />} />
           <Route path="dashboard" element={<Dashboard />} />
-          <Route path="pending-medications" element={<PendingMedications />} />
           <Route path="pending-medications" element={<PendingMedications />} />
           <Route path="health-checkups" element={<HealthCheckups />} />
           <Route path="counseling-appointments" element={<CounselingAppointments />} />

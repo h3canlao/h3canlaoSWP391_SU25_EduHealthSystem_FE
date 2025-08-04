@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getCheckupRecordsByStaffId } from '../../services/apiServices';
 import { FaUser, FaRuler, FaWeight, FaEye, FaHeartbeat, FaCheck, FaExclamation, FaComments, FaStethoscope, FaCalendar, FaClock } from 'react-icons/fa';
-import './HealthCheckups/HealthCheckups.css';
+import './HealthCheckups/CreateCheckup/HealthCheckups.css'
 
 function getUserIdFromToken() {
   const token = localStorage.getItem('accessToken');

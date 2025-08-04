@@ -25,7 +25,7 @@ const ModalStudent = ({ show, setShow, healthProfile, resetData, onUpdated }) =>
   const [formData, setFormData] = useState(initialFormData);
   const [updating, setUpdating] = useState(false);
   const [activeTab, setActiveTab] = useState("profile");
-
+  
   // Cập nhật dữ liệu khi mở modal
   useEffect(() => {
     // Reset tab khi mở modal

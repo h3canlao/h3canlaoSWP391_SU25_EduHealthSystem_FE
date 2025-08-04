@@ -68,7 +68,8 @@ const StudentProfiles = () => {
           cancelText: "Hủy",
           onOk: async () => {
             try {
-              await createHealthProfile(student.studentCode);
+              const newProfile = { studentCode: student.studentCode };
+              await createHealthProfile(newProfile);
               toast.success("Tạo hồ sơ sức khỏe thành công!");
               const res = await getNewestHealthProfile(student.studentCode);
               setHealthProfile(res?.data?.data || null);

@@ -140,7 +140,12 @@
   color: #666;
   flex: 1;
 }
-
+.students-container {
+  display: flex;
+  flex-direction: row!important;
+  gap: 24px;
+  margin-top: 24px;
+}
 /* Responsive */
 @media (max-width: 768px) {
   .parent-checkup-schedules-container {

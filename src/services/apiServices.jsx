@@ -263,7 +263,7 @@ export const getVaccinationSchedules = async () => {
 
 // Lấy chi tiết lịch tiêm chủng
 export const getVaccinationScheduleDetail = async (id) => {
-  return axios.get(`${BASE_URL}/VaccinationSchedule/with-parent-acpt${id}`, { headers: getAuthHeaders() });
+  return axios.get(`${BASE_URL}/VaccinationSchedule/${id}`, { headers: getAuthHeaders() });
 };
 
 // Tạo record tiêm chủng

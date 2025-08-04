@@ -16,6 +16,7 @@ export default function VaccinationRecords() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
 
+  // Tải dữ liệu khi component mount
   useEffect(() => {
     setLoading(true);
     getAllVaccinationRecords()
@@ -24,6 +25,7 @@ export default function VaccinationRecords() {
       .finally(() => setLoading(false));
   }, []);
 
+  // Lọc dữ liệu theo từ khóa tìm kiếm
   const filtered = records.filter(r =>
     r.studentName?.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').includes(
       search.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '')

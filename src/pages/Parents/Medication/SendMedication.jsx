@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { Button, Typography, Spin, Empty, Card, Tag, List, Collapse, Row, Col, Divider } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Button, Typography, Spin, Empty, Card, Tag, List, Collapse, Space } from 'antd';
 import { PlusOutlined, CheckCircleOutlined, CarOutlined, HomeOutlined, DesktopOutlined, ClockCircleOutlined, MedicineBoxOutlined, CalendarOutlined } from '@ant-design/icons';
 import { getAllParentMedicationDelivery, getStudentsByParentId } from '../../../services/apiServices';
 import { getUserInfo } from '../../../services/handleStorageApi';
@@ -9,244 +9,68 @@ import './SendMedication.css';
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
 
-// Status definitions
-const STATUS_COLORS = {
-  primary: '#1890ff',
-  success: '#52c41a',
-  warning: '#faad14',
-  danger: '#f5222d',
-  default: '#8c8c8c',
-};
-
-// Status mapping - value is from API (0: pending, 1: confirmed, etc.)
+// Mapping trạng thái đơn thuốc
 const STATUS_MAP = {
-  0: { color: STATUS_COLORS.default, icon: <ClockCircleOutlined />, text: 'Đang chờ' },
-  1: { color: STATUS_COLORS.primary, icon: <DesktopOutlined />, text: 'Đã gửi' },
-  2: { color: STATUS_COLORS.success, icon: <CheckCircleOutlined />, text: 'Đã xác nhận' },
-  3: { color: STATUS_COLORS.warning, icon: <CarOutlined />, text: 'Từ chối' },
-  4: { color: STATUS_COLORS.danger, icon: <HomeOutlined />, text: 'Đã giao' },
+  0: { color: '#8c8c8c', icon: <ClockCircleOutlined />, text: 'Đang chờ' },
+  1: { color: '#1890ff', icon: <DesktopOutlined />, text: 'Đã gửi' },
+  2: { color: '#52c41a', icon: <CheckCircleOutlined />, text: 'Đã xác nhận' },
+  3: { color: '#faad14', icon: <CarOutlined />, text: 'Từ chối' },
+  4: { color: '#f5222d', icon: <HomeOutlined />, text: 'Đã giao' },
 };
 
 const SendMedication = () => {
   const [medications, setMedications] = useState([]);
   const [students, setStudents] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [studentLoading, setStudentLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
 
-  // Get parent ID from token
-  const parentId = useMemo(() => {
-    const userInfo = getUserInfo();
-    try {
-      return userInfo?.accessToken 
-        ? JSON.parse(atob(userInfo.accessToken.split('.')[1]))?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] 
-        : null;
-    } catch {
-      return null;
-    }
-  }, []);
+  // Lấy ID phụ huynh từ token
+  const parentId = getUserInfo()?.accessToken 
+    ? JSON.parse(atob(getUserInfo().accessToken.split('.')[1]))?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] 
+    : null;
 
-  // Fetch students associated with parent
-  const fetchStudents = async () => {
-    if (!parentId) return;
-    
-    setStudentLoading(true);
-    try {
-      const res = await getStudentsByParentId(parentId);
-      setStudents(res.data?.data || []);
-    } catch (error) {
-      setStudents([]);
-    } finally {
-      setStudentLoading(false);
-    }
-  };
-
-  // Fetch medication deliveries
-  const fetchMedications = async () => {
-    setLoading(true);
-    try {
-      const res = await getAllParentMedicationDelivery();
-      setMedications(Array.isArray(res.data?.data) ? res.data.data : []);
-    } catch (error) {
-      setMedications([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Initial data loading
+  // Tải dữ liệu ban đầu
   useEffect(() => {
     if (parentId) {
-      fetchStudents();
-      fetchMedications();
+      Promise.all([
+        getStudentsByParentId(parentId).then(res => res.data?.data || []),
+        getAllParentMedicationDelivery().then(res => res.data?.data || [])
+      ])
+      .then(([studentsData, medicationsData]) => {
+        setStudents(studentsData);
+        setMedications(medicationsData);
+      })
+      .catch(error => {
+        console.error("Error loading data:", error);
+        setStudents([]);
+        setMedications([]);
+      })
+      .finally(() => setLoading(false));
     }
   }, [parentId]);
 
-  // Handle modal close
-  const handleModalClose = (shouldReload = false) => {
-    setShowModal(false);
-    if (shouldReload) fetchMedications();
-  };
-
-  // Format date and time for display
+  // Định dạng ngày giờ
   const formatDateTime = (dateString) => {
-    if (!dateString) return '';
-    
+    if (!dateString) return '-';
     try {
-      const date = new Date(dateString);
-      return date.toLocaleString('vi-VN', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
+      return new Date(dateString).toLocaleString('vi-VN', {
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit'
       });
-    } catch (error) {
+    } catch {
       return dateString;
     }
   };
 
-  // Format time only (for schedule display)
-  const formatTime = (timeString) => {
-    if (!timeString) return '';
-    return timeString;
-  };
-
-  // Daily Schedule component
-  const DailyScheduleItem = ({ schedule }) => (
-    <div className="schedule-display-item">
-      <Row gutter={[8, 8]} align="middle">
-        <Col span={8}>
-          <Text strong><CalendarOutlined /> Thời gian:</Text> {formatTime(schedule.time)}
-        </Col>
-        <Col span={7}>
-          <Text strong>Liều lượng:</Text> {schedule.dosage}
-        </Col>
-        <Col span={9}>
-          <Text strong>Ghi chú:</Text> {schedule.note || '-'}
-        </Col>
-      </Row>
-    </div>
-  );
-
-  // Medication details component
-  const MedicationDetails = ({ medication }) => (
-    <div className="medication-details">
-      <Row gutter={[16, 8]}>
-        <Col span={12}>
-          <Text strong>Số lượng tổng:</Text> {medication.totalQuantity}
-        </Col>
-        <Col span={12}>
-          <Text strong>Đã sử dụng:</Text> {medication.quantityUsed}
-        </Col>
-      </Row>
-      <Row gutter={[16, 8]}>
-        <Col span={24}>
-          <Text strong>Còn lại:</Text> {medication.quantityRemaining}
-        </Col>
-      </Row>
-      <Row gutter={[16, 8]}>
-        <Col span={24}>
-          <Text strong>Hướng dẫn sử dụng:</Text> {medication.dosageInstruction || '-'}
-        </Col>
-      </Row>
-      
-      {medication.dailySchedule && medication.dailySchedule.length > 0 && (
-        <>
-          <Divider orientation="left" className="schedule-divider">Lịch uống thuốc</Divider>
-          {medication.dailySchedule.map((schedule, idx) => (
-            <DailyScheduleItem key={schedule.id || idx} schedule={schedule} />
-          ))}
-        </>
-      )}
-    </div>
-  );
-
-  // Medication card component
-  const MedicationCard = ({ delivery }) => {
-    const { studentName, notes, deliveredAt, status, medications } = delivery;
-    const statusInfo = STATUS_MAP[status] || STATUS_MAP[0]; // Default to pending if status unknown
-    
-    return (
-      <Card
-        className="medication-list-card"
-        style={{ marginBottom: 24, borderRadius: 12, boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}
-        bodyStyle={{ padding: 24, background: '#fafdff' }}
-      >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap' }}>
-          <div>
-            <div className="medication-student-name">
-              {studentName || 'Không có tên'}
-            </div>
-            <div style={{ color: '#555', marginTop: 8 }}>
-              <Text strong>Thời gian gửi:</Text> {formatDateTime(deliveredAt)}
-            </div>
-            <div style={{ color: '#555' }}>
-              <Text strong>Ghi chú:</Text> {notes || '-'}
-            </div>
-          </div>
-          <div style={{ minWidth: 140, textAlign: 'right' }}>
-            <Tag
-              icon={statusInfo.icon}
-              color={statusInfo.color}
-              style={{ fontSize: 16, padding: '6px 16px', borderRadius: 8, marginBottom: 8 }}
-            >
-              {statusInfo.text}
-            </Tag>
-          </div>
-        </div>
-
-        {medications && medications.length > 0 ? (
-          <div className="medications-container" style={{ marginTop: 16 }}>
-            <Collapse 
-              bordered={false} 
-              className="medications-collapse"
-              expandIconPosition="end"
-            >
-              {medications.map((med, idx) => (
-                <Panel 
-                  key={med.id || `med-${idx}`}
-                  header={
-                    <div className="medication-panel-header">
-                      <MedicineBoxOutlined /> <span className="medication-name">{med.medicationName}</span>
-                    </div>
-                  }
-                >
-                  <MedicationDetails medication={med} />
-                </Panel>
-              ))}
-            </Collapse>
-          </div>
-        ) : (
-          <div style={{ marginTop: 16, color: '#999', fontStyle: 'italic' }}>
-            Không có thông tin thuốc
-          </div>
-        )}
-      </Card>
-    );
-  };
-
-  // Loading or empty state
-  const renderContent = () => {
-    if (loading || studentLoading) {
-      return <Spin size="large" style={{ display: 'block', margin: '40px auto' }} />;
+  // Xử lý đóng modal và tải lại dữ liệu nếu cần
+  const handleModalClose = (shouldReload) => {
+    setShowModal(false);
+    if (shouldReload) {
+      setLoading(true);
+      getAllParentMedicationDelivery()
+        .then(res => setMedications(res.data?.data || []))
+        .finally(() => setLoading(false));
     }
-    
-    if (medications.length === 0) {
-      return <Empty description="Không có đơn thuốc." />;
-    }
-    
-    return (
-      <div className="medication-list-scroll" style={{ maxHeight: 'calc(93vh - 120px)', overflowY: 'auto', paddingRight: 8 }}>
-        <List
-          dataSource={medications}
-          renderItem={(delivery) => (
-            <MedicationCard key={delivery.id} delivery={delivery} />
-          )}
-          className="medication-list"
-        />
-      </div>
-    );
   };
 
   return (
@@ -265,8 +89,95 @@ const SendMedication = () => {
           </Button>
         </div>
         
-        {renderContent()}
+        {/* Hiển thị danh sách đơn thuốc */}
+        {loading ? (
+          <Spin size="large" style={{ display: 'block', margin: '40px auto' }} />
+        ) : medications.length === 0 ? (
+          <Empty description="Không có đơn thuốc." />
+        ) : (
+          <div className="medication-list-scroll" style={{ maxHeight: 'calc(93vh - 120px)', overflowY: 'auto', paddingRight: 8 }}>
+            <List
+              dataSource={medications}
+              renderItem={(delivery) => {
+                const statusInfo = STATUS_MAP[delivery.status] || STATUS_MAP[0];
+                
+                return (
+                  <Card
+                    className="medication-list-card"
+                    style={{ marginBottom: 24, borderRadius: 12, boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}
+                    bodyStyle={{ padding: 24, background: '#fafdff' }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div>
+                        <div className="medication-student-name">{delivery.studentName || 'Không có tên'}</div>
+                        <div style={{ color: '#555', marginTop: 8 }}>
+                          <Text strong>Thời gian gửi:</Text> {formatDateTime(delivery.deliveredAt)}
+                        </div>
+                        <div style={{ color: '#555' }}>
+                          <Text strong>Ghi chú:</Text> {delivery.notes || '-'}
+                        </div>
+                      </div>
+                      <div style={{ minWidth: 140, textAlign: 'right' }}>
+                        <Tag
+                          icon={statusInfo.icon}
+                          color={statusInfo.color}
+                          style={{ fontSize: 16, padding: '6px 16px', borderRadius: 8 }}
+                        >
+                          {statusInfo.text}
+                        </Tag>
+                      </div>
+                    </div>
+
+                    {/* Chi tiết thuốc */}
+                    {delivery.medications?.length > 0 && (
+                      <div style={{ marginTop: 16 }}>
+                        <Collapse bordered={false} expandIconPosition="end" className="medications-collapse">
+                          {delivery.medications.map((med, idx) => (
+                            <Panel 
+                              key={med.id || idx}
+                 s            header={
+                                <div className="medication-panel-header">
+                                  <MedicineBoxOutlined /> <span className="medication-name">{med.medicationName}</span>
+                                </div>
+                              }
+                            >
+                              <div>
+                                <div>
+                                  <Text strong>Số lượng tổng:</Text>{med.totalQuantity} 
+                                  <Text strong>Đã sử dụng:</Text>{med.quantityUsed} 
+                                  <Text strong>Còn lại:</Text>{med.quantityRemaining}
+                                </div>
+                                <div>
+                                  <Text strong>Hướng dẫn sử dụng:</Text> {med.dosageInstruction || '-'}
+                                </div>
+                                
+                                {/* Lịch uống thuốc */}
+                                {med.dailySchedule?.length > 0 && (
+                                  <div style={{ marginTop: 12, borderTop: '1px solid #f0f0f0', paddingTop: 12 }}>
+                                    <div style={{ marginBottom: 8 }}><Text strong>Lịch uống thuốc:</Text></div>
+                                    {med.dailySchedule.map((schedule, idx) => (
+                                      <div key={idx} style={{ padding: '4px 0' }}>
+                                        <CalendarOutlined /> {schedule.time} - 
+                                        Liều lượng: {schedule.dosage} 
+                                        {schedule.note && ` - Ghi chú: ${schedule.note}`}
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            </Panel>
+                          ))}
+                        </Collapse>
+                      </div>
+                    )}
+                  </Card>
+                );
+              }}
+            />
+          </div>
+        )}
         
+        {/* Modal gửi đơn thuốc */}
         <ModalMedication
           show={showModal}
           setShow={setShowModal}
