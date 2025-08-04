@@ -1,14 +1,16 @@
 // src/pages/HealthEventTabs.js
 import React, { useEffect, useState } from "react";
-import { Table, Typography, Tag, Spin, message, Input, Card, Button, Space } from "antd";
+import { Table, Typography, Tag, Spin, message, Input, Card, Button, Space, Tabs } from "antd"; // Thêm Tabs
 import { PlusOutlined, EyeOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom"; // Hook để điều hướng
+import { useNavigate } from "react-router-dom";
 import { getHealthEvents } from "@/services/apiServices";
-import "./HealthEvent.css"; // Bạn có thể giữ lại CSS cũ hoặc tùy chỉnh thêm
+import HealthEventForm from "./HealthEventForm"; // Giả sử bạn có component form này
+import "./HealthEvent.css";
 
 const { Title } = Typography;
 const { Search } = Input;
 
+// Các MAP hằng số giữ nguyên
 const EVENT_TYPE_MAP = {
   Accident: "Tai nạn",
   Fever: "Sốt",
@@ -17,13 +19,11 @@ const EVENT_TYPE_MAP = {
   Other: "Khác",
   VaccineReaction: "Phản ứng vắc xin",
 };
-
 const EVENT_STATUS_MAP = {
   InProgress: { color: "blue", text: "Đang xử lý" },
   Completed: { color: "green", text: "Hoàn thành" },
   Pending: { color: "grey", text: "Chờ xử lý" },
   Cancelled: { color: "red", text: "Đã hủy" },
-  // Thêm status mới từ data example
   Resolved: { color: "green", text: "Hoàn thành" },
 };
 
@@ -31,7 +31,8 @@ export default function HealthEventTabs() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const navigate = useNavigate(); // Khởi tạo hook navigate
+  const [activeTab, setActiveTab] = useState("1"); // <-- State để quản lý tab
+  const navigate = useNavigate();
 
   const fetchEvents = () => {
     setLoading(true);
@@ -44,6 +45,13 @@ export default function HealthEventTabs() {
   useEffect(() => {
     fetchEvents();
   }, []);
+
+  // Hàm được gọi khi tạo mới thành công
+  const handleCreationSuccess = () => {
+    message.success("Tạo sự kiện mới thành công!");
+    setActiveTab("1"); // Chuyển về tab danh sách
+    fetchEvents(); // Tải lại dữ liệu mới nhất
+  };
 
   const filteredEvents = events.filter((ev) =>
     ev.studentName
@@ -59,23 +67,10 @@ export default function HealthEventTabs() {
   );
 
   const columns = [
-    {
-      title: "Mã sự kiện",
-      dataIndex: "eventCode",
-      key: "eventCode",
-      width: 150,
-    },
-    {
-      title: "Học sinh",
-      dataIndex: "studentName",
-      key: "studentName",
-    },
-    {
-      title: "Loại sự kiện",
-      dataIndex: "eventType",
-      key: "eventType",
-      render: (v) => EVENT_TYPE_MAP[v] || v,
-    },
+    // Các cột không đổi
+    { title: "Mã sự kiện", dataIndex: "eventCode", key: "eventCode", width: 150 },
+    { title: "Học sinh", dataIndex: "studentName", key: "studentName" },
+    { title: "Loại sự kiện", dataIndex: "eventType", key: "eventType", render: (v) => EVENT_TYPE_MAP[v] || v },
     {
       title: "Thời gian",
       dataIndex: "occurredAt",
@@ -97,46 +92,56 @@ export default function HealthEventTabs() {
       align: "center",
       render: (_, record) => (
         <Space size="middle">
-          <Button
-            type="primary"
-            icon={<EyeOutlined />}
-            onClick={() => navigate(`/nurse/health-event/${record.id}`)} // Điều hướng đến trang chi tiết
-          >
-            Xem
-          </Button>
+          {" "}
+          <Button type="primary" icon={<EyeOutlined />} onClick={() => navigate(`/nurse/health-event/${record.id}`)}>
+            {" "}
+            Xem{" "}
+          </Button>{" "}
         </Space>
       ),
+    },
+  ];
+
+  const tabItems = [
+    {
+      key: "1",
+      label: "Danh sách sự kiện",
+      children: (
+        <>
+          <Search
+            placeholder="Tìm tên học sinh..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{ marginBottom: 20, maxWidth: 350 }}
+            allowClear
+          />
+          <Spin spinning={loading}>
+            <Table columns={columns} dataSource={filteredEvents} rowKey="id" pagination={{ pageSize: 8 }} bordered />
+          </Spin>
+        </>
+      ),
+    },
+    {
+      key: "2",
+      label: "Tạo sự kiện mới",
+      children: <HealthEventForm onCreationSuccess={handleCreationSuccess} />, // <-- Truyền callback vào form
     },
   ];
 
   return (
     <div className="health-event-page" style={{ padding: 24 }}>
       <Card>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
           <Title level={3} style={{ margin: 0 }}>
             Quản lý sự kiện y tế
           </Title>
-          <Space>
-            <Search
-              placeholder="Tìm tên học sinh..."
-              onSearch={(value) => setSearchTerm(value)}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              style={{ width: 300 }}
-              allowClear
-            />
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={() => navigate("/health-events/new")} // Điều hướng đến trang tạo mới
-            >
-              Tạo sự kiện mới
-            </Button>
-          </Space>
+          {/* Nút này sẽ chuyển sang tab tạo mới */}
+          <Button type="primary" icon={<PlusOutlined />} onClick={() => setActiveTab("2")}>
+            Tạo sự kiện mới
+          </Button>
         </div>
 
-        <Spin spinning={loading}>
-          <Table columns={columns} dataSource={filteredEvents} rowKey="id" pagination={{ pageSize: 8 }} bordered />
-        </Spin>
+        <Tabs activeKey={activeTab} onChange={(key) => setActiveTab(key)} items={tabItems} />
       </Card>
     </div>
   );

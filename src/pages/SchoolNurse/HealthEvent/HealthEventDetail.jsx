@@ -1,40 +1,52 @@
+import React, { useCallback, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import {
-  ArrowLeftOutlined,
-  CalendarOutlined,
-  CarOutlined,
-  CheckCircleOutlined,
-  EnvironmentOutlined,
-  InteractionOutlined, // Đã thêm lại icon này
-  MedicineBoxOutlined,
-  PhoneOutlined,
-  ToolOutlined,
-  UserOutlined,
-} from "@ant-design/icons";
-import {
+  Spin,
   Alert,
-  Button,
-  Card,
-  Col,
   Descriptions,
+  Tag,
+  Card,
+  Button,
+  Row,
+  Col,
+  Table,
+  Modal,
   Form,
   Input,
   message,
-  Modal,
-  Row,
   Space,
-  Spin,
-  Table,
-  Tag,
   Typography,
 } from "antd";
+import {
+  UserOutlined,
+  CalendarOutlined,
+  EnvironmentOutlined,
+  MedicineBoxOutlined,
+  ToolOutlined,
+  PhoneOutlined,
+  CarOutlined,
+  CheckCircleOutlined,
+  InteractionOutlined,
+  ArrowLeftOutlined,
+} from "@ant-design/icons";
 import dayjs from "dayjs";
-import { useCallback, useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { getHealthEventById, handoverHealthEvent, resolveHealthEvent } from "../../../services/apiServices";
+
+// Import các service cần thiết từ file API của bạn
+import {
+  getHealthEventById,
+  resolveHealthEvent,
+  handoverHealthEvent,
+  treatHealthEvent,
+  getUsers,
+  getMedicationLots,
+  getMedicalSupplyLots,
+} from "../../../services/apiServices";
+
+// Import Modal xử lý sự kiện từ file riêng
+import TreatEventModal from "./TreatEventModal";
 
 const { Title } = Typography;
 
-// Các hàm helper không đổi
 const statusConfig = {
   Pending: { name: "Chờ xử lý", color: "orange" },
   InProgress: { name: "Đang xử lý", color: "blue" },
@@ -58,7 +70,8 @@ const getSeverityTag = (severity) => {
 const HealthEventDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [form] = Form.useForm();
+  const [resolveForm] = Form.useForm();
+  const [handoverForm] = Form.useForm();
 
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -66,37 +79,73 @@ const HealthEventDetail = () => {
 
   const [isResolveModalVisible, setIsResolveModalVisible] = useState(false);
   const [isHandoverModalVisible, setIsHandoverModalVisible] = useState(false);
+  const [isTreatModalVisible, setIsTreatModalVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Logic xử lý dữ liệu không thay đổi
+  const [users, setUsers] = useState([]);
+  const [medicationLots, setMedicationLots] = useState([]);
+  const [supplyLots, setSupplyLots] = useState([]);
+
   const fetchData = useCallback(async () => {
     setLoading(true);
-    setError(null);
     try {
       const res = await getHealthEventById(id);
       setData(res.data.data);
     } catch (err) {
-      setError("Không thể tải dữ liệu. Vui lòng thử lại.");
-      console.error(err);
+      setError("Không thể tải dữ liệu chi tiết sự kiện.");
     } finally {
       setLoading(false);
     }
   }, [id]);
 
+  const fetchFormData = useCallback(async () => {
+    try {
+      const [usersRes, medLotsRes, supplyLotsRes] = await Promise.all([
+        getUsers({ role: "Nurse" }),
+        getMedicationLots({ inStock: true }),
+        getMedicalSupplyLots({ inStock: true }),
+      ]);
+      setUsers(usersRes.data?.data || []);
+      setMedicationLots(medLotsRes.data?.data || []);
+      setSupplyLots(supplyLotsRes.data?.data || []);
+    } catch (err) {
+      message.error("Lỗi khi tải dữ liệu cho form xử lý.");
+    }
+  }, []);
+
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+    fetchFormData();
+  }, [fetchData, fetchFormData]);
+
+  const handleTreat = async (values) => {
+    setIsSubmitting(true);
+    const treatData = {
+      ...values,
+      firstAidAt: values.firstAidAt ? dayjs(values.firstAidAt).toISOString() : null,
+      referralDepartureTime: values.referralDepartureTime ? dayjs(values.referralDepartureTime).toISOString() : null,
+    };
+    try {
+      await treatHealthEvent(id, treatData);
+      message.success("Cập nhật thông tin xử lý thành công!");
+      setIsTreatModalVisible(false);
+      fetchData();
+    } catch (err) {
+      message.error(err?.response?.data?.message || "Có lỗi xảy ra khi cập nhật xử lý.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const handleResolve = async (values) => {
     setIsSubmitting(true);
     try {
-      await resolveHealthEvent(id, values.completionNotes);
+      await resolveHealthEvent(id, values);
       message.success("Sự kiện đã được hoàn thành!");
       setIsResolveModalVisible(false);
       fetchData();
     } catch (err) {
-      message.error("Có lỗi xảy ra khi hoàn thành sự kiện.");
-      console.error(err);
+      message.error(err?.response?.data?.message || "Có lỗi xảy ra khi hoàn thành sự kiện.");
     } finally {
       setIsSubmitting(false);
     }
@@ -114,29 +163,21 @@ const HealthEventDetail = () => {
       setIsHandoverModalVisible(false);
       fetchData();
     } catch (err) {
-      message.error("Có lỗi xảy ra khi bàn giao.");
-      console.error(err);
+      message.error(err?.response?.data?.message || "Có lỗi xảy ra khi bàn giao.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Các hàm render khi loading, error, no data giữ nguyên
-  if (loading) {
+  if (loading)
     return (
       <div style={{ textAlign: "center", margin: "50px" }}>
         <Spin size="large" />
       </div>
     );
-  }
-  if (error) {
-    return <Alert message="Lỗi" description={error} type="error" showIcon />;
-  }
-  if (!data) {
-    return <Alert message="Không tìm thấy dữ liệu" type="warning" />;
-  }
+  if (error) return <Alert message="Lỗi" description={error} type="error" showIcon />;
+  if (!data) return <Alert message="Không tìm thấy dữ liệu" type="warning" />;
 
-  // Cấu hình các cột cho bảng giữ nguyên
   const medicationColumns = [
     { title: "Tên thuốc", dataIndex: "medicationName", key: "medicationName" },
     { title: "Số lượng", dataIndex: "quantity", key: "quantity", align: "center" },
@@ -156,8 +197,9 @@ const HealthEventDetail = () => {
     { title: "Ghi chú", dataIndex: "notes", key: "notes" },
   ];
 
-  const canResolve = data.eventStatus !== "Resolved";
-  const canHandover = !data.parentArrivalAt;
+  const canTreat = data.eventStatus === "Pending";
+  const canResolve = data.eventStatus !== "Resolved" && data.eventStatus !== "Cancelled";
+  const canHandover = !data.parentArrivalAt && data.eventStatus !== "Cancelled";
 
   return (
     <div style={{ padding: "24px", background: "#f5f5f5" }}>
@@ -175,11 +217,21 @@ const HealthEventDetail = () => {
         }
         extra={
           <Space>
+            {canTreat && (
+              <Button
+                key="treat"
+                type="primary"
+                icon={<InteractionOutlined />}
+                onClick={() => setIsTreatModalVisible(true)}
+              >
+                Xử lý / Sơ cứu
+              </Button>
+            )}
             {canHandover && (
               <Button
-                key="2"
+                key="handover"
                 type="primary"
-                ghost // <-- Sử dụng ghost để có style đẹp hơn
+                ghost
                 icon={<InteractionOutlined />}
                 onClick={() => setIsHandoverModalVisible(true)}
               >
@@ -188,10 +240,10 @@ const HealthEventDetail = () => {
             )}
             {canResolve && (
               <Button
-                key="1"
+                key="resolve"
                 type="primary"
-                icon={<CheckCircleOutlined />}
                 onClick={() => setIsResolveModalVisible(true)}
+                icon={<CheckCircleOutlined />}
               >
                 Hoàn thành Sự kiện
               </Button>
@@ -217,28 +269,34 @@ const HealthEventDetail = () => {
       <Row gutter={[24, 24]} style={{ marginTop: 24 }}>
         <Col xs={24} md={12}>
           <Card title="Thông tin chung">
-            <Descriptions bordered column={1}>
-              <Descriptions.Item label="Loại sự kiện">{data.eventType}</Descriptions.Item>
+            <Descriptions bordered column={1} size="small">
+              <Descriptions.Item label="Loại sự kiện">{data.eventType || "Chưa có"}</Descriptions.Item>
               <Descriptions.Item label="Mức độ">{getSeverityTag(data.severity)}</Descriptions.Item>
               <Descriptions.Item label="Vị trí">
-                <EnvironmentOutlined /> {data.location}
+                <EnvironmentOutlined /> {data.location || "Chưa có"}
               </Descriptions.Item>
-              <Descriptions.Item label="Mô tả">{data.description}</Descriptions.Item>
-              <Descriptions.Item label="Người báo cáo">{data.reportedByName}</Descriptions.Item>
+              <Descriptions.Item label="Mô tả ban đầu">{data.description || "Không có"}</Descriptions.Item>
+              <Descriptions.Item label="Người báo cáo">{data.reportedByName || "Chưa có"}</Descriptions.Item>
             </Descriptions>
           </Card>
         </Col>
 
         <Col xs={24} md={12}>
-          <Card title={<> Sơ cứu & Triệu chứng</>}>
-            <Descriptions bordered column={1}>
-              <Descriptions.Item label="Triệu chứng">{data.symptoms}</Descriptions.Item>
-              <Descriptions.Item label="Bộ phận bị thương">{data.injuredBodyPartsRaw}</Descriptions.Item>
-              <Descriptions.Item label="Người sơ cứu">{data.firstResponderName || "Chưa có"}</Descriptions.Item>
+          <Card
+            title={
+              <>
+                <InteractionOutlined /> Sơ cứu & Triệu chứng
+              </>
+            }
+          >
+            <Descriptions bordered column={1} size="small">
+              <Descriptions.Item label="Triệu chứng">{data.symptoms || "Chưa có"}</Descriptions.Item>
+              <Descriptions.Item label="Bộ phận bị thương">{data.injuredBodyPartsRaw || "Không rõ"}</Descriptions.Item>
+              <Descriptions.Item label="Người sơ cứu">{data.firstResponderName || "Chưa xử lý"}</Descriptions.Item>
               <Descriptions.Item label="Thời gian sơ cứu">
-                {dayjs(data.firstAidAt).format("HH:mm:ss DD/MM/YYYY")}
+                {data.firstAidAt ? dayjs(data.firstAidAt).format("HH:mm:ss DD/MM/YYYY") : "Chưa xử lý"}
               </Descriptions.Item>
-              <Descriptions.Item label="Các bước sơ cứu">{data.firstAidDescription}</Descriptions.Item>
+              <Descriptions.Item label="Các bước sơ cứu">{data.firstAidDescription || "Chưa xử lý"}</Descriptions.Item>
             </Descriptions>
           </Card>
         </Col>
@@ -251,7 +309,7 @@ const HealthEventDetail = () => {
               </>
             }
           >
-            <Descriptions bordered column={1}>
+            <Descriptions bordered column={1} size="small">
               <Descriptions.Item label="Phương thức">{data.parentNotificationMethod || "Chưa có"}</Descriptions.Item>
               <Descriptions.Item label="Thời gian thông báo">
                 {data.parentNotifiedAt ? dayjs(data.parentNotifiedAt).format("HH:mm DD/MM/YYYY") : "Chưa thông báo"}
@@ -273,9 +331,11 @@ const HealthEventDetail = () => {
                 </>
               }
             >
-              <Descriptions bordered column={1}>
-                <Descriptions.Item label="Bệnh viện chuyển đến">{data.referralHospital}</Descriptions.Item>
-                <Descriptions.Item label="Phương tiện di chuyển">{data.referralTransportBy}</Descriptions.Item>
+              <Descriptions bordered column={1} size="small">
+                <Descriptions.Item label="Bệnh viện chuyển đến">{data.referralHospital || "Chưa có"}</Descriptions.Item>
+                <Descriptions.Item label="Phương tiện di chuyển">
+                  {data.referralTransportBy || "Chưa có"}
+                </Descriptions.Item>
                 <Descriptions.Item label="Thời gian khởi hành">
                   {data.referralDepartureTime
                     ? dayjs(data.referralDepartureTime).format("HH:mm DD/MM/YYYY")
@@ -294,10 +354,15 @@ const HealthEventDetail = () => {
               </>
             }
           >
-            <Table columns={medicationColumns} dataSource={data.medications} pagination={false} rowKey="id" />
+            <Table
+              columns={medicationColumns}
+              dataSource={data.medications}
+              pagination={false}
+              rowKey="id"
+              size="small"
+            />
           </Card>
         </Col>
-
         <Col xs={24}>
           <Card
             title={
@@ -306,12 +371,21 @@ const HealthEventDetail = () => {
               </>
             }
           >
-            <Table columns={supplyColumns} dataSource={data.supplies} pagination={false} rowKey="id" />
+            <Table columns={supplyColumns} dataSource={data.supplies} pagination={false} rowKey="id" size="small" />
           </Card>
         </Col>
       </Row>
 
-      {/* Các Modal không thay đổi về logic, chỉ tinh chỉnh nhỏ */}
+      <TreatEventModal
+        open={isTreatModalVisible}
+        onCancel={() => setIsTreatModalVisible(false)}
+        onFinish={handleTreat}
+        submitting={isSubmitting}
+        users={users}
+        medicationLots={medicationLots}
+        supplyLots={supplyLots}
+      />
+
       <Modal
         title="Xác nhận Hoàn thành Sự kiện"
         open={isResolveModalVisible}
@@ -320,18 +394,21 @@ const HealthEventDetail = () => {
           <Button key="back" onClick={() => setIsResolveModalVisible(false)}>
             Hủy
           </Button>,
-          <Button key="submit" type="primary" loading={isSubmitting} onClick={() => form.submit()}>
+          <Button key="submit" type="primary" loading={isSubmitting} onClick={() => resolveForm.submit()}>
             Xác nhận
           </Button>,
         ]}
       >
-        <Form form={form} layout="vertical" onFinish={handleResolve} name="resolve_form">
+        <Form form={resolveForm} layout="vertical" onFinish={handleResolve} name="resolve_form">
           <Form.Item
             name="completionNotes"
             label="Ghi chú hoàn thành"
             rules={[{ required: true, message: "Vui lòng nhập ghi chú!" }]}
           >
-            <Input.TextArea rows={4} placeholder="Nhập kết quả xử lý, tình trạng học sinh sau khi xử lý..." />
+            <Input.TextArea
+              rows={4}
+              placeholder="Nhập kết quả xử lý, tình trạng học sinh sau khi hoàn thành sự kiện..."
+            />
           </Form.Item>
         </Form>
       </Modal>
@@ -340,29 +417,20 @@ const HealthEventDetail = () => {
         title="Ghi nhận Bàn giao cho Phụ huynh"
         open={isHandoverModalVisible}
         onCancel={() => setIsHandoverModalVisible(false)}
-        onOk={() => form.submit()}
+        onOk={() => handoverForm.submit()}
         confirmLoading={isSubmitting}
         okText="Xác nhận"
         cancelText="Hủy"
       >
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleHandover}
-          name="handover_form"
-          initialValues={{ parentSignature: "" }}
-        >
-          <p>Thời gian bàn giao sẽ được ghi nhận là thời điểm hiện tại khi bạn nhấn "Xác nhận".</p>
+        <Form form={handoverForm} layout="vertical" onFinish={handleHandover} name="handover_form">
+          <p>Thời gian bàn giao sẽ được ghi nhận là thời điểm hiện tại.</p>
           <Form.Item
             name="parentSignature"
             label="Phụ huynh xác nhận (Nhập họ tên)"
-            rules={[{ required: true, message: "Vui lòng nhập tên phụ huynh để xác nhận!" }]}
+            rules={[{ required: true, message: "Vui lòng nhập tên phụ huynh!" }]}
           >
             <Input placeholder="Ví dụ: Nguyễn Văn A" />
           </Form.Item>
-          <Typography.Text type="secondary" style={{ fontSize: "12px" }}>
-            Lưu ý: Việc nhập tên được xem như chữ ký xác nhận của phụ huynh.
-          </Typography.Text>
         </Form>
       </Modal>
     </div>

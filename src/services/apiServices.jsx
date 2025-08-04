@@ -287,14 +287,26 @@ export const getHealthEventById = async (id) => {
 };
 
 export const resolveHealthEvent = async (id, completionNotes) => {
-  const body = { completionNotes };
-  return axios.put(`${BASE_URL}/HealthEvent/${id}/resolve`, body, { headers: getAuthHeaders() });
+  return axios.put(`${BASE_URL}/HealthEvent/${id}/resolve`, completionNotes, { headers: getAuthHeaders() });
+};
+export const treatHealthEvent = async (id, treatData) => {
+  return axios.put(`${BASE_URL}/HealthEvent/${id}/treat`, treatData, { headers: getAuthHeaders() });
 };
 
 export const handoverHealthEvent = async (id, handoverData) => {
   return axios.put(`${BASE_URL}/HealthEvent/${id}/handover`, handoverData, { headers: getAuthHeaders() });
 };
-// Lấy danh sách sự kiện y tế của con (dành cho phụ huynh)
+
+export const getUsers = async (params) => {
+  // Params có thể là { role: 'Nurse' } hoặc { role: 'Teacher' } để lọc
+  return axios.get(`${BASE_URL}/User`, { params, headers: getAuthHeaders() });
+};
+
+export const getMedicationLots = async (params) => {
+  // Params có thể là { inStock: true }
+  return axios.get(`${BASE_URL}/MedicationLot`, { params, headers: getAuthHeaders() });
+};
+
 const getHealthEventsMyChild = async () => {
   return axios.get(`${BASE_URL}/HealthEvent/myChild`, { headers: getAuthHeaders() });
 };
