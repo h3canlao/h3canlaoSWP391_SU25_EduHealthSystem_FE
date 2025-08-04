@@ -101,7 +101,7 @@ const HealthEventDetail = () => {
   const fetchFormData = useCallback(async () => {
     try {
       const [usersRes, medLotsRes, supplyLotsRes] = await Promise.all([
-        getUsers({ role: "Nurse" }),
+        getUsers({ role: "SchoolNurse" }),
         getMedicationLots({ inStock: true }),
         getMedicalSupplyLots({ inStock: true }),
       ]);

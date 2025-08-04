@@ -9,18 +9,18 @@ const { Title } = Typography;
 const { Option } = Select;
 
 const EVENT_TYPE = [
-  { label: "Tai nạn", value: 0 }, 
-  { label: "Sốt", value: 1 },    
-  { label: "Ngã", value: 2 },   
-  { label: "Bệnh", value: 3 },   
-  { label: "Khác", value: 4 },   
+  { label: "Tai nạn", value: 0 },
+  { label: "Sốt", value: 1 },
+  { label: "Ngã", value: 2 },
+  { label: "Bệnh", value: 3 },
+  { label: "Khác", value: 4 },
   { label: "Phản ứng vắc xin", value: 5 },
 ];
 
 // Keep for reference but we won't use in UI
 const EVENT_CATEGORY = [
   { label: "Tiêm chủng", value: 0 }, // Vaccination
-  { label: "Tư vấn", value: 0 },    // Consultation
+  { label: "Tư vấn", value: 0 }, // Consultation
 ];
 
 export default function HealthEventForm() {
@@ -34,7 +34,7 @@ export default function HealthEventForm() {
   useEffect(() => {
     setLoading(true);
     getAllStudents()
-      .then(res => {
+      .then((res) => {
         setStudents(res.data?.data || []);
       })
       .catch(() => {
@@ -46,7 +46,7 @@ export default function HealthEventForm() {
   // Set the default value for eventCategory when the form initializes
   useEffect(() => {
     form.setFieldsValue({
-      eventCategory: 0 // Set default to "Tư vấn" (consultation)
+      eventCategory: 0, // Set default to "Tư vấn" (consultation)
     });
   }, [form]);
 
@@ -56,8 +56,8 @@ export default function HealthEventForm() {
       const payload = {
         studentId: values.studentId,
         eventCategory: 0, // Always set to "Tư vấn" (consultation)
-        vaccinationRecordId: null, 
-        eventType: values.eventType, 
+        vaccinationRecordId: null,
+        eventType: values.eventType,
         description: values.description,
         occurredAt: values.occurredAt && values.occurredAt.toDate().toISOString(),
       };
@@ -92,42 +92,64 @@ export default function HealthEventForm() {
           <Title level={3} className="health-event-title">
             <PlusCircleOutlined /> Khai báo sự kiện y tế
           </Title>
-          {loading ? <Spin /> : (
-            <Form 
-              form={form}
-              layout="vertical" 
-              onFinish={onFinish} 
-              className="health-event-form"
-            >
-              <Form.Item label="Học sinh" name="studentId" rules={[{ required: true, message: "Chọn học sinh" }]}> 
+          {loading ? (
+            <Spin />
+          ) : (
+            <Form form={form} layout="vertical" onFinish={onFinish} className="health-event-form">
+              <Form.Item label="Học sinh" name="studentId" rules={[{ required: true, message: "Chọn học sinh" }]}>
                 <Select
                   placeholder="Chọn học sinh"
                   showSearch
                   filterOption={(input, option) =>
-                    (option?.children || "").toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').includes(
-                      input.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '')
-                    )
+                    (option?.children || "")
+                      .toLowerCase()
+                      .normalize("NFD")
+                      .replace(/\p{Diacritic}/gu, "")
+                      .includes(
+                        input
+                          .toLowerCase()
+                          .normalize("NFD")
+                          .replace(/\p{Diacritic}/gu, "")
+                      )
                   }
                 >
-                  {students.map(s => (
-                    <Option key={s.id} value={s.id}>{s.lastName + " " + s.firstName}</Option>
+                  {students.map((s) => (
+                    <Option key={s.id} value={s.id}>
+                      {s.lastName + " " + s.firstName}
+                    </Option>
                   ))}
                 </Select>
               </Form.Item>
-              <Form.Item label="Loại sự kiện" name="eventType" rules={[{ required: true, message: "Chọn loại sự kiện" }]}> 
+              <Form.Item
+                label="Loại sự kiện"
+                name="eventType"
+                rules={[{ required: true, message: "Chọn loại sự kiện" }]}
+              >
                 <Select placeholder="Chọn loại sự kiện">
-                  {EVENT_TYPE.map(e => <Option key={e.value} value={e.value}>{e.label}</Option>)}
+                  {EVENT_TYPE.map((e) => (
+                    <Option key={e.value} value={e.value}>
+                      {e.label}
+                    </Option>
+                  ))}
                 </Select>
               </Form.Item>
               {/* Hidden field for eventCategory with default value */}
               <Form.Item name="eventCategory" hidden={true}>
                 <Input type="hidden" />
               </Form.Item>
-              <Form.Item label="Mô tả" name="description" rules={[{ required: true, message: "Nhập mô tả" }]}> 
+              <Form.Item label="Mô tả" name="description" rules={[{ required: true, message: "Nhập mô tả" }]}>
                 <Input.TextArea rows={3} placeholder="Nhập mô tả sự kiện" />
               </Form.Item>
-              <Form.Item label="Thời gian xảy ra" name="occurredAt" rules={[{ required: true, message: "Chọn thời gian" }]}> 
-                <DatePicker showTime style={{ width: "100%" }} format="YYYY-MM-DD HH:mm" />
+              <Form.Item
+                label="Thời gian xảy ra"
+                name="occurredAt"
+                rules={[{ required: true, message: "Chọn thời gian" }]}
+              >
+                <DatePicker
+                  showTime
+                  style={{ width: "100%" }}
+                  format="YYYY-MM-DD HH:mm" // Định dạng hiển thị cho người dùng
+                />
               </Form.Item>
               <Form.Item>
                 <Button type="primary" htmlType="submit" loading={submitting} block>
@@ -143,4 +165,4 @@ export default function HealthEventForm() {
       )}
     </div>
   );
-} 
+}

@@ -70,6 +70,7 @@ import CheckupScheduleDetail from "./pages/Admin/CheckupSchedule/CheckupSchedule
 import Blog from "./pages/Blog";
 import Homepage from "./pages/Homepage";
 import HealthEventDetail from "./pages/SchoolNurse/HealthEvent/HealthEventDetail";
+import ConfirmHealthEventPage from "./pages/Parents/ConfirmHealthEventPage";
 
 const Router = () => {
   return (
@@ -77,6 +78,7 @@ const Router = () => {
       <Routes>
         <Route path="/" element={<Homepage />} />
         <Route path="/signin" element={<Signin />} />
+        <Route path="/confirm-health-event/:id/parent-ack" element={<ConfirmHealthEventPage />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forget-password" element={<ForgetPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
