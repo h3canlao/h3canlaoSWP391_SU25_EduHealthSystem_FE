@@ -113,7 +113,7 @@ export default function VaccinationScheduleInfo() {
     setReactionSeverity(0);
     setShowModal(true);
   };
-
+  
   // Mở modal cập nhật
   const openUpdateModal = (student) => {
     setSelectedStudent(student);
@@ -142,36 +142,36 @@ export default function VaccinationScheduleInfo() {
         message.success("Cập nhật tiêm chủng thành công!");
       } else {
         // Lấy ID y tá
-        const nurseId = JSON.parse(atob(localStorage.getItem("accessToken")?.split(".")[1] || ""))
-          ?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
-        
+      const nurseId = JSON.parse(atob(localStorage.getItem("accessToken")?.split(".")[1] || ""))
+        ?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
+      
         // Lấy thông tin phiên học sinh
-        const res = await getSessionStudents(selectedStudent.studentId, id);
-        const sessionStudents = res.data?.data || [];
-        
-        if (sessionStudents.length === 0) {
-          message.error("Không tìm thấy thông tin phiên cho học sinh này!");
-          return;
-        }
-        
+      const res = await getSessionStudents(selectedStudent.studentId, id);
+      const sessionStudents = res.data?.data || [];
+      
+      if (sessionStudents.length === 0) {
+        message.error("Không tìm thấy thông tin phiên cho học sinh này!");
+        return;
+      }
+      
         // Cập nhật check-in và tạo hồ sơ tiêm
-        const currentSessionStudent = sessionStudents[0];
-        await updateSessionStudentCheckInTime({
-          sessionStudentId: [currentSessionStudent.sessionStudentId],
+      const currentSessionStudent = sessionStudents[0];
+      await updateSessionStudentCheckInTime({
+        sessionStudentId: [currentSessionStudent.sessionStudentId],
           note: `Đã tiêm chủng vào lúc ${administeredDate.format("DD/MM/YYYY HH:mm")}`
-        });
-        
-        await createVaccinationRecord({
-          studentId: selectedStudent.studentId,
-          scheduleId: id,
+      });
+      
+      await createVaccinationRecord({
+        studentId: selectedStudent.studentId,
+        scheduleId: id,
           administeredDate: administeredDate.toDate().toISOString(),
-          vaccinatedById: nurseId,
+        vaccinatedById: nurseId,
           vaccinatedAt: administeredDate.toDate().toISOString(),
           reactionFollowup24h,
           reactionFollowup72h,
           reactionSeverity,
-        });
-        
+      });
+      
         message.success("Ghi nhận tiêm chủng thành công!");
       }
       
@@ -241,15 +241,15 @@ export default function VaccinationScheduleInfo() {
         {/* Học sinh chưa tiêm */}
         <Card title="Học sinh chưa tiêm" style={{ marginBottom: 20 }}>
           {/* Thêm ô tìm kiếm */}
-          <Input 
+            <Input
             placeholder="Tìm kiếm theo tên hoặc mã học sinh"
-            prefix={<SearchOutlined />}
-            value={searchPending}
-            onChange={e => setSearchPending(e.target.value)}
-            style={{ marginBottom: 16 }}
-            allowClear
-          />
-          
+              prefix={<SearchOutlined />}
+              value={searchPending}
+              onChange={e => setSearchPending(e.target.value)}
+              style={{ marginBottom: 16 }}
+              allowClear
+            />
+            
           <div style={{ maxHeight: 600, overflow: 'auto' }}>
             {filteredPending.length === 0 ? (
               <Empty description={searchPending ? "Không tìm thấy học sinh nào phù hợp" : "Không có học sinh nào chưa tiêm"} />
@@ -276,19 +276,19 @@ export default function VaccinationScheduleInfo() {
             )}
           </div>
         </Card>
-        
+          
         {/* Học sinh đã tiêm */}
         <Card title="Học sinh đã tiêm" style={{ marginBottom: 20 }}>
           {/* Thêm ô tìm kiếm */}
-          <Input 
+            <Input
             placeholder="Tìm kiếm theo tên hoặc mã học sinh"
-            prefix={<SearchOutlined />}
-            value={searchVaccinated}
-            onChange={e => setSearchVaccinated(e.target.value)}
-            style={{ marginBottom: 16 }}
-            allowClear
-          />
-          
+              prefix={<SearchOutlined />}
+              value={searchVaccinated}
+              onChange={e => setSearchVaccinated(e.target.value)}
+              style={{ marginBottom: 16 }}
+              allowClear
+            />
+            
           <div style={{ maxHeight: 600, overflow: 'auto' }}>
             {filteredVaccinated.length === 0 ? (
               <Empty description={searchVaccinated ? "Không tìm thấy học sinh nào phù hợp" : "Chưa có học sinh nào được tiêm"} />
@@ -316,7 +316,7 @@ export default function VaccinationScheduleInfo() {
             )}
           </div>
         </Card>
-      </div>
+        </div>
       
       {/* Modal tiêm chủng */}
       <Modal
@@ -332,43 +332,43 @@ export default function VaccinationScheduleInfo() {
           <div>
             <div style={{ marginBottom: 16 }}>
               <strong>Học sinh:</strong> {selectedStudent.studentName}
-            </div>
+        </div>
             
-            <div style={{ marginBottom: 12 }}>
+        <div style={{ marginBottom: 12 }}>
               <div><strong>Ngày giờ tiêm:</strong></div>
-              <input
+          <input 
                 type="datetime-local"
                 value={administeredDate?.format("YYYY-MM-DDTHH:mm")}
                 onChange={e => setAdministeredDate(dayjs(e.target.value))}
                 style={{ width: "100%", padding: 8, border: "1px solid #d9d9d9", borderRadius: 4 }}
-              />
-            </div>
+          />
+        </div>
             
-            <div style={{ marginBottom: 12 }}>
+        <div style={{ marginBottom: 12 }}>
               <label>
-                <input 
-                  type="checkbox" 
+          <input 
+            type="checkbox" 
                   checked={reactionFollowup24h} 
                   onChange={e => setReactionFollowup24h(e.target.checked)} 
                   style={{ marginRight: 8 }} 
-                />
+          />
                 Phản ứng sau 24h
               </label>
-            </div>
+        </div>
             
-            <div style={{ marginBottom: 12 }}>
+        <div style={{ marginBottom: 12 }}>
               <label>
-                <input 
-                  type="checkbox" 
+          <input 
+            type="checkbox" 
                   checked={reactionFollowup72h} 
                   onChange={e => setReactionFollowup72h(e.target.checked)} 
                   style={{ marginRight: 8 }} 
-                />
+          />
                 Phản ứng sau 72h
               </label>
-            </div>
+        </div>
             
-            <div style={{ marginBottom: 12 }}>
+        <div style={{ marginBottom: 12 }}>
               <div><strong>Mức độ phản ứng:</strong></div>
               <select
                 value={reactionSeverity}
@@ -379,8 +379,8 @@ export default function VaccinationScheduleInfo() {
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
                 ))}
               </select>
-            </div>
-          </div>
+        </div>
+        </div>
         )}
       </Modal>
     </div>

@@ -7,7 +7,7 @@ import { Bounce, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ConfirmEmail from "@/pages/Parents/Auth/2FA/ConfirmEmail/confirmEmail";
 
-import SendMedication from "./pages/Parents/Medication/SendMedication";
+import SendMedication from "./pages/Parents/Medication/SendMedication/SendMedication";
 import StudentProfiles from "./pages/Parents/StudentProfiles/StudentProfiles";
 import Parents from "./pages/Parents/Parents";
 import ParentCheckupSchedules from "./pages/Parents/MedicalCheckups/ParentCheckupSchedule/ParentCheckupSchedules";
@@ -43,6 +43,7 @@ import ParentVaccinationSchedules from "./pages/Parents/Immunization/ParentVacci
 import HealthEventTabs from "./pages/SchoolNurse/HealthEvent/HealthEventTabs";
 import ParentHealthEvents from "./pages/Parents/ParentHealthEvents";
 import ParentVaccinationRecords from "./pages/Parents/Immunization/ParentVaccinationRecords";
+import TodayMedication from "./pages/Parents/Medication/TodayMedication/TodayMedication";
 
 import { getUserRole } from "@/services/handleStorageApi";
 
@@ -95,11 +96,11 @@ const Router = () => {
           }
         >
           <Route index element={<StudentProfiles />} />
+          <Route path="student-profiles" element={<StudentProfiles />} />
+          <Route path="send-medication" element={<SendMedication />} />
+          <Route path="today-medication" element={<TodayMedication />} />
           <Route path="checkup-schedules" element={<ParentCheckupSchedules />} />
           <Route path="checkup-records" element={<ParentCheckupRecords />} />
-          <Route path="send-medication" element={<SendMedication />} />
-          <Route path="confirm-medications" element={<SendMedication />} />
-          <Route path="student-profiles" element={<StudentProfiles />} />
           <Route path="counseling-records" element={<ParentCounselingRecords />} />
           <Route path="vaccine-consent" element={<ParentVaccinationConsent />} />
           <Route path="vaccination-schedules" element={<ParentVaccinationSchedules />} />

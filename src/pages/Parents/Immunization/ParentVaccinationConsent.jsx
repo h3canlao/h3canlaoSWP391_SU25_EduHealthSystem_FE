@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Card, List, Button, Modal, Input, message, Tag, Empty, Spin } from "antd";
+import { Card, Button, Modal, Input, message, Tag, Empty, Spin } from "antd";
 import { getPendingVaccinationConsents, acceptVaccinationConsent } from "@/services/apiServices";
 import dayjs from "dayjs";
 import { toast } from "react-toastify";
@@ -76,12 +76,10 @@ export default function ParentVaccinationConsent() {
       ) : data.length === 0 ? (
         <Empty description="Không có lịch cần xác nhận." />
       ) : (
-        <List
-          grid={{ gutter: 16, column: 1 }}
-          dataSource={data}
-          style={{ width: "100%", maxWidth: 900 }}
-          renderItem={(item) => (
+        <div style={{ width: "100%", maxWidth: 900 }}>
+          {data.map((item, index) => (
             <Card
+              key={item.id || index}
               title={
                 <>
                   <b>{item.campaignName}</b> - {item.vaccinationTypeName}
@@ -96,23 +94,34 @@ export default function ParentVaccinationConsent() {
               style={{ marginBottom: 16 }}
               bodyStyle={{ padding: 16 }}
             >
-              <List
-                dataSource={item.students}
-                renderItem={student => (
-                  <List.Item actions={[
-                    student.consentStatus === 1 ? (
-                      <Button type="primary" onClick={() => openModal(item, student)}>
-                        Xác nhận
-                      </Button>
-                    ) : null
-                  ]}>
-                    <b>{student.studentName}</b> ({student.studentCode}) - Lớp {student.grade}{student.section}
-                  </List.Item>
-                )}
-              />
+              <div>
+                {item.students.map((student, studentIndex) => (
+                  <div 
+                    key={student.studentId || studentIndex} 
+                    style={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between', 
+                      alignItems: 'center',
+                      padding: '8px 0',
+                      borderBottom: studentIndex < item.students.length - 1 ? '1px solid #f0f0f0' : 'none'
+                    }}
+                  >
+                    <div>
+                      <b>{student.studentName}</b> ({student.studentCode}) - Lớp {student.grade}{student.section}
+                    </div>
+                    <div>
+                      {student.consentStatus === 1 && (
+                        <Button type="primary" onClick={() => openModal(item, student)}>
+                          Xác nhận
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </Card>
-          )}
-        />
+          ))}
+        </div>
       )}
       
       <Modal

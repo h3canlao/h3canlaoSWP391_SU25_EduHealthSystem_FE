@@ -4,7 +4,7 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import { createParentMedicationDelivery } from '../../../services/apiServices';
+import { createParentMedicationDelivery } from '../../../../services/apiServices';
 import "./ModalMedication.css";
 import { toast } from "react-toastify";
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';

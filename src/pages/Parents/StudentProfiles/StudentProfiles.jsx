@@ -27,8 +27,8 @@ const StudentCard = ({ student, onClick }) => {
 };
 
 const StudentProfiles = () => {
-  const [students, setStudents] = useState([]);
-  const [loading, setLoading] = useState(true);
+    const [students, setStudents] = useState([]);
+    const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [healthProfile, setHealthProfile] = useState(null);
   const userInfo = getUserInfo();
