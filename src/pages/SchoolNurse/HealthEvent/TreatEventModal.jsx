@@ -79,9 +79,9 @@ const TreatEventModal = ({
           <Col span={12}>
             <Form.Item name="severity" label="Mức độ">
               <Select placeholder="Chọn mức độ">
-                <Option value="Minor">Mức độ 1: Nhẹ</Option>
-                <Option value="Moderate">Mức độ 2: Trung bình</Option>
-                <Option value="Severe">Mức độ 3: Nặng</Option>
+                <Option value={1}>Mức độ 1: Nhẹ</Option>
+                <Option value={2}>Mức độ 2: Trung bình</Option>
+                <Option value={3}>Mức độ 3: Nặng</Option>
               </Select>
             </Form.Item>
           </Col>
