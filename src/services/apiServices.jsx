@@ -144,7 +144,7 @@ const getPendingMedicationDeliveries = async () => {
 // Lấy danh sách đơn thuốc cần dùng trong ngày
 const getPendingMedicationUsageRecords = async () => {
   return axios.get(`${BASE_URL}/medication-usage-records/pending`, {
-    headers: getAuthHeaders()
+    headers: getAuthHeaders(),
   });
 };
 
@@ -165,7 +165,7 @@ const updateMedicationUsageRecord = async (usageRecordId, isTaken, note = "") =>
       id: usageRecordId,
       isTaken,
       takenAt: new Date().toISOString(),
-      note
+      note,
     },
     { headers: getAuthHeaders() }
   );
@@ -296,6 +296,15 @@ const getMedicalSupplyLots = async () => {
 const updateHealthEventTreatment = async (data) => {
   // data: { healthEventId, supplyUsages: [{ medicalSupplyLotId, quantityUsed, notes }] }
   return axios.put(`${BASE_URL}/HealthEvent/treatment`, data, { headers: getAuthHeaders() });
+};
+
+export const confirmHealthEventByParent = async (id, token) => {
+  // API yêu cầu method PUT và có token trong query params
+  return axios.put(`${BASE_URL}/health-events/${id}/parent-ack`, null, {
+    params: {
+      token: token,
+    },
+  });
 };
 
 // Lấy danh sách sự kiện y tế

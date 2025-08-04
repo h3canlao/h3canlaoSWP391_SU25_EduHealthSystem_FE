@@ -71,17 +71,26 @@ const TreatEventModal = ({
               <Input.TextArea rows={3} />
             </Form.Item>
           </Col>
-          <Col span={8}>
+          <Col span={12}>
             <Form.Item name="location" label="Vị trí">
               <Input />
             </Form.Item>
           </Col>
-          <Col span={8}>
+          <Col span={12}>
+            <Form.Item name="severity" label="Mức độ">
+              <Select placeholder="Chọn mức độ">
+                <Option value="Minor">Mức độ 1: Nhẹ</Option>
+                <Option value="Moderate">Mức độ 2: Trung bình</Option>
+                <Option value="Severe">Mức độ 3: Nặng</Option>
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col span={12}>
             <Form.Item name="symptoms" label="Triệu chứng">
               <Input />
             </Form.Item>
           </Col>
-          <Col span={8}>
+          <Col span={12}>
             <Form.Item name="injuredBodyPartsRaw" label="Bộ phận bị thương">
               <Input />
             </Form.Item>
