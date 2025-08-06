@@ -1,11 +1,12 @@
 // src/pages/HealthEventTabs.js
 import React, { useEffect, useState } from "react";
-import { Table, Typography, Tag, Spin, message, Input, Card, Button, Space, Tabs } from "antd"; // Thêm Tabs
+import { Table, Typography, Tag, Spin, message, Input, Card, Button, Space, Tabs, Popconfirm } from "antd"; // Thêm Tabs
 import { PlusOutlined, EyeOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { getHealthEvents } from "@/services/apiServices";
 import HealthEventForm from "./HealthEventForm"; // Giả sử bạn có component form này
 import "./HealthEvent.css";
+import axios from "axios";
 
 const { Title } = Typography;
 const { Search } = Input;
@@ -66,6 +67,16 @@ export default function HealthEventTabs() {
       )
   );
 
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`https://localhost:7096/api/HealthEvent/batch`, { data: id, params: { isPermanent: true } });
+      fetchEvents();
+
+      message.success("Xóa sự kiện thành công!");
+    } catch (er) {
+      message.error(er?.message || "Xóa thất bại");
+    }
+  };
   const columns = [
     // Các cột không đổi
     { title: "Mã sự kiện", dataIndex: "eventCode", key: "eventCode", width: 150 },
@@ -92,11 +103,15 @@ export default function HealthEventTabs() {
       align: "center",
       render: (_, record) => (
         <Space size="middle">
-          {" "}
           <Button type="primary" icon={<EyeOutlined />} onClick={() => navigate(`/nurse/health-event/${record.id}`)}>
-            {" "}
-            Xem{" "}
-          </Button>{" "}
+            Xem
+          </Button>
+
+          <Popconfirm title="Xác nhận xóa sự kiện này?" onConfirm={() => handleDelete([record.id])}>
+            <Button type="link" danger>
+              Xóa
+            </Button>
+          </Popconfirm>
         </Space>
       ),
     },

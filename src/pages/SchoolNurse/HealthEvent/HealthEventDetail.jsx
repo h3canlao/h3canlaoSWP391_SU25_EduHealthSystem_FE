@@ -194,7 +194,12 @@ const HealthEventDetail = () => {
     { title: "Tên vật tư", dataIndex: "medicalSupplyName", key: "medicalSupplyName" },
     { title: "Số lượng", dataIndex: "quantityUsed", key: "quantityUsed", align: "center" },
     { title: "Số lô", dataIndex: "lotNumber", key: "lotNumber" },
-    { title: "Ghi chú", dataIndex: "notes", key: "notes" },
+    {
+      title: "Thời gian sử dụng",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (text) => (text ? dayjs(text).format("HH:mm DD/MM/YYYY") : "N/A"),
+    },
   ];
 
   const canTreat = data.eventStatus === "Pending";
