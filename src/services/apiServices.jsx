@@ -241,7 +241,10 @@ export const getMedicationUsageRecordsByStudentId = async (studentId) => {
 
 // Lấy thông tin uống thuốc theo ngày
 export const getMedicationUsageRecordsByDate = async (date) => {
-  return axios.get(`${BASE_URL}/medication-usage-records/date/${date}`, { headers: getAuthHeaders() });
+  return axios.get(`${BASE_URL}/medication-usage-records/Parent/getByDay`, { 
+    params: { day: date },
+    headers: getAuthHeaders() 
+  });
 };
 
 // Lấy lịch tư vấn theo studentId
