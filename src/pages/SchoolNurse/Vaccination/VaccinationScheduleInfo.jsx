@@ -156,6 +156,7 @@ export default function VaccinationScheduleInfo() {
       
         // Cập nhật check-in và tạo hồ sơ tiêm
       const currentSessionStudent = sessionStudents[0];
+      // const currentSessionStudent = sessionStudents.find(s => s.scheduleId === id);
       await updateSessionStudentCheckInTime({
         sessionStudentId: [currentSessionStudent.sessionStudentId],
           note: `Đã tiêm chủng vào lúc ${administeredDate.format("DD/MM/YYYY HH:mm")}`

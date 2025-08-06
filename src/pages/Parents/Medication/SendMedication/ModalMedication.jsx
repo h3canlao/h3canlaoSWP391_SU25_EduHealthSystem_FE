@@ -53,7 +53,7 @@ const ModalMedication = ({ show, setShow, onClose, students = [] }) => {
   // Thao tác với lịch uống thuốc
   const addSchedule = (medIndex) => {
     const newMeds = [...medications];
-    newMeds[medIndex].dailySchedule.push({ time: "08:00:00", dosage: 1, note: "" });
+    newMeds[medIndex].dailySchedule.push({ time: "02:00:00", dosage: 1, note: "" });
     setMedications(newMeds);
   };
   
