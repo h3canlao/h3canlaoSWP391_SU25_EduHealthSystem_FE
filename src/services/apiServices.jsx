@@ -239,6 +239,11 @@ export const getMedicationUsageRecordsByStudentId = async (studentId) => {
   return axios.get(`${BASE_URL}/medication-usage-records/student/${studentId}`, { headers: getAuthHeaders() });
 };
 
+// Lấy thông tin uống thuốc theo ngày
+export const getMedicationUsageRecordsByDate = async (date) => {
+  return axios.get(`${BASE_URL}/medication-usage-records/date/${date}`, { headers: getAuthHeaders() });
+};
+
 // Lấy lịch tư vấn theo studentId
 export const getCounselingAppointmentsByStudentId = async (studentId) => {
   return axios.get(`${BASE_URL}/counseling-appointments/id/${studentId}`, { headers: getAuthHeaders() });
@@ -439,4 +444,4 @@ export {
   updateHealthEventTreatment,
   getHealthEvents,
   getHealthEventsMyChild,
-};
+}

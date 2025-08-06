@@ -1,63 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Typography, Spin, Empty, Avatar, Tag, Divider } from 'antd';
-import { UserOutlined, MedicineBoxOutlined, CheckCircleOutlined, CloseCircleOutlined, CalendarOutlined, ClockCircleOutlined } from '@ant-design/icons';
-import { getMedicationUsageRecordsByStudentId, getStudentsByParentId } from '../../../../services/apiServices';
-import { getUserInfo } from '../../../../services/handleStorageApi';
+import { Card, Typography, Spin, Empty, Avatar, Tag, Divider, DatePicker, Button, Collapse } from 'antd';
+import { CheckCircleOutlined, CloseCircleOutlined, DownOutlined, MedicineBoxOutlined } from '@ant-design/icons';
+import { getMedicationUsageRecordsByDate } from '../../../../services/apiServices';
 import './TodayMedication.css';
+import dayjs from 'dayjs';
 
 const { Title, Text } = Typography;
+const { Panel } = Collapse;
 
 const TodayMedication = () => {
-  const [loading, setLoading] = useState(true);
-  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [medicationRecords, setMedicationRecords] = useState([]);
-
-  // Get parent ID from token
-  const parentId = getUserInfo()?.accessToken 
-    ? JSON.parse(atob(getUserInfo().accessToken.split('.')[1]))?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] 
-    : null;
+  const [selectedDate, setSelectedDate] = useState(dayjs());
 
   // Load data
-  useEffect(() => {
-    if (!parentId) {
-      setLoading(false);
-      return;
-    }
-
-    // Get student list for parent
-    getStudentsByParentId(parentId)
+  const fetchMedicationRecords = () => {
+    setLoading(true);
+    // Format date as YYYY-MM-DD
+    const formattedDate = selectedDate.format('YYYY-MM-DD');
+    
+    getMedicationUsageRecordsByDate(formattedDate)
       .then(res => {
-        const studentsList = res.data?.data || [];
-        setStudents(studentsList);
-
-        // If students exist, get medication records for each
-        if (studentsList.length > 0) {
-          return Promise.all(
-            studentsList.map(student => 
-              getMedicationUsageRecordsByStudentId(student.id)
-                .then(response => {
-                  // Add student info to each record
-                  const records = response.data?.data || [];
-                  return records.map(record => ({
-                    ...record,
-                    studentName: student.firstName && student.lastName 
-                      ? `${student.firstName} ${student.lastName}`
-                      : student.fullName || 'Unknown',
-                    studentCode: student.studentCode,
-                    grade: student.grade,
-                    section: student.section
-                  }));
-                })
-                .catch(() => [])
-            )
-          );
-        }
-        return [];
-      })
-      .then(results => {
-        // Combine all records into one array
-        const allRecords = results ? results.flat() : [];
-        setMedicationRecords(allRecords);
+        const records = res.data?.data || [];
+        setMedicationRecords(records);
       })
       .catch(error => {
         console.error("Error loading data:", error);
@@ -65,13 +30,23 @@ const TodayMedication = () => {
       .finally(() => {
         setLoading(false);
       });
-  }, [parentId]);
+  };
+
+  // Load initial data when component mounts
+  useEffect(() => {
+    fetchMedicationRecords();
+  }, []);
+
+  // Handle date change
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+  };
 
   // Format date and time
   const formatDate = (dateString) => {
     if (!dateString) return '-';
     try {
-      return new Date(dateString).toLocaleDateString('en-US');
+      return new Date(dateString).toLocaleDateString('vi-VN');
     } catch {
       return dateString;
     }
@@ -80,7 +55,7 @@ const TodayMedication = () => {
   const formatTime = (dateString) => {
     if (!dateString) return '-';
     try {
-      return new Date(dateString).toLocaleTimeString('en-US', {
+      return new Date(dateString).toLocaleTimeString('vi-VN', {
         hour: '2-digit',
         minute: '2-digit'
       });
@@ -93,8 +68,21 @@ const TodayMedication = () => {
     <div className="medication-container">
       <div className="medication-header">
         <Title level={2} style={{ margin: 0 }}>
-          <MedicineBoxOutlined /> Medication History
+          <MedicineBoxOutlined /> Lịch Sử Dùng Thuốc
         </Title>
+      </div>
+
+      <div className="date-selector">
+        <DatePicker 
+          value={selectedDate} 
+          onChange={handleDateChange} 
+          format="YYYY-MM-DD" 
+          style={{ marginRight: 16 }}
+          placeholder="Chọn ngày"
+        />
+        <Button type="primary" onClick={fetchMedicationRecords}>
+          Tìm Kiếm
+        </Button>
       </div>
 
       <div className="medication-content">
@@ -103,7 +91,7 @@ const TodayMedication = () => {
             <Spin size="large" />
           </div>
         ) : medicationRecords.length === 0 ? (
-          <Empty description="Không có lịch sử thuốc đã dùng" />
+          <Empty description="Không tìm thấy lịch sử dùng thuốc cho ngày này" />
         ) : (
           <div className="medication-list">
             {medicationRecords.map(record => (
@@ -115,27 +103,25 @@ const TodayMedication = () => {
                 <div className="medication-card-header">
                   <div className="student-info">
                     <Avatar 
-                      icon={<UserOutlined />} 
+                      src="https://images.icon-icons.com/3310/PNG/512/student_man_avatar_user_toga_school_university_icon_209264.png"
                       style={{ marginRight: 12 }} 
                       size="large" 
                     />
                     <div>
-                      <Text strong className="student-name">{record.studentName}</Text>
-                      <div className="student-details">
-                        <Text type="secondary">Student ID: {record.studentCode}</Text>
-                        <Text type="secondary"> | Class: {record.grade}{record.section}</Text>
-                      </div>
+                      <Text strong className="student-name">
+                        {record.studentName} - {record.medicationName}
+                      </Text>
                     </div>
                   </div>
 
                   <div>
                     {record.isTaken ? (
                       <Tag color="success" icon={<CheckCircleOutlined />} className="status-tag">
-                        Medication Taken
+                        Đã Dùng Thuốc
                       </Tag>
                     ) : (
                       <Tag color="error" icon={<CloseCircleOutlined />} className="status-tag">
-                        Not Taken
+                        Chưa Dùng
                       </Tag>
                     )}
                   </div>
@@ -143,29 +129,41 @@ const TodayMedication = () => {
 
                 <Divider style={{ margin: '12px 0' }} />
 
-                <div className="medication-details">
-                  <div className="detail-row">
-                    <div className="detail-item">
-                      <MedicineBoxOutlined className="detail-icon" />
-                      <Text strong>Medication Name:</Text>
-                      <Text>{record.medicationName}</Text>
-                    </div>
-                  </div>
+                <Collapse 
+                  ghost
+                  expandIcon={({ isActive }) => <DownOutlined rotate={isActive ? 180 : 0} />}
+                >
+                  <Panel header="Xem Chi Tiết" key="1">
+                    <div className="medication-details">
+                      <div className="detail-section">
+                        <Text strong className="detail-label">Hướng Dẫn Liều Dùng:</Text>
+                        <Text className="detail-value">{record.dosageInstruction || 'Không có hướng dẫn'}</Text>
+                      </div>
 
-                  <div className="detail-row">
-                    <div className="detail-item">
-                      <CalendarOutlined className="detail-icon" />
-                      <Text strong>Date:</Text>
-                      <Text>{formatDate(record.usedAt)}</Text>
-                    </div>
+                      <div className="detail-section">
+                        <Text strong className="detail-label">Số Lượng:</Text>
+                        <Text className="detail-value">Đã Dùng: {record.quantityUsed} / Tổng: {record.totalQuantity} / Còn Lại: {record.quantityRemaining}</Text>
+                      </div>
 
-                    <div className="detail-item">
-                      <ClockCircleOutlined className="detail-icon" />
-                      <Text strong>Time:</Text>
-                      <Text>{formatTime(record.usedAt)}</Text>
+                      <div className="detail-section">
+                        <Text strong className="detail-label">Ngày:</Text>
+                        <Text className="detail-value">{formatDate(record.usedAt)}</Text>
+                      </div>
+
+                      <div className="detail-section">
+                        <Text strong className="detail-label">Giờ:</Text>
+                        <Text className="detail-value">{formatTime(record.usedAt)}</Text>
+                      </div>
+
+                      {record.note && (
+                        <div className="detail-section">
+                          <Text strong className="detail-label">Ghi Chú:</Text>
+                          <Text className="detail-value">{record.note}</Text>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                </div>
+                  </Panel>
+                </Collapse>
               </Card>
             ))}
           </div>

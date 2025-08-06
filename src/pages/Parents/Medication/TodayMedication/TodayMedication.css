@@ -8,11 +8,21 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
   background-color: #fff;
   padding: 16px 24px;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.date-selector {
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  padding: 16px 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 16px;
 }
 
 .medication-content {
@@ -56,10 +66,6 @@
   display: block;
 }
 
-.student-details {
-  font-size: 13px;
-}
-
 .status-tag {
   padding: 4px 8px;
   font-size: 14px;
@@ -70,22 +76,22 @@
   padding: 8px 0;
 }
 
-.detail-row {
+.detail-section {
   display: flex;
-  flex-wrap: wrap;
-  margin-bottom: 12px;
+  flex-direction: column;
+  margin-bottom: 16px;
+  padding: 8px 12px;
+  background-color: #f9f9f9;
+  border-radius: 6px;
 }
 
-.detail-item {
-  display: flex;
-  align-items: center;
-  margin-right: 24px;
-  margin-bottom: 8px;
+.detail-label {
+  margin-bottom: 4px;
+  color: #666;
 }
 
-.detail-icon {
-  margin-right: 8px;
-  color: #1890ff;
+.detail-value {
+  font-size: 15px;
 }
 
 .medication-list {
@@ -100,8 +106,23 @@
   }
   
   .medication-header, 
-  .medication-content {
+  .medication-content,
+  .date-selector {
     padding: 12px;
+  }
+  
+  .date-selector {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .date-selector .ant-picker {
+    margin-bottom: 12px;
+    width: 100%;
+  }
+  
+  .date-selector button {
+    width: 100%;
   }
   
   .detail-row {
